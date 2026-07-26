@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="--grad-opacity: 0.9; --bg-black: #050505; --panel-grey: #1c1c1c; --border-grey: #333333; --accent-yellow: #ffcc00;"><head>
+<html lang="en" style="--grad-opacity: 0.9; --bg-black: #000000; --panel-grey: #1f1f1f; --border-grey: #3b3b3b; --accent-yellow: #ffc600; --text-main: #ffffff; --text-dim: #999999; --input-grey: #121212;"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>Prototype 1.1</title>
@@ -7,7 +7,53 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&amp;family=Lato:wght@400;700&amp;display=swap" rel="stylesheet">
 <style>
-        .source-value {
+        .target-pill {
+			display: inline-flex;
+			align-items: center;
+			background: rgba(255, 204, 0, 0.1);
+			border: 1px solid var(--accent-yellow);
+			color: var(--accent-yellow);
+			padding: 2px 6px;
+			border-radius: 4px;
+			font-size: 0.75em;
+			margin: 2px;
+			white-space: nowrap;
+		}
+		.target-pill-remove {
+			margin-left: 6px;
+			cursor: pointer;
+			color: #e74c3c;
+			font-weight: bold;
+			padding-left: 4px;
+			border-left: 1px solid rgba(231, 76, 60, 0.4);
+		}
+		
+		.drag-handle {
+			cursor: grab;
+			padding-right: 6px;
+			color: var(--text-dim);
+			font-size: 1.1em;
+			line-height: 1;
+			user-select: none;
+			opacity: 0.4;
+			transition: opacity 0.2s, color 0.2s;
+		}
+		.comp-item:hover .drag-handle {
+			opacity: 1;
+			color: var(--accent-yellow);
+		}
+		.drag-handle:active {
+			cursor: grabbing;
+		}
+		.comp-item.dragging {
+			opacity: 0.5;
+			border: 1px dashed var(--accent-yellow);
+		}
+		.comp-item.drag-over {
+			border-top: 2px solid var(--accent-yellow);
+		}
+		
+		.source-value {
 			color: #a020f0 !important; /* Purple */
 			font-weight: bold;
 			background: rgba(160, 32, 240, 0.05) !important;
@@ -523,17 +569,17 @@
 </svg>
 <div id="top-bar">
 <div id="history-controls">
-<button class="btn-sm" id="btn-undo" onclick="undo()" title="Undo" disabled="">↰</button>
+<button class="btn-sm" id="btn-undo" onclick="undo()" title="Undo">↰</button>
 <button class="btn-sm" id="btn-redo" onclick="redo()" title="Redo" disabled="">↱</button>
 </div>
 <input id="project-title" type="text" value="Prototype 1.1">
 <div class="metric-box" title="Total aircraft mass including the wing and all components.">Total Mass: <span id="top-mass" style="color:var(--accent-yellow)">1000.00</span> <span class="unit-mass">g</span></div>
 <div class="metric-box" title="Thrust to Weight Ratio. 1.0 is a safe number to aim for.">TWR: <span id="top-twr" style="color: rgb(46, 204, 113);">1.56</span></div>
-<div class="metric-box" title="Actual center of gravity location measured from behind the wing leading edge.">CG: <span id="top-actual-cg" style="color:var(--accent-yellow)">9.01</span> <span class="unit-dim">cm</span></div>
+<div class="metric-box" title="Actual center of gravity location measured from behind the wing leading edge.">CG: <span id="top-actual-cg" style="color:var(--accent-yellow)">9.13</span> <span class="unit-dim">cm</span></div>
 <div class="metric-box" title="Recommended geometric CG based on approximately 33% of the mean aerodynamic chord.">Geo CG: <span id="top-rec-cg" style="color:#2ecc71">7.42</span> <span class="unit-dim">cm</span></div>
 <div class="metric-box" title="Wing loading. Higher values generally increase speed and stability but reduce low-speed performance. A lower wing loading means a floatier plane.">WL: <span id="top-wl" style="color:var(--accent-yellow)">37.04</span> <span id="top-wl-unit">g/dm²</span></div>
 <div class="metric-box" title="Cubic wing loading. Useful for estimating aircraft flight characteristics and handling. The higher the number the sportier the plane and the harder it is to fly.">CWL: <span id="top-cwl" style="color:var(--accent-yellow)">7.1</span> <span id="top-flight-type" style="color:var(--text-dim); font-size:0.9em; margin-left:4px;">(Sport)</span></div>
-<div class="metric-box" title="Static margin indicates pitch stability. Positive values are generally more stable.">SM: <span id="top-sm" style="color: rgb(46, 204, 113);">10.7%</span><span id="top-sm-guide" style="font-size: 0.9em; margin-left: 4px; color: rgb(46, 204, 113);">(Stable)</span></div>
+<div class="metric-box" title="Static margin indicates pitch stability. Positive values are generally more stable.">SM: <span id="top-sm" style="color: rgb(46, 204, 113);">10.1%</span><span id="top-sm-guide" style="font-size: 0.9em; margin-left: 4px; color: rgb(46, 204, 113);">(Stable)</span></div>
 <div class="metric-box" title="Horizontal tail volume coefficient. Measures horizontal stabilizer effectiveness. Greater than 0.3 is good.">Vh: <span id="top-vh" style="color: rgb(46, 204, 113);">0.428</span><span id="top-vh-guide" style="font-size: 0.9em; margin-left: 4px; color: rgb(46, 204, 113);">(Good)</span></div>
 <div class="metric-box" title="Vertical tail volume coefficient. Measures vertical stabilizer effectiveness. Greater than 0.3 is good.">Vv: <span id="top-vv" style="color: rgb(46, 204, 113);">0.031</span><span id="top-vv-guide" style="font-size: 0.9em; margin-left: 4px; color: rgb(46, 204, 113);">(Good)</span></div>
 
@@ -585,19 +631,19 @@
 		<label>Theme Editor</label>
 		<div class="color-picker-group">
 			<span style="font-size: 0.75em; color: var(--text-dim);">Background</span>
-			<input id="theme-bg" oninput="updateThemeColors()" type="color" value="#6c6c6c">
+			<input id="theme-bg" oninput="updateThemeColors()" type="color" value="#000000">
 		</div>
 		<div class="color-picker-group" style="margin-top: 4px;">
 			<span style="font-size: 0.75em; color: var(--text-dim);">Panels</span>
-			<input id="theme-panel" oninput="updateThemeColors()" type="color" value="#dfdfdf">
+			<input id="theme-panel" oninput="updateThemeColors()" type="color" value="#1f1f1f">
 		</div>
 		<div class="color-picker-group" style="margin-top: 4px;">
 			<span style="font-size: 0.75em; color: var(--text-dim);">Borders</span>
-			<input id="theme-border" oninput="updateThemeColors()" type="color" value="#cfcfcf">
+			<input id="theme-border" oninput="updateThemeColors()" type="color" value="#3b3b3b">
 		</div>
 		<div class="color-picker-group" style="margin-top: 4px;">
 			<span style="font-size: 0.75em; color: var(--text-dim);">Highlight</span>
-			<input id="theme-highlight" oninput="updateThemeColors()" type="color" value="#ffcc00">
+			<input id="theme-highlight" oninput="updateThemeColors()" type="color" value="#ffc600">
 		</div>
 		<div class="input-group" style="margin-top: 6px;">
 			<label>Gradient Strength</label>
@@ -620,133 +666,193 @@
 					<button class="btn-sm" onclick="addNewComponent()" style="padding: 2px 6px; font-size: 0.7em;">+ Add</button>
 				</div>
 			</div>
-            <div id="comp-list"><div class="comp-item selected">
+            <div id="comp-list"><div class="comp-item ">
 			<div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
 				<span style="opacity: 1;">Main Wing Panel</span>
 				<div style="display:flex; align-items:center;">
 					<span onclick="toggleVisibility('main-wing', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 8px; font-size: 1.1em; opacity: 1;">👁️</span>
 					<span style="font-size:0.8em;color:var(--accent-yellow); opacity: 1;">90.00g</span>
 				</div>
-			</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Front Fuselage + Front Gear</span>
-					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('front-fus', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">70.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('front-fus', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Rear Fuse</span>
-					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('rear-fus', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">20.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('rear-fus', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Horizontal Stab</span>
+			</div></div><div class="comp-item " draggable="true" data-id="horiz-stab">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Horizontal Stab</span>
+					</div>
 					<div style="display:flex; align-items:center; flex-shrink:0;">
 						<span onclick="toggleVisibility('horiz-stab', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
 						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">25.00g</span>
 						<span class="comp-item-copy" onclick="copyComponentById('horiz-stab', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Vertical Stab</span>
+					</div></div><div class="comp-item " draggable="true" data-id="vert-stab">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Vertical Stab</span>
+					</div>
 					<div style="display:flex; align-items:center; flex-shrink:0;">
 						<span onclick="toggleVisibility('vert-stab', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
 						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">12.00g</span>
 						<span class="comp-item-copy" onclick="copyComponentById('vert-stab', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Battery</span>
-					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('comp-1779044380002', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">150.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('comp-1779044380002', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Rudder Servo</span>
-					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('comp-1779044465220', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">9.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('comp-1779044465220', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Elevator Servo</span>
-					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('comp-1779044494428', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">9.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('comp-1779044494428', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Aileron Servos ⧓</span>
-					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('comp-1779044508866', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">36.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('comp-1779044508866', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Tilt Servos ⧓</span>
-					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('comp-1779298878926', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">36.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('comp-1779298878926', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 0.5;">Rear Landing Gear</span>
-					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('comp-1779044975978', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 0.2;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 0.5; margin-right: 4px;">68.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('comp-1779044975978', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Motors and ESCs ⧓</span>
-					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('comp-1779231114708', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">200.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('comp-1779231114708', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Tail Motor and ESC</span>
-					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('comp-1784062659261', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">50.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('comp-1784062659261', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Spar</span>
-					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('comp-1779241854755', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">50.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('comp-1779241854755', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Spar Rear</span>
-					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('comp-1779242396440', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">10.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('comp-1779242396440', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Motor Mounts ⧓</span>
-					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('comp-1779299043963', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">160.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('comp-1779299043963', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">GPS</span>
-					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('comp-1779313212955', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">66.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('comp-1779313212955', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 0.5;">Electronics (FC, wires, Connectors)</span>
-					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('comp-1779313389645', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 0.2;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 0.5; margin-right: 4px;">70.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('comp-1779313389645', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Tail Clamp</span>
+					</div></div><div class="comp-item " draggable="true" data-id="comp-1779313505716">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Tail Clamp</span>
+					</div>
 					<div style="display:flex; align-items:center; flex-shrink:0;">
 						<span onclick="toggleVisibility('comp-1779313505716', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
 						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">15.00g</span>
 						<span class="comp-item-copy" onclick="copyComponentById('comp-1779313505716', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Exta Weight Post Assembly</span>
+					</div></div><div class="comp-item " draggable="true" data-id="comp-1779044494428">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Elevator Servo</span>
+					</div>
 					<div style="display:flex; align-items:center; flex-shrink:0;">
-						<span onclick="toggleVisibility('comp-1783459208570', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">40.00g</span>
-						<span class="comp-item-copy" onclick="copyComponentById('comp-1783459208570', event)" title="Duplicate Component">📋</span>
-					</div></div><div class="comp-item ">
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: 1;">Payload Mechanism</span>
+						<span onclick="toggleVisibility('comp-1779044494428', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">12.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('comp-1779044494428', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item " draggable="true" data-id="comp-1779044465220">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Rudder Servo</span>
+					</div>
+					<div style="display:flex; align-items:center; flex-shrink:0;">
+						<span onclick="toggleVisibility('comp-1779044465220', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">12.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('comp-1779044465220', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item " draggable="true" data-id="comp-1779044508866">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Aileron Servos ⧓</span>
+					</div>
+					<div style="display:flex; align-items:center; flex-shrink:0;">
+						<span onclick="toggleVisibility('comp-1779044508866', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">48.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('comp-1779044508866', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item " draggable="true" data-id="comp-1779298878926">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Tilt Servos ⧓</span>
+					</div>
+					<div style="display:flex; align-items:center; flex-shrink:0;">
+						<span onclick="toggleVisibility('comp-1779298878926', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">48.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('comp-1779298878926', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item " draggable="true" data-id="front-fus">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Front Fuselage + Front Gear</span>
+					</div>
+					<div style="display:flex; align-items:center; flex-shrink:0;">
+						<span onclick="toggleVisibility('front-fus', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">70.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('front-fus', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item " draggable="true" data-id="rear-fus">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Rear Fuse</span>
+					</div>
+					<div style="display:flex; align-items:center; flex-shrink:0;">
+						<span onclick="toggleVisibility('rear-fus', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">20.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('rear-fus', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item " draggable="true" data-id="comp-1779231114708">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Motors and ESCs ⧓</span>
+					</div>
+					<div style="display:flex; align-items:center; flex-shrink:0;">
+						<span onclick="toggleVisibility('comp-1779231114708', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">200.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('comp-1779231114708', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item " draggable="true" data-id="comp-1779044380002">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Battery</span>
+					</div>
+					<div style="display:flex; align-items:center; flex-shrink:0;">
+						<span onclick="toggleVisibility('comp-1779044380002', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">150.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('comp-1779044380002', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item " draggable="true" data-id="comp-1784062659261">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Tail Motor and ESC</span>
+					</div>
+					<div style="display:flex; align-items:center; flex-shrink:0;">
+						<span onclick="toggleVisibility('comp-1784062659261', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">50.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('comp-1784062659261', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item " draggable="true" data-id="comp-1779299043963">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Motor Mounts ⧓</span>
+					</div>
+					<div style="display:flex; align-items:center; flex-shrink:0;">
+						<span onclick="toggleVisibility('comp-1779299043963', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">160.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('comp-1779299043963', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item " draggable="true" data-id="comp-1779241854755">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Spar</span>
+					</div>
+					<div style="display:flex; align-items:center; flex-shrink:0;">
+						<span onclick="toggleVisibility('comp-1779241854755', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">50.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('comp-1779241854755', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item " draggable="true" data-id="comp-1779242396440">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Spar Rear</span>
+					</div>
+					<div style="display:flex; align-items:center; flex-shrink:0;">
+						<span onclick="toggleVisibility('comp-1779242396440', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">10.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('comp-1779242396440', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item " draggable="true" data-id="comp-1779313212955">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">GPS</span>
+					</div>
+					<div style="display:flex; align-items:center; flex-shrink:0;">
+						<span onclick="toggleVisibility('comp-1779313212955', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">66.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('comp-1779313212955', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item " draggable="true" data-id="comp-1779313389645">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 0.5;">Electronics (FC, wires, Connectors)</span>
+					</div>
+					<div style="display:flex; align-items:center; flex-shrink:0;">
+						<span onclick="toggleVisibility('comp-1779313389645', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 0.2;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 0.5; margin-right: 4px;">70.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('comp-1779313389645', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item " draggable="true" data-id="comp-1779044975978">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 0.5;">Rear Landing Gear</span>
+					</div>
+					<div style="display:flex; align-items:center; flex-shrink:0;">
+						<span onclick="toggleVisibility('comp-1779044975978', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 0.2;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 0.5; margin-right: 4px;">60.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('comp-1779044975978', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item " draggable="true" data-id="comp-1784681822333">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Payload Mechanism</span>
+					</div>
 					<div style="display:flex; align-items:center; flex-shrink:0;">
 						<span onclick="toggleVisibility('comp-1784681822333', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
 						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">30.00g</span>
 						<span class="comp-item-copy" onclick="copyComponentById('comp-1784681822333', event)" title="Duplicate Component">📋</span>
+					</div></div><div class="comp-item selected" draggable="true" data-id="comp-1783459208570">
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Exta Weight Post Assembly</span>
+					</div>
+					<div style="display:flex; align-items:center; flex-shrink:0;">
+						<span onclick="toggleVisibility('comp-1783459208570', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
+						<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">30.00g</span>
+						<span class="comp-item-copy" onclick="copyComponentById('comp-1783459208570', event)" title="Duplicate Component">📋</span>
 					</div></div></div>
         </div>
     </div>
@@ -755,11 +861,11 @@
 
     <div id="workspace">
         <div id="view-controls">
-            <button class="view-btn" onclick="setView('top')">Top View</button>
+            <button class="view-btn active" onclick="setView('top')">Top View</button>
             <button class="view-btn" onclick="setView('side')">Side View</button>
             <button class="view-btn" onclick="setView('front')">Front View</button>
 			<button class="view-btn" onclick="setView('graph')">Graph Sweep</button>
-			<button class="view-btn active" onclick="setView('variables')">Variables</button>
+			<button class="view-btn" onclick="setView('variables')">Variables</button>
 			<div id="mass-preset-controls" style="flex: 1; overflow: hidden; display: flex !important; justify-content: flex-end; gap: 6px; align-items: center;"><span style="font-size: 0.7em; color: var(--text-dim); text-transform: uppercase; font-weight: bold; flex-shrink: 0;">Mass Set:</span><button class="view-btn active" id="btn-profile-budget" style="margin: 0px; border-color: var(--accent-yellow); color: var(--accent-yellow);" title="Budget" onclick="handleProfileClick('budget')">Budget</button><button class="view-btn" id="btn-profile-measured" style="margin: 0px; border-color: var(--border-grey); color: var(--text-dim);" title="Measured" onclick="handleProfileClick('measured')">Measured</button><button class="view-btn" id="btn-profile-predicted" style="margin: 0px; border-color: var(--border-grey); color: var(--text-dim);" title="Predicted" onclick="handleProfileClick('predicted')">Predicted</button>
 				<button class="view-btn" onclick="addMassProfile()" title="Add Custom Profile" style="margin:0; padding: 4px 8px; font-weight: bold; color: #2ecc71; flex-shrink: 0;">+</button>
 				<button class="view-btn" onclick="deleteMassProfile()" title="Delete Active Profile" style="margin:0; padding: 4px 8px; font-weight: bold; color: #e74c3c; flex-shrink: 0;">-</button>
@@ -794,12 +900,12 @@
 						<div id="pg-y-axes" style="display: flex; flex-direction: column; gap: 10px;"><div style="background: linear-gradient(145deg, rgba(255,255,255,calc(var(--grad-opacity) * 0.13)) 0%, rgba(0,0,0,var(--grad-opacity)) 100%), var(--panel-grey); border: 1px solid rgb(52, 152, 219); padding: 8px; border-radius: 6px; backdrop-filter: blur(4px);">
 					<div style="display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center;">
 						<span style="color: #3498db; font-size: 0.7em; font-weight: bold; text-transform: uppercase;">Y1</span>
-						<button id="pg-btn-y-1784940460956" class="btn-sm" onclick="startEyedropper('y-1784940460956')" style="width: 100%; border-color: #3498db; color: #3498db; background: rgba(0,0,0,0.5); font-size: 0.7em; padding: 2px 4px;">
+						<button id="pg-btn-y-1785091725311" class="btn-sm" onclick="startEyedropper('y-1785091725311')" style="width: 100%; border-color: #3498db; color: #3498db; background: rgba(0,0,0,0.5); font-size: 0.7em; padding: 2px 4px;">
 							SELECT VARIABLE
 						</button>
 						<div style="display: flex; gap: 6px; align-items: center;">
-							<span style="cursor: pointer; opacity: 1; filter: grayscale(0);" onclick="toggleYAxisVisibility(1784940460956)">👁️</span>
-							<span style="cursor: pointer; color: #e74c3c; font-size: 1em;" onclick="removeYAxisBox(1784940460956)">✖</span>
+							<span style="cursor: pointer; opacity: 1; filter: grayscale(0);" onclick="toggleYAxisVisibility(1785091725311)">👁️</span>
+							<span style="cursor: pointer; color: #e74c3c; font-size: 1em;" onclick="removeYAxisBox(1785091725311)">✖</span>
 						</div>
 					</div>
 				</div></div>
@@ -815,10 +921,10 @@
                     </pattern>
                 </defs>
                 <rect fill="url(#gridPattern)" height="10000%" id="bg-grid-fill" pointer-events="none" width="10000%" x="-5000%" y="-5000%"></rect>
-                <g id="wing-layer"><path d="M -60 -1.460495694578562 L 0 -1.4604956945785643 L 60 -1.460495694578562 L 60 2.638054710044796 L 0 2.6380547100448 L -60 2.638054710044796 Z" fill="#1b1b1b" stroke="#888" class="interactive-shape active-part"></path></g>
-                <g id="components-layer"><polygon points="-4,-3.951484203338623 4,-3.951484203338623 4,6.048515796661377 -4,6.048515796661377" fill="#6b6b6b" fill-opacity="0.4" stroke="#6b6b6b" class="interactive-shape "></polygon><polygon points="-2.05,-4.088122940063477 2.05,-4.088122940063477 2.05,-2.6881229400634767 -2.05,-2.6881229400634767" fill="#95a5a6" fill-opacity="0.4" stroke="#95a5a6" class="interactive-shape "></polygon><text x="0" y="-3.388122940063477" class="part-label" style="font-size: 1.9307262899000506px;">Rear Fuse</text><polygon points="-19,-4.237686328773833 19,-4.237686328773833 19,-2.762313671226167 -19,-2.762313671226167" fill="#7f8c8d" fill-opacity="0.4" stroke="#7f8c8d" class="interactive-shape "></polygon><polygon points="-0.3,-20.088122940063478 0.3,-20.088122940063478 0.3,-4.088122940063476 -0.3,-4.088122940063476" fill="#ffffff" fill-opacity="0.4" stroke="#ffffff" class="interactive-shape "></polygon><polygon points="-2,-1 2,-1 2,3 -2,3" fill="#ff0000" fill-opacity="0.4" stroke="#ff0000" class="interactive-shape "></polygon><text x="0" y="1" class="part-label" style="font-size: 1.9307262899000506px;">Battery</text><polygon points="-4,-2.25 -3,-2.25 -3,-0.25 -4,-0.25" fill="#0000ff" fill-opacity="0.4" stroke="#0000ff" class="interactive-shape "></polygon><text x="-3.5" y="-1.25" class="part-label" style="font-size: 1.9307262899000506px;">Rudder Servo</text><polygon points="3,-2.25 4,-2.25 4,-0.25 3,-0.25" fill="#0000ff" fill-opacity="0.4" stroke="#0000ff" class="interactive-shape "></polygon><text x="3.5" y="-1.25" class="part-label" style="font-size: 1.9307262899000506px;">Elevator Servo</text><polygon points="-31,-2.6881229400634767 -30,-2.6881229400634767 -30,-0.6881229400634765 -31,-0.6881229400634765" fill="#0517fa" fill-opacity="0.4" stroke="#0517fa" class="interactive-shape "></polygon><polygon points="30,-2.6881229400634767 31,-2.6881229400634767 31,-0.6881229400634765 30,-0.6881229400634765" fill="#0517fa" fill-opacity="0.2" stroke="#0517fa" stroke-dasharray="2,2" class="interactive-shape "></polygon><polygon points="-23.5,-0.25 -22.5,-0.25 -22.5,1.75 -23.5,1.75" fill="#f1c40f" fill-opacity="0.4" stroke="#f1c40f" class="interactive-shape "></polygon><polygon points="22.5,-0.25 23.5,-0.25 23.5,1.75 22.5,1.75" fill="#f1c40f" fill-opacity="0.2" stroke="#f1c40f" stroke-dasharray="2,2" class="interactive-shape "></polygon><polygon points="-26.5,-1.5629448890686035 -23.5,-1.5629448890686035 -23.5,1.4370551109313965 -26.5,1.4370551109313965" fill="#e817be" fill-opacity="0.4" stroke="#e817be" class="interactive-shape "></polygon><polygon points="23.5,-1.5629448890686035 26.5,-1.5629448890686035 26.5,1.4370551109313965 23.5,1.4370551109313965" fill="#e817be" fill-opacity="0.2" stroke="#e817be" stroke-dasharray="2,2" class="interactive-shape "></polygon><polygon points="-1.5,-1.0629448890686035 1.5,-1.0629448890686035 1.5,0.9370551109313965 -1.5,0.9370551109313965" fill="#e817be" fill-opacity="0.4" stroke="#e817be" class="interactive-shape "></polygon><text x="0" y="-0.06294488906860352" class="part-label" style="font-size: 1.9307262899000506px;">Tail Motor and ESC</text><polygon points="-60,-1.3 60,-1.3 60,-0.30000000000000004 -60,-0.30000000000000004" fill="#dfdfdf" fill-opacity="0.4" stroke="#dfdfdf" class="interactive-shape "></polygon><polygon points="-30,-0.85 30,-0.85 30,-0.15000000000000002 -30,-0.15000000000000002" fill="#dfdfdf" fill-opacity="0.4" stroke="#dfdfdf" class="interactive-shape "></polygon><polygon points="-26.5,-0.550355863571167 -23.5,-0.550355863571167 -23.5,1.449644136428833 -26.5,1.449644136428833" fill="#00ff00" fill-opacity="0.4" stroke="#00ff00" class="interactive-shape "></polygon><text x="-25" y="0.44964413642883305" class="part-label" style="font-size: 1.9307262899000506px;">Motor Mounts</text><polygon points="23.5,-0.550355863571167 26.5,-0.550355863571167 26.5,1.449644136428833 23.5,1.449644136428833" fill="#00ff00" fill-opacity="0.2" stroke="#00ff00" stroke-dasharray="2,2" class="interactive-shape "></polygon><text x="25" y="0.44964413642883305" class="part-label" style="font-size: 1.9307262899000506px;">Motor Mounts</text><polygon points="-3,-5 3,-5 3,-3 -3,-3" fill="#000000" fill-opacity="0.4" stroke="#000000" class="interactive-shape "></polygon><text x="0" y="-4" class="part-label" style="font-size: 1.9307262899000506px;">GPS</text><polygon points="-1.95,-5 1.95,-5 1.95,-2 -1.95,-2" fill="#00ff00" fill-opacity="0.4" stroke="#00ff00" class="interactive-shape "></polygon><polygon points="-2.5,-2.5 2.5,-2.5 2.5,2.5 -2.5,2.5" fill="#f1c40f" fill-opacity="0.4" stroke="#f1c40f" class="interactive-shape "></polygon><polygon points="-5,-5 5,-5 5,5 -5,5" fill="#f1c40f" fill-opacity="0.4" stroke="#f1c40f" class="interactive-shape "></polygon></g>
-                <g id="mac-layer" pointer-events="none"></g>
-                <g id="cg-layer" pointer-events="none"></g>
+                <g id="wing-layer"><path d="M 0 0 L 0 -60 L 22.499999999999954 -60 L 22.5 0 Z M 0 0 L 0 60 L 22.499999999999954 60 L 22.5 0 Z" fill="#1b1b1b" stroke="#888" stroke-width="1" class="interactive-shape " transform="translate(0, 0) scale(0.9986295347545738, 1) translate(0, 0)"></path></g>
+                <g id="components-layer"><polygon points="51.041419322958085,-19 65.04219426346768,-19 65.04219426346768,19 51.041419322958085,19" fill="#7f8c8d" fill-opacity="0.4" stroke="#7f8c8d" class="interactive-shape "></polygon><polygon points="51.041806793212885,-0.3 64.04180679321288,-0.3 64.04180679321288,0.3 51.041806793212885,0.3" fill="#ffffff" fill-opacity="0.4" stroke="#ffffff" class="interactive-shape "></polygon><polygon points="51.041806793212885,-1.95 61.041806793212885,-1.95 61.041806793212885,1.95 51.041806793212885,1.95" fill="#00ff00" fill-opacity="0.4" stroke="#00ff00" class="interactive-shape "></polygon><polygon points="55.838481426239014,3 57.838481426239014,3 57.838481426239014,4 55.838481426239014,4" fill="#0000ff" fill-opacity="0.4" stroke="#0000ff" class="interactive-shape "></polygon><text x="56.838481426239014" y="3.5" class="part-label" style="font-size: 1.7065542898074404px;">Elevator Servo</text><polygon points="55.838481426239014,-4 57.838481426239014,-4 57.838481426239014,-3 55.838481426239014,-3" fill="#0000ff" fill-opacity="0.4" stroke="#0000ff" class="interactive-shape "></polygon><text x="56.838481426239014" y="-3.5" class="part-label" style="font-size: 1.7065542898074404px;">Rudder Servo</text><polygon points="11.642518043518066,-31 13.642518043518066,-31 13.642518043518066,-30 11.642518043518066,-30" fill="#0517fa" fill-opacity="0.4" stroke="#0517fa" class="interactive-shape "></polygon><polygon points="11.642518043518066,30 13.642518043518066,30 13.642518043518066,31 11.642518043518066,31" fill="#0517fa" fill-opacity="0.2" stroke="#0517fa" stroke-dasharray="2,2" class="interactive-shape "></polygon><polygon points="-9,-23.5 -7,-23.5 -7,-22.5 -9,-22.5" fill="#f1c40f" fill-opacity="0.4" stroke="#f1c40f" class="interactive-shape "></polygon><polygon points="-9,22.5 -7,22.5 -7,23.5 -9,23.5" fill="#f1c40f" fill-opacity="0.2" stroke="#f1c40f" stroke-dasharray="2,2" class="interactive-shape "></polygon><polygon points="-15.5,-4 16.5,-4 16.5,4 -15.5,4" fill="#6b6b6b" fill-opacity="0.4" stroke="#6b6b6b" class="interactive-shape "></polygon><polygon points="16.5,-2.05 57.5,-2.05 57.5,2.05 16.5,2.05" fill="#95a5a6" fill-opacity="0.4" stroke="#95a5a6" class="interactive-shape "></polygon><text x="37" y="0" class="part-label" style="font-size: 1.7065542898074404px;">Rear Fuse</text><polygon points="-9,-26.5 -7,-26.5 -7,-23.5 -9,-23.5" fill="#e817be" fill-opacity="0.4" stroke="#e817be" class="interactive-shape "></polygon><polygon points="-9,23.5 -7,23.5 -7,26.5 -9,26.5" fill="#e817be" fill-opacity="0.2" stroke="#e817be" stroke-dasharray="2,2" class="interactive-shape "></polygon><polygon points="-11.427639770507813,-2 -3.427639770507813,-2 -3.427639770507813,2 -11.427639770507813,2" fill="#ff0000" fill-opacity="0.4" stroke="#ff0000" class="interactive-shape "></polygon><text x="-7.427639770507813" y="0" class="part-label" style="font-size: 1.7065542898074404px;">Battery</text><polygon points="36.56433868408203,-1.5 39.56433868408203,-1.5 39.56433868408203,1.5 36.56433868408203,1.5" fill="#e817be" fill-opacity="0.4" stroke="#e817be" class="interactive-shape "></polygon><text x="38.06433868408203" y="0" class="part-label" style="font-size: 1.7065542898074404px;">Tail Motor and ESC</text><polygon points="-7,-26.5 13.5,-26.5 13.5,-23.5 -7,-23.5" fill="#00ff00" fill-opacity="0.4" stroke="#00ff00" class="interactive-shape "></polygon><text x="3.25" y="-25" class="part-label" style="font-size: 1.7065542898074404px;">Motor Mounts</text><polygon points="-7,23.5 13.5,23.5 13.5,26.5 -7,26.5" fill="#00ff00" fill-opacity="0.2" stroke="#00ff00" stroke-dasharray="2,2" class="interactive-shape "></polygon><text x="3.25" y="25" class="part-label" style="font-size: 1.7065542898074404px;">Motor Mounts</text><polygon points="6,-60 7,-60 7,60 6,60" fill="#dfdfdf" fill-opacity="0.4" stroke="#dfdfdf" class="interactive-shape "></polygon><polygon points="12.8,-30 13.5,-30 13.5,30 12.8,30" fill="#dfdfdf" fill-opacity="0.4" stroke="#dfdfdf" class="interactive-shape "></polygon><polygon points="-1.0210990905761719,-3 4.978900909423828,-3 4.978900909423828,3 -1.0210990905761719,3" fill="#000000" fill-opacity="0.4" stroke="#000000" class="interactive-shape "></polygon><text x="1.9789009094238281" y="0" class="part-label" style="font-size: 1.7065542898074404px;">GPS</text><polygon points="0,-5 10,-5 10,5 0,5" fill="#f1c40f" fill-opacity="0.4" stroke="#f1c40f" class="interactive-shape "></polygon><polygon points="10.04,-2.5 15.04,-2.5 15.04,2.5 10.04,2.5" fill="#f1c40f" fill-opacity="0.4" stroke="#f1c40f" class="interactive-shape active-part"></polygon><line stroke="#e73ce1" stroke-width="2" stroke-dasharray="6,4" x1="70.213708" y1="0" x2="-86.213708" y2="0"></line></g>
+                <g id="mac-layer" pointer-events="none"><line x1="0" y1="-29.999999999999993" x2="22.499999999999975" y2="-29.999999999999993" stroke="#2ecc71" stroke-width="1"></line><line x1="0" y1="29.999999999999993" x2="22.499999999999975" y2="29.999999999999993" stroke="#2ecc71" stroke-width="1"></line><line x1="7.424999999999992" y1="-29.999999999999993" x2="7.424999999999992" y2="29.999999999999993" stroke="#2ecc71" stroke-width="0.5" stroke-dasharray="2,2"></line></g>
+                <g id="cg-layer" pointer-events="none"><g><circle cx="7.424999999999992" cy="0" r="0.8529121421520237" fill="#000" stroke="#fff" stroke-width="0.14215202369200394"></circle><path d="M 7.424999999999992 0 L 7.424999999999992 -0.8529121421520237 A 0.8529121421520237 0.8529121421520237 0 0 1 8.277912142152015 0 Z" fill="#2ecc71"></path><path d="M 7.424999999999992 0 L 7.424999999999992 0.8529121421520237 A 0.8529121421520237 0.8529121421520237 0 0 1 6.5720878578479685 0 Z" fill="#2ecc71"></path><line x1="6.287783810463961" y1="0" x2="8.562216189536024" y2="0" stroke="#fff" stroke-width="0.14215202369200394"></line><line x1="7.424999999999992" y1="-1.1372161895360315" x2="7.424999999999992" y2="1.1372161895360315" stroke="#fff" stroke-width="0.14215202369200394"></line></g><g><circle cx="9.127679415130613" cy="0" r="0.8529121421520237" fill="#000" stroke="#fff" stroke-width="0.14215202369200394"></circle><path d="M 9.127679415130613 0 L 9.127679415130613 -0.8529121421520237 A 0.8529121421520237 0.8529121421520237 0 0 1 9.980591557282636 0 Z" fill="#f1c40f"></path><path d="M 9.127679415130613 0 L 9.127679415130613 0.8529121421520237 A 0.8529121421520237 0.8529121421520237 0 0 1 8.27476727297859 0 Z" fill="#f1c40f"></path><line x1="7.990463225594582" y1="0" x2="10.264895604666645" y2="0" stroke="#fff" stroke-width="0.14215202369200394"></line><line x1="9.127679415130613" y1="-1.1372161895360315" x2="9.127679415130613" y2="1.1372161895360315" stroke="#fff" stroke-width="0.14215202369200394"></line></g></g>
             </svg>
             <div id="legend" style="display: flex;">
                 <div class="legend-item"><div class="legend-color" style="background: #2ecc71; height: 2px;"></div> MAC Projection</div>
@@ -832,7 +938,7 @@
                     <button class="btn-sm" onclick="toggleGraphView()">Close Graph</button>
                 </div>
                 <div style="flex: 1; position: relative; width: 100%; height: 100%;">
-					<div id="graph-interactive-legend" style="position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, rgba(255,255,255,calc(var(--grad-opacity) * 0.13)) 0%, rgba(0,0,0,var(--grad-opacity)) 100%), var(--panel-grey); border: 1px solid var(--border-grey); border-radius: 6px; padding: 8px 16px; z-index: 30; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 16px; width: max-content; max-width: 90%; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+					<div id="graph-interactive-legend" style="position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); background: linear-gradient(180deg, rgba(255,255,255,calc(var(--grad-opacity) * 0.13)) 0%, rgba(0,0,0,var(--grad-opacity)) 100%), var(--panel-grey); border: 1px solid var(--border-grey); border-radius: 6px; padding: 8px 16px; z-index: 30; display: none; flex-flow: wrap; justify-content: center; gap: 16px; width: max-content; max-width: 90%; box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 15px;">
 						<div class="legend-row" id="leg-cl-main" style="display: flex; align-items: center; gap: 6px;">
 							<input type="checkbox" checked="checked" onchange="toggleGraphLine('cl-curve-main', this.checked)" style="margin: 0;">
 							<span style="color: #2ecc71; font-size: 0.8em; font-weight: bold; white-space: nowrap;">Blended Lift (CL)</span>
@@ -865,14 +971,14 @@
 						</div>
 					</div>
                     <svg id="cl-graph-main" style="width: 100%; height: 100%; overflow: visible; display: block;">
-                        <g id="graph-grid-layer"><line x1="40" y1="0" x2="40" y2="300" stroke="#222" stroke-width="1"></line><line x1="40" y1="225" x2="40" y2="235" stroke="#777" stroke-width="1"></line><text x="40" y="250" fill="var(--text-dim)" font-size="12" text-anchor="middle" font-family="sans-serif">-5°</text><line x1="144" y1="0" x2="144" y2="300" stroke="#222" stroke-width="1"></line><line x1="144" y1="225" x2="144" y2="235" stroke="#777" stroke-width="1"></line><text x="144" y="250" fill="var(--text-dim)" font-size="12" text-anchor="middle" font-family="sans-serif">0°</text><line x1="248" y1="0" x2="248" y2="300" stroke="#222" stroke-width="1"></line><line x1="248" y1="225" x2="248" y2="235" stroke="#777" stroke-width="1"></line><text x="248" y="250" fill="var(--text-dim)" font-size="12" text-anchor="middle" font-family="sans-serif">5°</text><line x1="352" y1="0" x2="352" y2="300" stroke="#222" stroke-width="1"></line><line x1="352" y1="225" x2="352" y2="235" stroke="#777" stroke-width="1"></line><text x="352" y="250" fill="var(--text-dim)" font-size="12" text-anchor="middle" font-family="sans-serif">10°</text><line x1="456" y1="0" x2="456" y2="300" stroke="#222" stroke-width="1"></line><line x1="456" y1="225" x2="456" y2="235" stroke="#777" stroke-width="1"></line><text x="456" y="250" fill="var(--text-dim)" font-size="12" text-anchor="middle" font-family="sans-serif">15°</text><line x1="560" y1="0" x2="560" y2="300" stroke="#222" stroke-width="1"></line><line x1="560" y1="225" x2="560" y2="235" stroke="#777" stroke-width="1"></line><text x="560" y="250" fill="var(--text-dim)" font-size="12" text-anchor="middle" font-family="sans-serif">20°</text><line x1="0" y1="270" x2="600" y2="270" stroke="#222" stroke-width="1"></line><line x1="139" y1="270" x2="149" y2="270" stroke="#777" stroke-width="1"></line><text x="134" y="274" fill="var(--text-dim)" font-size="12" text-anchor="end" font-family="sans-serif">-0.5</text><line x1="0" y1="190" x2="600" y2="190" stroke="#222" stroke-width="1"></line><line x1="139" y1="190" x2="149" y2="190" stroke="#777" stroke-width="1"></line><text x="134" y="194" fill="var(--text-dim)" font-size="12" text-anchor="end" font-family="sans-serif">0.5</text><line x1="0" y1="150" x2="600" y2="150" stroke="#222" stroke-width="1"></line><line x1="139" y1="150" x2="149" y2="150" stroke="#777" stroke-width="1"></line><text x="134" y="154" fill="var(--text-dim)" font-size="12" text-anchor="end" font-family="sans-serif">1.0</text><line x1="0" y1="110" x2="600" y2="110" stroke="#222" stroke-width="1"></line><line x1="139" y1="110" x2="149" y2="110" stroke="#777" stroke-width="1"></line><text x="134" y="114" fill="var(--text-dim)" font-size="12" text-anchor="end" font-family="sans-serif">1.5</text><line x1="0" y1="70" x2="600" y2="70" stroke="#222" stroke-width="1"></line><line x1="139" y1="70" x2="149" y2="70" stroke="#777" stroke-width="1"></line><text x="134" y="74" fill="var(--text-dim)" font-size="12" text-anchor="end" font-family="sans-serif">2.0</text><line x1="0" y1="30" x2="600" y2="30" stroke="#222" stroke-width="1"></line><line x1="139" y1="30" x2="149" y2="30" stroke="#777" stroke-width="1"></line><text x="134" y="34" fill="var(--text-dim)" font-size="12" text-anchor="end" font-family="sans-serif">2.5</text><line x1="144" y1="0" x2="144" y2="300" stroke="#555" stroke-width="1.5"></line><line x1="0" y1="230" x2="600" y2="230" stroke="#555" stroke-width="1.5"></line><text x="590" y="215" fill="var(--text-dim)" font-size="14" text-anchor="end" font-family="sans-serif">AoA</text><text x="511.47688923518376" y="76.19200000000001" fill="var(--accent-yellow)" font-size="12" text-anchor="end" font-family="sans-serif">Stall: 17.9°</text></g>
-                        <path id="cl-curve-main" fill="none" stroke="#2ecc71" stroke-width="2" d="M 75.01604649195257 194.952 L 89.84400580638803 190.51999999999998 L 105.02364419994832 185.736 L 119.88357433975877 181.272 L 134.95930755085035 176.59199999999998 L 149.84321580969203 172.10399999999998 L 164.81504383831492 167.52800000000002 L 179.76289374790656 162.976 L 194.56687494331078 158.56799999999998 L 209.55468838462116 153.976 L 224.2068081594942 149.72 L 239.00279664855466 145.32 L 253.7987851376151 140.92000000000002 L 268.34699973001943 136.768 L 297.0677717166721 128.84 L 311.45613218220143 124.84800000000001 L 325.8924488857933 120.80799999999999 L 340.31278017669774 116.78400000000002 L 354.37343968213355 113.11999999999998 L 368.3541721241319 109.536 L 382.1590650265678 106.12800000000001 L 395.74815485772257 102.93599999999998 L 409.2333395064087 99.84800000000001 L 422.4307867267199 97.048 L 434.80498519362527 95.07199999999997 L 446.8275045814057 93.44799999999998 L 459.32159364346717 91.35199999999998 L 471.4560109200602 89.61600000000001 L 483.47853030784074 87.99199999999999 L 495.0134946086527 86.856 L 505.94900593368374 86.32 L 516.4768892351838 86.19200000000001 L 526.2534581403713 86.816 L 535.5344792522469 87.93599999999998 L 553.5130539129045 90.75999999999999 L 562.8819947945611 91.79200000000003 L 572.6745491124365 92.40000000000003 L 582.6269575571868 92.84800000000001 L 592.6912638907493 93.184 L 602.6436723354996 93.632 L 612.9797306847496 93.696 L 622.7802777089686 94.29599999999999 L 632.9724673440312 94.50400000000002 L 642.6291456540628 95.24799999999999 L 652.9492185906253 95.32800000000003 L 662.7177947894694 95.96000000000001 L 672.7980865357196 96.28 L 683.214071948407 96.26400000000001 L 693.3503126390633 96.52799999999999 "></path>
-                        <line id="cl-stall-line-main" stroke="var(--accent-yellow)" stroke-dasharray="4" stroke-width="1.5" ...="" x1="0" x2="600" y1="86.19200000000001" y2="86.19200000000001"></line>
-						<line id="cl-stall-vert-main" stroke="var(--accent-yellow)" stroke-dasharray="4" stroke-width="1.5" ...="" x1="516.4768892351838" x2="516.4768892351838" y1="0" y2="300"></line>
-                        <circle id="cl-current-pt-main" r="5" fill="var(--accent-yellow)" cx="206.4" cy="154.94254052433374"><title>AoA: 3°
-Lift (CL): 0.938</title></circle>
-                    <path id="cd-curve-main" fill="none" stroke="#e74c3c" stroke-width="2" d="M 75.01604649195257 220.872 L 89.84400580638803 221.216 L 105.02364419994832 221.49599999999998 L 119.88357433975877 221.704 L 134.95930755085035 221.864 L 149.84321580969203 222.008 L 164.81504383831492 222.10399999999998 L 179.76289374790656 222.152 L 194.56687494331078 222.16 L 209.55468838462116 222.168 L 224.2068081594942 222.136 L 239.00279664855466 222.096 L 253.7987851376151 222.056 L 268.34699973001943 222.432 L 297.0677717166721 222.216 L 311.45613218220143 221.968 L 325.8924488857933 221.688 L 340.31278017669774 221.424 L 354.37343968213355 221.12 L 368.3541721241319 220.784 L 382.1590650265678 220.4 L 395.74815485772257 219.96 L 409.2333395064087 219.464 L 422.4307867267199 218.776 L 434.80498519362527 217.816 L 446.8275045814057 216.864 L 459.32159364346717 215.664 L 471.4560109200602 214.296 L 483.47853030784074 212.55200000000002 L 495.0134946086527 210.304 L 505.94900593368374 207.55200000000002 L 516.4768892351838 204 L 526.2534581403713 199.736 L 535.5344792522469 189.76 L 553.5130539129045 184.696 L 562.8819947945611 179.824 L 572.6745491124365 174.944 L 582.6269575571868 170.016 L 592.6912638907493 164.848 L 602.6436723354996 160.04000000000002 L 612.9797306847496 154.43200000000002 L 622.7802777089686 149.288 L 632.9724673440312 143.336 L 642.6291456540628 138.2 L 652.9492185906253 132.27200000000002 L 662.7177947894694 126.744 L 672.7980865357196 121.632 L 683.214071948407 116.10400000000001 L 693.3503126390633 NaN "></path><circle id="cd-current-pt-main" r="5" cx="206.4" cy="222.1663161314907" fill="var(--accent-yellow)"><title>AoA: 3°
-Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></path><path id="cd-curve-root" fill="none" d=""></path><path id="cl-curve-tip" fill="none" d=""></path><path id="cd-curve-tip" fill="none" d=""></path></svg>
+                        <rect width="100%" height="100%" fill="var(--bg-black)"></rect>
+                        <line x1="0" y1="0" x2="600" y2="300" stroke="#e74c3c" stroke-width="2" stroke-opacity="0.2"></line>
+                        <line x1="600" y1="0" x2="0" y2="300" stroke="#e74c3c" stroke-width="2" stroke-opacity="0.2"></line>
+                        <text x="300" y="150" fill="#e74c3c" font-size="20" text-anchor="middle" font-weight="bold" font-family="sans-serif">MISSING AIRFOIL DATA</text>
+                        <text x="300" y="175" fill="var(--text-dim)" font-size="12" text-anchor="middle" font-family="sans-serif">Dataset is corrupt or invalid for this configuration.</text>
+                    <path id="cl-curve-root" fill="none" d=""></path><path id="cd-curve-root" fill="none" d=""></path><path id="cl-curve-tip" fill="none" d=""></path><path id="cd-curve-tip" fill="none" d=""></path><path id="cl-curve-main" fill="none" stroke="#2ecc71" stroke-width="2" d="M 75.01604649195257 194.952 L 89.84400580638803 190.51999999999998 L 105.02364419994832 185.736 L 119.88357433975875 181.272 L 134.95930755085033 176.59199999999998 L 149.84321580969203 172.10399999999998 L 164.81504383831492 167.52800000000002 L 179.76289374790656 162.976 L 194.56687494331075 158.56799999999998 L 209.55468838462116 153.976 L 224.2068081594942 149.72 L 239.00279664855466 145.32 L 253.7987851376151 140.92000000000002 L 268.34699973001943 136.768 L 297.06777171667204 128.84 L 311.45613218220143 124.84800000000001 L 325.8924488857933 120.80799999999999 L 340.31278017669774 116.78400000000002 L 354.37343968213355 113.11999999999998 L 368.3541721241319 109.536 L 382.1590650265678 106.12800000000001 L 395.74815485772257 102.93599999999998 L 409.2333395064087 99.84800000000001 L 422.4307867267199 97.048 L 434.80498519362527 95.07199999999997 L 446.8275045814057 93.44799999999998 L 459.32159364346717 91.35199999999998 L 471.4560109200602 89.61600000000001 L 483.47853030784074 87.99199999999999 L 495.01349460865265 86.856 L 505.9490059336837 86.32 L 516.4768892351836 86.19200000000001 L 526.2534581403713 86.816 L 535.5344792522469 87.93599999999998 L 553.5130539129045 90.75999999999999 L 562.8819947945611 91.79200000000003 L 572.6745491124365 92.40000000000003 L 582.6269575571868 92.84800000000001 L 592.6912638907493 93.184 L 602.6436723354996 93.632 L 612.9797306847496 93.696 L 622.7802777089686 94.29599999999999 L 632.9724673440312 94.50400000000002 L 642.6291456540628 95.24799999999999 L 652.9492185906253 95.32800000000003 L 662.7177947894694 95.96000000000001 L 672.7980865357194 96.28 L 683.214071948407 96.26400000000001 L 693.3503126390633 96.52799999999999 "></path><path id="cd-curve-main" fill="none" stroke="#e74c3c" stroke-width="2" d="M 75.01604649195257 220.872 L 89.84400580638803 221.216 L 105.02364419994832 221.49599999999998 L 119.88357433975875 221.704 L 134.95930755085033 221.864 L 149.84321580969203 222.008 L 164.81504383831492 222.10399999999998 L 179.76289374790656 222.152 L 194.56687494331075 222.16 L 209.55468838462116 222.168 L 224.2068081594942 222.136 L 239.00279664855466 222.096 L 253.7987851376151 222.056 L 268.34699973001943 222.432 L 297.06777171667204 222.216 L 311.45613218220143 221.968 L 325.8924488857933 221.688 L 340.31278017669774 221.424 L 354.37343968213355 221.12 L 368.3541721241319 220.784 L 382.1590650265678 220.4 L 395.74815485772257 219.96 L 409.2333395064087 219.464 L 422.4307867267199 218.776 L 434.80498519362527 217.816 L 446.8275045814057 216.864 L 459.32159364346717 215.664 L 471.4560109200602 214.296 L 483.47853030784074 212.55200000000002 L 495.01349460865265 210.304 L 505.9490059336837 207.55200000000002 L 516.4768892351836 204 L 526.2534581403713 199.736 L 535.5344792522469 189.76 L 553.5130539129045 184.696 L 562.8819947945611 179.824 L 572.6745491124365 174.944 L 582.6269575571868 170.016 L 592.6912638907493 164.848 L 602.6436723354996 160.04000000000002 L 612.9797306847496 154.43200000000002 L 622.7802777089686 149.288 L 632.9724673440312 143.336 L 642.6291456540628 138.2 L 652.9492185906253 132.27200000000002 L 662.7177947894694 126.744 L 672.7980865357194 121.632 L 683.214071948407 116.10400000000001 L 693.3503126390633 NaN "></path><circle id="cl-current-pt-main" r="5" cx="206.4" cy="154.94254052433374" fill="var(--accent-yellow)"><title>AoA: 3°
+Lift (CL): 0.938</title></circle><circle id="cd-current-pt-main" r="5" cx="206.4" cy="222.1663161314907" fill="var(--accent-yellow)"><title>AoA: 3°
+Drag (CD): 0.0098</title></circle></svg>
                 </div>
             </div>
 			<div id="spreadsheet-overlay" style="display: none; position: absolute; inset: 0px; background: var(--bg-black); z-index: 30; box-sizing: border-box; flex-direction: column;">
@@ -894,7 +1000,7 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
                     </th>
 					<th style="padding: 8px; position: sticky; top: 0; z-index: 10; background: var(--bg-black); box-shadow: 0 1px 0 0 var(--accent-yellow); box-sizing: border-box; width: 132px;">
                         <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start; overflow: hidden;">
-                            <select onchange="updateSpreadsheetCol('A', this.value)" style="background: transparent; color: var(--accent-yellow); border: medium; outline: none; font-weight: bold; cursor: pointer; font-size: 1em; padding: 0px; margin-right: 4px; appearance: auto; width: 2164px; max-width: 100%;"><option value="budget" style="background:var(--bg-black);">Budget</option><option value="measured" style="background:var(--bg-black);" selected="true">Measured</option><option value="predicted" style="background:var(--bg-black);">Predicted</option></select>
+                            <select onchange="updateSpreadsheetCol('A', this.value)" style="background: transparent; color: var(--accent-yellow); border: medium; outline: none; font-weight: bold; cursor: pointer; font-size: 1em; padding: 0px; margin-right: 4px; appearance: auto; width: 2164px; max-width: 100%;"><option value="budget" selected="true" style="background:var(--bg-black);">Budget</option><option value="measured" style="background:var(--bg-black);">Measured</option><option value="predicted" style="background:var(--bg-black);">Predicted</option></select>
                             <div style="white-space: nowrap; font-size: 0.9em;">(g): <span style="color:var(--accent-yellow)">1000.0</span> <span style="cursor:pointer; padding: 0 4px; color: var(--accent-yellow);" onclick="handleSort('valA')">▼</span></div>
                         </div>
                         <div class="col-resizer"></div>
@@ -933,40 +1039,6 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 						<input type="text" value="Making wing hollow can help" placeholder="..." onchange="updateSpreadsheetValue('main-wing', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
 					</td>
 				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
-					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('front-fus');">
-						<input type="text" value="Front Fuselage + Front Gear" onchange="updateSpreadsheetValue('front-fus', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
-						
-					</td>
-					<td style="padding: 8px; position: relative; box-sizing: border-box;">
-						<input type="number" step="0.1" value="70" onchange="updateSpreadsheetDynamic('front-fus', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; border-color: #e74c3c;">
-					</td>
-					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="number" step="0.1" value="0" onchange="updateSpreadsheetDynamic('front-fus', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
-					</td>
-					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
-						-70.0
-					</td>
-					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="text" value="Includes steerign servo" placeholder="..." onchange="updateSpreadsheetValue('front-fus', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
-					</td>
-				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
-					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('rear-fus');">
-						<input type="text" value="Rear Fuse" onchange="updateSpreadsheetValue('rear-fus', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
-						
-					</td>
-					<td style="padding: 8px; position: relative; box-sizing: border-box;">
-						<input type="number" step="0.1" value="20" onchange="updateSpreadsheetDynamic('rear-fus', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; border-color: #e74c3c;">
-					</td>
-					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="number" step="0.1" value="0" onchange="updateSpreadsheetDynamic('rear-fus', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
-					</td>
-					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
-						-20.0
-					</td>
-					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('rear-fus', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
-					</td>
-				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
 					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('horiz-stab');">
 						<input type="text" value="Horizontal Stab" onchange="updateSpreadsheetValue('horiz-stab', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
 						
@@ -1001,38 +1073,21 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('vert-stab', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
 					</td>
 				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
-					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1779044380002');">
-						<input type="text" value="Battery" onchange="updateSpreadsheetValue('comp-1779044380002', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
+					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1779313505716');">
+						<input type="text" value="Tail Clamp" onchange="updateSpreadsheetValue('comp-1779313505716', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
 						
 					</td>
 					<td style="padding: 8px; position: relative; box-sizing: border-box;">
-						<input type="number" step="0.1" value="150" onchange="updateSpreadsheetDynamic('comp-1779044380002', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; border-color: #e74c3c;">
+						<input type="number" step="0.1" value="15" onchange="updateSpreadsheetDynamic('comp-1779313505716', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
 					</td>
 					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="number" step="0.1" value="0" onchange="updateSpreadsheetDynamic('comp-1779044380002', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
+						<input type="number" step="0.1" value="0" onchange="updateSpreadsheetDynamic('comp-1779313505716', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
 					</td>
 					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
-						-150.0
+						-15.0
 					</td>
 					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('comp-1779044380002', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
-					</td>
-				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
-					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1779044465220');">
-						<input type="text" value="Rudder Servo" onchange="updateSpreadsheetValue('comp-1779044465220', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
-						
-					</td>
-					<td style="padding: 8px; position: relative; box-sizing: border-box;">
-						<input type="number" step="0.1" value="9" onchange="updateSpreadsheetDynamic('comp-1779044465220', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
-					</td>
-					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="number" step="0.1" value="9" onchange="updateSpreadsheetDynamic('comp-1779044465220', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
-					</td>
-					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
-						0.0
-					</td>
-					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('comp-1779044465220', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
+						<input type="text" value="If stabs are ASA Im thinking this can be lighter than before (20g -&gt; 15g)" placeholder="..." onchange="updateSpreadsheetValue('comp-1779313505716', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
 					</td>
 				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
 					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1779044494428');">
@@ -1040,16 +1095,33 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 						
 					</td>
 					<td style="padding: 8px; position: relative; box-sizing: border-box;">
-						<input type="number" step="0.1" value="9" onchange="updateSpreadsheetDynamic('comp-1779044494428', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
+						<input type="number" step="0.1" value="12" onchange="updateSpreadsheetDynamic('comp-1779044494428', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
 					</td>
 					<td style="padding: 8px; box-sizing: border-box;">
 						<input type="number" step="0.1" value="9" onchange="updateSpreadsheetDynamic('comp-1779044494428', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
 					</td>
 					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
-						0.0
+						-3.0
 					</td>
 					<td style="padding: 8px; box-sizing: border-box;">
 						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('comp-1779044494428', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
+					</td>
+				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
+					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1779044465220');">
+						<input type="text" value="Rudder Servo" onchange="updateSpreadsheetValue('comp-1779044465220', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
+						
+					</td>
+					<td style="padding: 8px; position: relative; box-sizing: border-box;">
+						<input type="number" step="0.1" value="12" onchange="updateSpreadsheetDynamic('comp-1779044465220', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
+					</td>
+					<td style="padding: 8px; box-sizing: border-box;">
+						<input type="number" step="0.1" value="9" onchange="updateSpreadsheetDynamic('comp-1779044465220', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
+					</td>
+					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
+						-3.0
+					</td>
+					<td style="padding: 8px; box-sizing: border-box;">
+						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('comp-1779044465220', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
 					</td>
 				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
 					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1779044508866');">
@@ -1057,13 +1129,13 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 						<span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); pointer-events: none; font-size: 1.1em;">⧓</span>
 					</td>
 					<td style="padding: 8px; position: relative; box-sizing: border-box;">
-						<input type="number" step="0.1" value="18" onchange="updateSpreadsheetDynamic('comp-1779044508866', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; border-color: #e74c3c;">
+						<input type="number" step="0.1" value="24" onchange="updateSpreadsheetDynamic('comp-1779044508866', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
 					</td>
 					<td style="padding: 8px; box-sizing: border-box;">
 						<input type="number" step="0.1" value="18" onchange="updateSpreadsheetDynamic('comp-1779044508866', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
 					</td>
 					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
-						0.0
+						-6.0
 					</td>
 					<td style="padding: 8px; box-sizing: border-box;">
 						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('comp-1779044508866', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
@@ -1074,33 +1146,50 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 						<span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); pointer-events: none; font-size: 1.1em;">⧓</span>
 					</td>
 					<td style="padding: 8px; position: relative; box-sizing: border-box;">
-						<input type="number" step="0.1" value="18" onchange="updateSpreadsheetDynamic('comp-1779298878926', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
+						<input type="number" step="0.1" value="24" onchange="updateSpreadsheetDynamic('comp-1779298878926', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
 					</td>
 					<td style="padding: 8px; box-sizing: border-box;">
 						<input type="number" step="0.1" value="18" onchange="updateSpreadsheetDynamic('comp-1779298878926', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
 					</td>
 					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
-						0.0
+						-6.0
 					</td>
 					<td style="padding: 8px; box-sizing: border-box;">
 						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('comp-1779298878926', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
 					</td>
 				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
-					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1779044975978');">
-						<input type="text" value="Rear Landing Gear" onchange="updateSpreadsheetValue('comp-1779044975978', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
+					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('front-fus');">
+						<input type="text" value="Front Fuselage + Front Gear" onchange="updateSpreadsheetValue('front-fus', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
 						
 					</td>
 					<td style="padding: 8px; position: relative; box-sizing: border-box;">
-						<input type="number" step="0.1" value="68" onchange="updateSpreadsheetDynamic('comp-1779044975978', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
+						<input type="number" step="0.1" value="70" onchange="updateSpreadsheetDynamic('front-fus', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; border-color: #e74c3c;">
 					</td>
 					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="number" step="0.1" value="0" onchange="updateSpreadsheetDynamic('comp-1779044975978', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
+						<input type="number" step="0.1" value="0" onchange="updateSpreadsheetDynamic('front-fus', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
 					</td>
 					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
-						-68.0
+						-70.0
 					</td>
 					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('comp-1779044975978', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
+						<input type="text" value="Includes steerign servo" placeholder="..." onchange="updateSpreadsheetValue('front-fus', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
+					</td>
+				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
+					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('rear-fus');">
+						<input type="text" value="Rear Fuse" onchange="updateSpreadsheetValue('rear-fus', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
+						
+					</td>
+					<td style="padding: 8px; position: relative; box-sizing: border-box;">
+						<input type="number" step="0.1" value="20" onchange="updateSpreadsheetDynamic('rear-fus', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; border-color: #e74c3c;">
+					</td>
+					<td style="padding: 8px; box-sizing: border-box;">
+						<input type="number" step="0.1" value="0" onchange="updateSpreadsheetDynamic('rear-fus', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
+					</td>
+					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
+						-20.0
+					</td>
+					<td style="padding: 8px; box-sizing: border-box;">
+						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('rear-fus', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
 					</td>
 				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
 					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1779231114708');">
@@ -1120,6 +1209,23 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('comp-1779231114708', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
 					</td>
 				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
+					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1779044380002');">
+						<input type="text" value="Battery" onchange="updateSpreadsheetValue('comp-1779044380002', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
+						
+					</td>
+					<td style="padding: 8px; position: relative; box-sizing: border-box;">
+						<input type="number" step="0.1" value="150" onchange="updateSpreadsheetDynamic('comp-1779044380002', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; border-color: #e74c3c;">
+					</td>
+					<td style="padding: 8px; box-sizing: border-box;">
+						<input type="number" step="0.1" value="0" onchange="updateSpreadsheetDynamic('comp-1779044380002', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
+					</td>
+					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
+						-150.0
+					</td>
+					<td style="padding: 8px; box-sizing: border-box;">
+						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('comp-1779044380002', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
+					</td>
+				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
 					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1784062659261');">
 						<input type="text" value="Tail Motor and ESC" onchange="updateSpreadsheetValue('comp-1784062659261', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
 						
@@ -1135,6 +1241,23 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 					</td>
 					<td style="padding: 8px; box-sizing: border-box;">
 						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('comp-1784062659261', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
+					</td>
+				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
+					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1779299043963');">
+						<input type="text" value="Motor Mounts" onchange="updateSpreadsheetValue('comp-1779299043963', 'name', this.value, this)" style="width: calc(100% - 20px); padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
+						<span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); pointer-events: none; font-size: 1.1em;">⧓</span>
+					</td>
+					<td style="padding: 8px; position: relative; box-sizing: border-box;">
+						<input type="number" step="0.1" value="80" onchange="updateSpreadsheetDynamic('comp-1779299043963', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; border-color: #e74c3c;">
+					</td>
+					<td style="padding: 8px; box-sizing: border-box;">
+						<input type="number" step="0.1" value="0" onchange="updateSpreadsheetDynamic('comp-1779299043963', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
+					</td>
+					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
+						-80.0
+					</td>
+					<td style="padding: 8px; box-sizing: border-box;">
+						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('comp-1779299043963', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
 					</td>
 				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
 					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1779241854755');">
@@ -1171,23 +1294,6 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('comp-1779242396440', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
 					</td>
 				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
-					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1779299043963');">
-						<input type="text" value="Motor Mounts" onchange="updateSpreadsheetValue('comp-1779299043963', 'name', this.value, this)" style="width: calc(100% - 20px); padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
-						<span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); pointer-events: none; font-size: 1.1em;">⧓</span>
-					</td>
-					<td style="padding: 8px; position: relative; box-sizing: border-box;">
-						<input type="number" step="0.1" value="80" onchange="updateSpreadsheetDynamic('comp-1779299043963', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; border-color: #e74c3c;">
-					</td>
-					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="number" step="0.1" value="0" onchange="updateSpreadsheetDynamic('comp-1779299043963', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
-					</td>
-					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
-						-80.0
-					</td>
-					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('comp-1779299043963', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
-					</td>
-				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
 					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1779313212955');">
 						<input type="text" value="GPS" onchange="updateSpreadsheetValue('comp-1779313212955', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
 						
@@ -1222,38 +1328,21 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('comp-1779313389645', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
 					</td>
 				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
-					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1779313505716');">
-						<input type="text" value="Tail Clamp" onchange="updateSpreadsheetValue('comp-1779313505716', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
+					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1779044975978');">
+						<input type="text" value="Rear Landing Gear" onchange="updateSpreadsheetValue('comp-1779044975978', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
 						
 					</td>
 					<td style="padding: 8px; position: relative; box-sizing: border-box;">
-						<input type="number" step="0.1" value="15" onchange="updateSpreadsheetDynamic('comp-1779313505716', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
+						<input type="number" step="0.1" value="60" onchange="updateSpreadsheetDynamic('comp-1779044975978', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
 					</td>
 					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="number" step="0.1" value="0" onchange="updateSpreadsheetDynamic('comp-1779313505716', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
+						<input type="number" step="0.1" value="0" onchange="updateSpreadsheetDynamic('comp-1779044975978', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
 					</td>
 					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
-						-15.0
+						-60.0
 					</td>
 					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="text" value="If stabs are ASA Im thinking this can be lighter than before (20g -&gt; 15g)" placeholder="..." onchange="updateSpreadsheetValue('comp-1779313505716', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
-					</td>
-				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
-					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1783459208570');">
-						<input type="text" value="Exta Weight Post Assembly" onchange="updateSpreadsheetValue('comp-1783459208570', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
-						
-					</td>
-					<td style="padding: 8px; position: relative; box-sizing: border-box;">
-						<input type="number" step="0.1" value="40" onchange="updateSpreadsheetDynamic('comp-1783459208570', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
-					</td>
-					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="number" step="0.1" value="0" onchange="updateSpreadsheetDynamic('comp-1783459208570', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
-					</td>
-					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
-						-40.0
-					</td>
-					<td style="padding: 8px; box-sizing: border-box;">
-						<input type="text" value="Buffer" placeholder="..." onchange="updateSpreadsheetValue('comp-1783459208570', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
+						<input type="text" value="" placeholder="..." onchange="updateSpreadsheetValue('comp-1779044975978', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
 					</td>
 				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
 					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1784681822333');">
@@ -1272,11 +1361,28 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 					<td style="padding: 8px; box-sizing: border-box;">
 						<input type="text" value="Includes Servo" placeholder="..." onchange="updateSpreadsheetValue('comp-1784681822333', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
 					</td>
+				</tr><tr style="border-bottom: 1px solid var(--border-grey);">
+					<td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" onclick="selectComponent('comp-1783459208570');">
+						<input type="text" value="Exta Weight Post Assembly" onchange="updateSpreadsheetValue('comp-1783459208570', 'name', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
+						
+					</td>
+					<td style="padding: 8px; position: relative; box-sizing: border-box;">
+						<input type="number" step="0.1" value="30" onchange="updateSpreadsheetDynamic('comp-1783459208570', spreadColA, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
+					</td>
+					<td style="padding: 8px; box-sizing: border-box;">
+						<input type="number" step="0.1" value="0" onchange="updateSpreadsheetDynamic('comp-1783459208570', spreadColB, this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box; ">
+					</td>
+					<td style="padding: 8px; color: #2ecc71; font-weight: bold; box-sizing: border-box;">
+						-30.0
+					</td>
+					<td style="padding: 8px; box-sizing: border-box;">
+						<input type="text" value="Buffer" placeholder="..." onchange="updateSpreadsheetValue('comp-1783459208570', 'notes', this.value, this)" style="width: 100%; padding: 4px; margin: 0; box-sizing: border-box;">
+					</td>
 				</tr></tbody>
 					</table>
 				</div>
 			</div>
-			<div id="variables-overlay" style="display: flex;">
+			<div id="variables-overlay" style="display: none;">
 				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
 					<h3 style="margin: 0; color: var(--accent-yellow); font-family: 'Poppins', sans-serif;">Global Variables &amp; Equations</h3>
 					<button class="btn-sm" onclick="setView('top')">Close</button>
@@ -1338,6 +1444,46 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 					<td style="padding: 2px 0; text-align: right;">
 						<button class="btn-sm" style="border-color: #e74c3c; color: #e74c3c; padding: 2px 6px;" onclick="removeSysVar(1784600455135)" title="Delete Variable">✖</button>
 					</td>
+				</tr><tr>
+					<td style="padding: 2px 4px 2px 0;">
+						<button class="btn-sm" onclick="startEyedropper('var-1785100538470')" style="width: 100%; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+							Target
+						</button>
+					</td>
+					<td style="padding: 2px; text-align: center; color: var(--accent-yellow); font-weight: bold; font-size: 1.2em;">=</td>
+					<td style="padding: 2px 4px;">
+						<input type="text" style="width: 110px;" value="ServoMass" onchange="updateSystemProperty('var', 1785100538470, 'name', this.value)">
+					</td>
+					<td style="padding: 2px 4px;">
+						<input type="number" step="any" value="12" id="var-input-1785100538470" oninput="syncVarToDOM(1785100538470, this.value)" style="width: 70px;">
+					</td>
+					<td style="padding: 2px 4px;">
+						<select onchange="updateSystemProperty('var', 1785100538470, 'unit', this.value)" style="width: 60px; padding: 2px; font-size: 0.85em;">
+							<option value="none" selected="true">None</option>
+							<optgroup label="Dim">
+								<option value="mm">mm</option>
+								<option value="cm">cm</option>
+								<option value="m">m</option>
+								<option value="in">in</option>
+								<option value="ft">ft</option>
+							</optgroup>
+							<optgroup label="Mass">
+								<option value="g">g</option>
+								<option value="kg">kg</option>
+								<option value="oz">oz</option>
+								<option value="lb">lb</option>
+							</optgroup>
+							<optgroup label="Speed">
+								<option value="m/s">m/s</option>
+								<option value="km/h">km/h</option>
+								<option value="mph">mph</option>
+								<option value="kt">kt</option>
+							</optgroup>
+						</select>
+					</td>
+					<td style="padding: 2px 0; text-align: right;">
+						<button class="btn-sm" style="border-color: #e74c3c; color: #e74c3c; padding: 2px 6px;" onclick="removeSysVar(1785100538470)" title="Delete Variable">✖</button>
+					</td>
 				</tr></tbody>
 							</table>
 						</div>
@@ -1362,11 +1508,63 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 									</tr>
 								</thead>
 								<tbody id="eq-def-list"><tr>
-					<td style="padding: 2px 4px 2px 0;"><button class="btn-sm" onclick="startEyedropper('eq-1784600465712')" style="width: 100%; text-align: center;">comp-1779241854755 - WIDTH - CM</button></td>
+					<td style="padding: 4px; min-width: 140px; vertical-align: top;">
+						<div style="display:flex; flex-wrap:wrap; gap:2px; margin-bottom:4px;">
+							
+					<div class="target-pill">
+						<span style="overflow:hidden; text-overflow:ellipsis; max-width:140px;" title="comp-1779241854755 - WIDTH - CM">comp-1779241854755 - WIDTH - CM</span>
+						<span class="target-pill-remove" onclick="removeEqTarget(1784600465712, 'comp-1779241854755:prop-sy')">✖</span>
+					</div>
+				
+						</div>
+						<button class="btn-sm" onclick="startEyedropper('eq-1784600465712')" style="width: 100%; text-align: center;">+ Add Target</button>
+					</td>
 					<td style="padding: 2px; text-align: center; color: var(--accent-yellow); font-weight: bold; font-size: 1.2em;">=</td>
 					<td style="padding: 2px 4px;"><input type="text" value="WingSpan" onchange="updateSystemProperty('eq', 1784600465712, 'equation', this.value)" placeholder="e.g. wing * 2"></td>
 					<td style="padding: 2px 4px;"><input type="text" value="Spar Length = Wingspan" onchange="updateSystemProperty('eq', 1784600465712, 'nickname', this.value)" placeholder="Note..."></td>
 					<td style="padding: 2px 0; text-align: right;"><button class="btn-sm" style="border-color: #e74c3c; color: #e74c3c; padding: 2px 6px;" onclick="removeSysEq(1784600465712)" title="Delete Equation">✖</button></td>
+				</tr><tr>
+					<td style="padding: 4px; min-width: 140px; vertical-align: top;">
+						<div style="display:flex; flex-wrap:wrap; gap:2px; margin-bottom:4px;">
+							
+					<div class="target-pill">
+						<span style="overflow:hidden; text-overflow:ellipsis; max-width:140px;" title="comp-1779044494428 - PROP-MASS-VAL (budget)">comp-1779044494428 - PROP-MASS-VAL (budget)</span>
+						<span class="target-pill-remove" onclick="removeEqTarget(1785100640508, 'comp-1779044494428:prop-mass-val-budget')">✖</span>
+					</div>
+				
+					<div class="target-pill">
+						<span style="overflow:hidden; text-overflow:ellipsis; max-width:140px;" title="comp-1779044465220 - PROP-MASS-VAL (budget)">comp-1779044465220 - PROP-MASS-VAL (budget)</span>
+						<span class="target-pill-remove" onclick="removeEqTarget(1785100640508, 'comp-1779044465220:prop-mass-val-budget')">✖</span>
+					</div>
+				
+						</div>
+						<button class="btn-sm" onclick="startEyedropper('eq-1785100640508')" style="width: 100%; text-align: center;">+ Add Target</button>
+					</td>
+					<td style="padding: 2px; text-align: center; color: var(--accent-yellow); font-weight: bold; font-size: 1.2em;">=</td>
+					<td style="padding: 2px 4px;"><input type="text" value="ServoMass" onchange="updateSystemProperty('eq', 1785100640508, 'equation', this.value)" placeholder="e.g. wing * 2"></td>
+					<td style="padding: 2px 4px;"><input type="text" value="For single servos" onchange="updateSystemProperty('eq', 1785100640508, 'nickname', this.value)" placeholder="Note..."></td>
+					<td style="padding: 2px 0; text-align: right;"><button class="btn-sm" style="border-color: #e74c3c; color: #e74c3c; padding: 2px 6px;" onclick="removeSysEq(1785100640508)" title="Delete Equation">✖</button></td>
+				</tr><tr>
+					<td style="padding: 4px; min-width: 140px; vertical-align: top;">
+						<div style="display:flex; flex-wrap:wrap; gap:2px; margin-bottom:4px;">
+							
+					<div class="target-pill">
+						<span style="overflow:hidden; text-overflow:ellipsis; max-width:140px;" title="comp-1779044508866 - PROP-MASS-VAL (budget)">comp-1779044508866 - PROP-MASS-VAL (budget)</span>
+						<span class="target-pill-remove" onclick="removeEqTarget(1785100692151, 'comp-1779044508866:prop-mass-val-budget')">✖</span>
+					</div>
+				
+					<div class="target-pill">
+						<span style="overflow:hidden; text-overflow:ellipsis; max-width:140px;" title="comp-1779298878926 - PROP-MASS-VAL (budget)">comp-1779298878926 - PROP-MASS-VAL (budget)</span>
+						<span class="target-pill-remove" onclick="removeEqTarget(1785100692151, 'comp-1779298878926:prop-mass-val-budget')">✖</span>
+					</div>
+				
+						</div>
+						<button class="btn-sm" onclick="startEyedropper('eq-1785100692151')" style="width: 100%; text-align: center;">+ Add Target</button>
+					</td>
+					<td style="padding: 2px; text-align: center; color: var(--accent-yellow); font-weight: bold; font-size: 1.2em;">=</td>
+					<td style="padding: 2px 4px;"><input type="text" value="ServoMass*2" onchange="updateSystemProperty('eq', 1785100692151, 'equation', this.value)" placeholder="e.g. wing * 2"></td>
+					<td style="padding: 2px 4px;"><input type="text" value="For mirrired servos" onchange="updateSystemProperty('eq', 1785100692151, 'nickname', this.value)" placeholder="Note..."></td>
+					<td style="padding: 2px 0; text-align: right;"><button class="btn-sm" style="border-color: #e74c3c; color: #e74c3c; padding: 2px 6px;" onclick="removeSysEq(1785100692151)" title="Delete Equation">✖</button></td>
 				</tr></tbody>
 							</table>
 						</div>
@@ -1382,7 +1580,7 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 				<div style="flex: 1; color: #fff; font-size: 0.9em; line-height: 1.6;">
 					<h4 style="color: var(--accent-yellow); border-bottom: 1px solid var(--border-grey); padding-bottom: 4px;">Aircraft Design Tool</h4>
 					<p><!-- INSERT VERSION TEXT HERE -->
-						Version 4.2 | July 24th, 2026 | Victor R | Google Gemini was used to create this tool
+						Version 4.4 | July 26th, 2026 | Victor R | Google Gemini was used to create this tool
 					</p>
 
 					<h4 style="color: var(--accent-yellow); border-bottom: 1px solid var(--border-grey); padding-bottom: 4px; margin-top: 20px;">Features</h4>
@@ -1391,7 +1589,7 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 							<li style="margin-bottom: 8px;"><strong>Rendering:</strong> Renders top, side and front view of a simplified model of your airplane so you can visualize the CG location, mean chord and the scale of your design.</li>
 							<li style="margin-bottom: 8px;"><strong>Main math:</strong> Calculates your mass, CG, Tail sizing and more.</li>
 							<li style="margin-bottom: 8px;"><strong>Extra math:</strong> Calculates your coefficient of lift and drag from a NACA 4 digit code. Also gives ballpark numbers for important speeds like stall, takeoff and cruise.</li>
-							<li style="margin-bottom: 8px;"><strong>Variables and Equations:</strong> Use variables to drive equations and equations to drive properties. Want to automatically make the spar the same length as your wingspan? Your wingspan can drive the spar length!</li>
+							<li style="margin-bottom: 8px;"><strong>Variables and Equations:</strong> Use variables to drive equations and equations to drive properties (Can drive more than one thing with one equation). Want to automatically make the spar the same length as your wingspan? Your wingspan can drive the spar length!</li>
 							<li style="margin-bottom: 8px;"><strong>Mass tracking spreadsheet:</strong> Keep track of all your masses in one place and compare to different configurations using mass profiles.</li>
 							<li style="margin-bottom: 8px;"><strong>Graph Sweep:</strong> Want to know how a dependent variable changes as you change an independent one? Graph sweep can do that! This feature is the most unstable at the moment.</li>
 							<li style="margin-bottom: 8px;"><strong>Import/Export:</strong> Use "Save JSON" and "Load". Export as "Save HTML" for a self-contained file (not compatible between versions).</li>
@@ -1414,7 +1612,7 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 						</p><ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0;">
 							<li style="margin-bottom: 8px;">Switch layouts using the top view buttons (Top, Side, Front, Graph Sweep, Variables) and resize panels using the grid grab bars.</li>
 							<li style="margin-bottom: 8px;">Use the setting icon in the top right to change units, or customize the appearance of the tool.</li>
-							<li style="margin-bottom: 8px;"><strong>Managing Parts:</strong> Use the + Add button in the Parts panel to insert a component, click any item to edit its dimensions, rotation, or mirroring, and use the eye icon to hide/show items.</li>
+							<li style="margin-bottom: 8px;"><strong>Managing Parts:</strong> Use the + Add button in the Parts panel to insert a component, click any item to edit its dimensions, rotation, or mirroring, and use the eye icon to hide/show items. You can also click and drag on the left side of a component's label to re-order it</li>
 							<li style="margin-bottom: 8px;"><strong>Tracking Weights:</strong> Toggle between mass profiles using the top-right preset tabs, or open the spreadsheet table to compare columns side-by-side and export to CSV. To compare, click the down arrow and pick a profile. The columns can also be sorted by pressing the solid triangle icon.</li>
 							<li style="margin-bottom: 8px;"><strong>Setting Up Equations:</strong> Open the Variables tab, create a variable or driven property, click the target button to use the eyedropper, and pick an input box to link them. Maximum of 3 nested brackets and symbols like +, -, *, /.</li>
 							<li style="margin-bottom: 8px;"><strong>Running Sweeps:</strong> Head to Graph Sweep, pick a Y-axis target, add X-axis variables using the eyedropper crosshair to select a textbox. Define your bounds, and click Refresh to plot the curve. A jagged curve is due to the calculator rounding outputs.</li>
@@ -1427,14 +1625,14 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
 							<li style="margin-bottom: 8px;"><strong>Center of Gravity:</strong> Calculated using the standard weighted mass moment sum: X<sub>cg</sub> = Σ(m<sub>i</sub> × x<sub>i</sub>) / Σm<sub>i</sub>. Since parts are treated as solid rectangular blocks, their individual CGs are just dead center in their bounding boxes.</li>
 							<li style="margin-bottom: 8px;"><strong>Tail Volume Coefficients:</strong> Uses classic empirical ratios. Horizontal volume (V<sub>h</sub>) is (S<sub>h</sub> × L<sub>h</sub>) / (S<sub>w</sub> × MAC). Vertical volume (V<sub>v</sub>) is (S<sub>v</sub> × L<sub>v</sub>) / (S<sub>w</sub> × b). Moment arms span from the main wing's aerodynamic center to the tail's aerodynamic center.</li>
 							<li style="margin-bottom: 8px;"><strong>Aerodynamics &amp; XFOIL:</strong> The tool parses your NACA 4-digit code to grab geometric specs. Lift (C<sub>L</sub>) and drag (C<sub>D</sub>) coefficients are pulled straight from a pre-baked XFOIL dataset (<code>airfoil-data.js</code>) for realistic viscous polars.</li>
-							<li style="margin-bottom: 8px;"><strong>Drag Estimation:</strong> Built using the standard buildup method. Induced drag (C<sub>Di</sub>) uses the classic lifting-line approximation: C<sub>L</sub><sup>2</sup> / (π × AR × e). Parasite drag ignores complex 3D interference, using flat-plate skin friction and basic thickness form factors instead.</li>
-							<li style="margin-bottom: 8px;"><strong>Flight Speeds:</strong> Stall speed (V<sub>s</sub>) comes directly from steady level flight equilibrium: √(2W / (ρ × S × C<sub>Lmax</sub>)) at standard sea level. Takeoff and cruise speeds are ballpark empirical multiples of V<sub>s</sub>, don't expect true thrust/power curve intersections here.</li>
+							<li style="margin-bottom: 8px;"><strong>Drag Estimation:</strong> Built using the standard buildup method. Induced drag (C<sub>Di</sub>) uses the classic lifting-line approximation: C<sub>L</sub><sup>2</sup> / (π × AR × e), where Oswald efficiency (e) is dynamically estimated using Raymer's approximation. Parasitic drag uses the baseline C<sub>d0</sub> you select in the properties panel.</li>							
+							<li style="margin-bottom: 8px;"><strong>Flight Speeds:</strong> Stall speed (V<sub>s</sub>) comes directly from steady level flight equilibrium: √(2W / (ρ × S × C<sub>Lmax</sub>)) at standard sea level. Optimal cruise speed is calculated by iterating through the 3D polar to find the exact angle of attack that yields maximum L/D.</li>							
 							<li style="margin-bottom: 8px;"><strong>Geometric Constraints:</strong> Wing sweep and taper math assume perfectly straight leading and trailing edges. Complex aero-like fuselage lift, wing-root downwash on the tail, and dynamic stability is ignored.</li>
 							<li style="margin-bottom: 8px;"><strong>Graph Sweep Engine:</strong> Steps your chosen independent variable through defined bounds, forcing a recalculation of the whole equation web at every step to plot the points. Once done, it snaps everything back to its original state.</li>
 							<li style="margin-bottom: 8px;"><strong>What da heck is this giant HTML file?:</strong> The tool is a single HTML file running plain JavaScript. I decided to do this so its easy to share and run. Kinda crazy to scroll through the code though.</li>
 							<li style="margin-bottom: 8px;"><strong>Mass Discrepancies:</strong> Treating everything as uniform blocks ignores taper, hollowing, and point masses. If your real build has complex internal structures, your actual CG will definitely drift from this calculation.</li>
-							<li style="margin-bottom: 8px;"><strong>Aerodynamic Oversights:</strong> Slapping 2D XFOIL data onto a 3D airframe overestimates lift and underestimates drag. The math doe snot account for finite span effects, tip vortices, and junction interference. Theres probably a bunch of aerodynamic effect that I missed just because i didn't know about them. Overall, aero is not this tool's strong suit.</li>
-							<li style="margin-bottom: 8px;"><strong>Software Fragility:</strong> <strong>Graph Sweep</strong> is the most buggy feature. Rapid updates can cause jagged plots due to rounding. Also, the variable parser has no cyclic protection, if two variables drive each other, the app will freeze. I also tested this with the fewest crazy scenarios.</li>
+							<li style="margin-bottom: 8px;"><strong>Aerodynamic Oversights:</strong> While the tool does account for finite span effects and induced downwash based on your Aspect Ratio, it ignores complex 3D interference. Wing-root downwash on the tail, fuselage lift, tip vortices, and dynamic stability are excluded. Aero is a mathematical approximation.</li>							
+							<li style="margin-bottom: 8px;"><strong>Software buggy-ness:</strong> <strong>Graph Sweep</strong> is the most buggy feature. Rapid updates can cause jagged plots due to rounding. Also, the variable parser has no cyclic protection, if two variables drive each other, the app will freeze. I also tested this with the fewest crazy scenarios.</li>
 						</ul>
 					<p></p>
 				</div>
@@ -1447,8 +1645,8 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
     <div class="sidebar" id="properties-panel">
         <h2>Properties Panel</h2>
     
-    <div id="props-standard" style="display: none;">
-        <div class="input-group"><label>Component Name</label><input id="prop-name" type="text" value="Spar"></div>
+    <div id="props-standard" style="display: block;">
+        <div class="input-group"><label>Component Name</label><input id="prop-name" type="text" value="Exta Weight Post Assembly"></div>
         
         <div class="input-group">
             <label>Aerodynamic Role</label>
@@ -1501,7 +1699,7 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
         <div class="input-group" style="border-top: 1px solid var(--border-grey); padding-top: 6px;">
             <label>X Coord / Anchor</label>
             <div class="input-composite">
-                <input id="prop-x" step="0.1" type="number" value="6.00">
+                <input id="prop-x" step="0.1" type="number" value="10.04">
                 <select class="anchor-select" id="anchor-x" disabled=""><option value="min" selected="true">Front</option><option value="center">Center</option><option value="max">Back</option></select>
                 <svg class="lock-icon locked" id="lock-x" viewBox="0 0 24 24"><use href="#icon-lock"></use></svg>
             </div>
@@ -1517,9 +1715,9 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
         <div class="input-group">
             <label>Z Coord / Anchor</label>
             <div class="input-composite">
-                <input id="prop-z" step="0.1" type="number" value="0.80">
-                <select class="anchor-select" id="anchor-z"><option value="min">Bottom</option><option value="center" selected="true">Center</option><option value="max">Top</option></select>
-                <svg class="lock-icon" id="lock-z" viewBox="0 0 24 24"><use href="#icon-lock"></use></svg>
+                <input id="prop-z" step="0.1" type="number" value="0.00">
+                <select class="anchor-select" id="anchor-z" disabled=""><option value="min">Bottom</option><option value="center" selected="true">Center</option><option value="max">Top</option></select>
+                <svg class="lock-icon locked" id="lock-z" viewBox="0 0 24 24"><use href="#icon-lock"></use></svg>
             </div>
         </div>
         <div style="border-top: 1px solid var(--border-grey); padding-top: 6px;">
@@ -1530,28 +1728,28 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
                 <div><label style="font-size: 0.55em; color: var(--text-dim);">Yaw (Z)</label><input id="prop-rotZ" step="1" type="number" value="0"></div>
             </div>
         </div>
-        <div class="input-group"><label>Length (X) - <span class="unit-label-dim">cm</span></label><input id="prop-sx" step="0.1" type="number" value="1.00" style="opacity: 1;"></div>
-        <div class="input-group"><label>Width (Y) - <span class="unit-label-dim">cm</span></label><input id="prop-sy" step="0.1" type="number" value="120" style="opacity: 1;" class=""></div>
-        <div class="input-group"><label>Height (Z) - <span class="unit-label-dim">cm</span></label><input id="prop-sz" step="0.1" type="number" value="1.00" style="opacity: 1;"></div>
+        <div class="input-group"><label>Length (X) - <span class="unit-label-dim">cm</span></label><input id="prop-sx" step="0.1" type="number" value="5.00" style="opacity: 1;"></div>
+        <div class="input-group"><label>Width (Y) - <span class="unit-label-dim">cm</span></label><input id="prop-sy" step="0.1" type="number" value="5.00" style="opacity: 1;" class=""></div>
+        <div class="input-group"><label>Height (Z) - <span class="unit-label-dim">cm</span></label><input id="prop-sz" step="0.1" type="number" value="5.00" style="opacity: 1;"></div>
         <div class="input-group">
             <label>Mass - <span class="unit-mass">g</span></label>
             <div class="input-composite">
-                <input id="prop-mass-val" step="0.01" type="number" value="50.00">
+                <input id="prop-mass-val" step="0.01" type="number" value="30.00" class="">
                 <svg class="lock-icon" id="lock-mass" viewBox="0 0 24 24"><use href="#icon-lock"></use></svg>
             </div>
         </div>
         <div class="input-group">
             <label>Density (<span class="unit-label-mass">g</span>/<span class="unit-label-dim">cm</span>³)</label>
             <div class="input-composite">
-                <input id="prop-rho" step="0.0001" type="number" value="0.41667">
-                <svg class="lock-icon locked" id="lock-rho" viewBox="0 0 24 24"><use href="#icon-lock"></use></svg>
+                <input id="prop-rho" step="0.0001" type="number" value="0.24000">
+                <svg class="lock-icon" id="lock-rho" viewBox="0 0 24 24"><use href="#icon-lock"></use></svg>
             </div>
         </div>
-        <div class="input-group"><label>Colour</label><input id="prop-color" style="height:26px; padding:2px;" type="color" value="#dfdfdf"></div>
+        <div class="input-group"><label>Colour</label><input id="prop-color" style="height:26px; padding:2px;" type="color" value="#f1c40f"></div>
         <button class="btn-sm" id="prop-delete" style="width:100%; margin-top:6px; border-color:#e74c3c; color:#e74c3c;">Delete Component</button>
     </div>
 
-    <div id="props-wing" style="display: block;">
+    <div id="props-wing" style="display: none;">
         <div class="input-group"><label>Part Name</label><input id="wing-name" readonly="" style="color:var(--accent-yellow)" type="text" value="Main Wing Panel"></div>
         <div class="input-group-inline" style="border-bottom: 1px solid var(--border-grey); padding-bottom: 6px; margin-bottom: 6px;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-grey); padding-bottom: 6px; margin-bottom: 6px;">
@@ -1570,7 +1768,7 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
             <div class="input-group">
                 <label>Wingspan (<span class="unit-label-dim">cm</span>)</label>
                 <div class="input-composite">
-                    <input id="wing-b" step="0.5" type="number" value="120.00" style="opacity: 1;" class="source-value" title="Drives variable: WingSpan">
+                    <input id="wing-b" step="0.5" type="number" value="120.00" style="opacity: 1;" class="">
                     <svg class="lock-icon" id="lock-wing-b" onclick="toggleWingLock('b')" viewBox="0 0 24 24" style="opacity: 1;"><use href="#icon-lock"></use></svg>
                 </div>
             </div>
@@ -1579,7 +1777,7 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
             <div class="input-group">
                 <label>Root Chord (<span class="unit-label-dim">cm</span>)</label>
                 <div class="input-composite">
-                    <input id="wing-cr" step="0.1" type="number" value="22.50" style="opacity: 1;">
+                    <input id="wing-cr" step="0.1" type="number" value="22.5" style="opacity: 1;" class="">
                     <svg class="lock-icon" id="lock-wing-cr" onclick="toggleWingLock('cr')" viewBox="0 0 24 24" style="opacity: 1;"><use href="#icon-lock"></use></svg>
                 </div>
             </div>
@@ -1609,7 +1807,7 @@ Drag (CD): 0.0098</title></circle><path id="cl-curve-root" fill="none" d=""></pa
             <div class="input-group">
                 <label>Wing Area (<span class="unit-label-dim">cm</span>²)</label>
                 <div class="input-composite">
-                    <input id="wing-area" step="1" type="number" value="2700.00" style="opacity: 1;">
+                    <input id="wing-area" step="1" type="number" value="2700.00" style="opacity: 1;" class="">
                     <svg class="lock-icon" id="lock-wing-area" onclick="toggleWingLock('area')" viewBox="0 0 24 24" style="opacity: 1;"><use href="#icon-lock"></use></svg>
                 </div>
             </div>
@@ -1712,7 +1910,7 @@ A safe operational speed with a 20% margin above stall to prevent sudden droppin
 Depends on:
 • Stall Speed * 1.2" style="display: flex; justify-content: space-between; margin-bottom: 4px; cursor: help;">
 					<span style="font-size: 0.7em; color: var(--text-dim);">Est. Takeoff:</span>
-					<span id="calc-v-to" style="font-size: 0.8em; color: #f1c40f; font-weight: bold;">6.9 m/s</span>
+					<span id="calc-v-to" style="font-size: 0.8em; color: rgb(231, 76, 60); font-weight: bold;">6.9 m/s</span>
 				</div>
 
 				<div title="OPTIMAL CRUISE / MAX L/D: 
@@ -1723,13 +1921,13 @@ Depends on:
 • Aspect Ratio
 • Airfoil Drag (Thick wings force a higher speed)" style="display: flex; justify-content: space-between; margin-bottom: 4px; cursor: help;">
 					<span style="font-size: 0.7em; color: var(--text-dim);">Opt. Cruise:</span>
-					<span id="calc-v-cruise" style="font-size: 0.8em; color: #3498db; font-weight: bold;">8.4 m/s (Max L/D: 8.6)</span>
+					<span id="calc-v-cruise" style="font-size: 0.8em; color: rgb(231, 76, 60); font-weight: bold;">8.4 m/s (Max L/D: 8.6)</span>
 				</div>
 
 				<div style="display: flex; justify-content: space-between;">
 					<span style="font-size: 0.7em; color: var(--text-dim);">Comf. Cruise:</span>
 					<span style="font-size: 0.8em; color: #2ecc71; font-weight: bold;">
-						<span id="v-comfortable">11.1</span> <span class="unit-speed">m/s</span>
+						<span id="v-comfortable" style="color: rgb(231, 76, 60);">11.1</span> <span class="unit-speed">m/s</span>
 					</span>
 				</div>
 
@@ -1855,10 +2053,10 @@ Depends on:
     "name": "Main Wing Panel",
     "b": 120,
     "cr": 22.5,
-    "ct": 22.499999999999964,
+    "ct": 22.499999999999954,
     "sweep": 0,
     "dihedral": 0,
-    "rho": 0.016677089847821583,
+    "rho": 0.016677089847821586,
     "color": "#1b1b1b",
     "isHollow": false,
     "wallT": 0.5,
@@ -1885,88 +2083,6 @@ Depends on:
 };
         
         let components = [
-    {
-        "id": "front-fus",
-        "name": "Front Fuselage + Front Gear",
-        "type": "body",
-        "x": -15.5,
-        "y": -4,
-        "z": -6.048515796661377,
-        "sx": 32,
-        "sy": 8,
-        "sz": 10,
-        "rho": 0.11532125205930807,
-        "color": "#6b6b6b",
-        "lockedX": false,
-        "lockedY": true,
-        "lockedZ": false,
-        "anchorX": "min",
-        "anchorY": "center",
-        "anchorZ": "center",
-        "showLabel": false,
-        "isHollow": true,
-        "wallT": 0.5,
-        "isMirrored": false,
-        "rotX": 0,
-        "rotY": 0,
-        "rotZ": 0,
-        "lockedMass": true,
-        "lockedRho": false,
-        "thrustAuto": false,
-        "thrust": 0,
-        "propDia": 5,
-        "propPitch": 3,
-        "motorKV": 2300,
-        "battCells": 3,
-        "budgetMass": 60,
-        "measuredMass": 0,
-        "notes": "Includes steerign servo",
-        "valA": 70,
-        "valB": 0,
-        "deltaMass": -70,
-        "predictedMass": 0
-    },
-    {
-        "id": "rear-fus",
-        "name": "Rear Fuse",
-        "type": "body",
-        "x": 16.5,
-        "y": -2.05,
-        "z": 2.6881229400634767,
-        "sx": 41,
-        "sy": 4.1,
-        "sz": 1.4,
-        "rho": 0.4504910352283988,
-        "color": "#95a5a6",
-        "lockedX": false,
-        "lockedY": true,
-        "lockedZ": false,
-        "anchorX": "min",
-        "anchorY": "center",
-        "anchorZ": "center",
-        "showLabel": true,
-        "isHollow": true,
-        "wallT": 0.1,
-        "isMirrored": false,
-        "rotX": 0,
-        "rotY": 0,
-        "rotZ": 0,
-        "lockedMass": true,
-        "lockedRho": false,
-        "thrustAuto": false,
-        "thrust": 0,
-        "propDia": 5,
-        "propPitch": 3,
-        "motorKV": 2300,
-        "battCells": 3,
-        "budgetMass": 28,
-        "measuredMass": 0,
-        "notes": "",
-        "valA": 20,
-        "valB": 0,
-        "deltaMass": -20,
-        "predictedMass": 0
-    },
     {
         "id": "horiz-stab",
         "name": "Horizontal Stab",
@@ -2050,65 +2166,24 @@ Depends on:
         "predictedMass": 0
     },
     {
-        "id": "comp-1779044380002",
-        "name": "Battery",
+        "id": "comp-1779313505716",
+        "name": "Tail Clamp",
         "type": "body",
-        "x": -11.427639770507813,
-        "y": -2,
-        "z": -3,
-        "sx": 8,
-        "sy": 4,
-        "sz": 4,
-        "rho": 1.171875,
-        "color": "#ff0000",
+        "x": 51.041806793212885,
+        "y": -1.95,
+        "z": 2,
+        "sx": 10,
+        "sy": 3.9,
+        "sz": 3,
+        "rho": 0.1282051282051282,
+        "color": "#00ff00",
         "lockedX": false,
         "lockedY": true,
         "lockedZ": false,
         "anchorX": "min",
         "anchorY": "center",
         "anchorZ": "center",
-        "showLabel": true,
-        "isHollow": false,
-        "wallT": 0.2,
-        "isMirrored": false,
-        "rotX": 0,
-        "rotY": 0,
-        "rotZ": 0,
-        "lockedMass": true,
-        "lockedRho": false,
-        "thrustAuto": false,
-        "thrust": 0,
-        "propDia": 5,
-        "propPitch": 3,
-        "motorKV": 2300,
-        "battCells": 3,
-        "budgetMass": 150,
-        "measuredMass": 0,
-        "notes": "",
-        "valA": 150,
-        "valB": 0,
-        "deltaMass": -150,
-        "predictedMass": 0
-    },
-    {
-        "id": "comp-1779044465220",
-        "name": "Rudder Servo",
-        "type": "body",
-        "x": 55.838481426239014,
-        "y": -4,
-        "z": 0.25,
-        "sx": 2,
-        "sy": 1,
-        "sz": 2,
-        "rho": 2.25,
-        "color": "#0000ff",
-        "lockedX": false,
-        "lockedY": false,
-        "lockedZ": false,
-        "anchorX": "min",
-        "anchorY": "center",
-        "anchorZ": "center",
-        "showLabel": true,
+        "showLabel": false,
         "isHollow": false,
         "wallT": 0.2,
         "isMirrored": false,
@@ -2123,12 +2198,12 @@ Depends on:
         "propPitch": 3,
         "motorKV": 2300,
         "battCells": 3,
-        "budgetMass": 9,
-        "measuredMass": 9,
-        "notes": "",
-        "valA": 9,
-        "valB": 9,
-        "deltaMass": 0,
+        "budgetMass": 15,
+        "measuredMass": 0,
+        "notes": "If stabs are ASA Im thinking this can be lighter than before (20g -> 15g)",
+        "valA": 15,
+        "valB": 0,
+        "deltaMass": -15,
         "predictedMass": 0
     },
     {
@@ -2141,7 +2216,7 @@ Depends on:
         "sx": 2,
         "sy": 1,
         "sz": 2,
-        "rho": 2.25,
+        "rho": 3,
         "color": "#0000ff",
         "lockedX": false,
         "lockedY": false,
@@ -2167,9 +2242,50 @@ Depends on:
         "budgetMass": 9,
         "measuredMass": 9,
         "notes": "",
-        "valA": 9,
+        "valA": 12,
         "valB": 9,
-        "deltaMass": 0,
+        "deltaMass": -3,
+        "predictedMass": 0
+    },
+    {
+        "id": "comp-1779044465220",
+        "name": "Rudder Servo",
+        "type": "body",
+        "x": 55.838481426239014,
+        "y": -4,
+        "z": 0.25,
+        "sx": 2,
+        "sy": 1,
+        "sz": 2,
+        "rho": 3,
+        "color": "#0000ff",
+        "lockedX": false,
+        "lockedY": false,
+        "lockedZ": false,
+        "anchorX": "min",
+        "anchorY": "center",
+        "anchorZ": "center",
+        "showLabel": true,
+        "isHollow": false,
+        "wallT": 0.2,
+        "isMirrored": false,
+        "rotX": 0,
+        "rotY": 0,
+        "rotZ": 0,
+        "lockedMass": false,
+        "lockedRho": false,
+        "thrustAuto": false,
+        "thrust": 0,
+        "propDia": 5,
+        "propPitch": 3,
+        "motorKV": 2300,
+        "battCells": 3,
+        "budgetMass": 9,
+        "measuredMass": 9,
+        "notes": "",
+        "valA": 12,
+        "valB": 9,
+        "deltaMass": -3,
         "predictedMass": 0
     },
     {
@@ -2182,7 +2298,7 @@ Depends on:
         "sx": 2,
         "sy": 1,
         "sz": 2,
-        "rho": 2.25,
+        "rho": 3,
         "color": "#0517fa",
         "lockedX": true,
         "lockedY": false,
@@ -2197,7 +2313,7 @@ Depends on:
         "rotX": 0,
         "rotY": 0,
         "rotZ": 0,
-        "lockedMass": true,
+        "lockedMass": false,
         "lockedRho": false,
         "thrustAuto": false,
         "thrust": 0,
@@ -2208,9 +2324,9 @@ Depends on:
         "budgetMass": 18,
         "measuredMass": 18,
         "notes": "",
-        "valA": 18,
+        "valA": 24,
         "valB": 18,
-        "deltaMass": 0,
+        "deltaMass": -6,
         "predictedMass": 0
     },
     {
@@ -2223,7 +2339,7 @@ Depends on:
         "sx": 2,
         "sy": 1,
         "sz": 2,
-        "rho": 2.25,
+        "rho": 3,
         "color": "#f1c40f",
         "lockedX": false,
         "lockedY": false,
@@ -2249,23 +2365,23 @@ Depends on:
         "budgetMass": 18,
         "measuredMass": 18,
         "notes": "",
-        "valA": 18,
+        "valA": 24,
         "valB": 18,
-        "deltaMass": 0,
+        "deltaMass": -6,
         "predictedMass": 0
     },
     {
-        "id": "comp-1779044975978",
-        "name": "Rear Landing Gear",
+        "id": "front-fus",
+        "name": "Front Fuselage + Front Gear",
         "type": "body",
-        "x": 10.418050765991211,
-        "y": -5,
-        "z": -9.75,
-        "sx": 10,
-        "sy": 10,
+        "x": -15.5,
+        "y": -4,
+        "z": -6.048515796661377,
+        "sx": 32,
+        "sy": 8,
         "sz": 10,
-        "rho": 0.068,
-        "color": "#808080",
+        "rho": 0.11532125205930807,
+        "color": "#6b6b6b",
         "lockedX": false,
         "lockedY": true,
         "lockedZ": false,
@@ -2273,27 +2389,67 @@ Depends on:
         "anchorY": "center",
         "anchorZ": "center",
         "showLabel": false,
-        "isHollow": false,
-        "wallT": 0.2,
+        "isHollow": true,
+        "wallT": 0.5,
         "isMirrored": false,
         "rotX": 0,
         "rotY": 0,
         "rotZ": 0,
-        "lockedMass": false,
+        "lockedMass": true,
         "lockedRho": false,
-        "isHidden": true,
         "thrustAuto": false,
         "thrust": 0,
         "propDia": 5,
         "propPitch": 3,
         "motorKV": 2300,
         "battCells": 3,
-        "budgetMass": 80,
+        "budgetMass": 60,
+        "measuredMass": 0,
+        "notes": "Includes steerign servo",
+        "valA": 70,
+        "valB": 0,
+        "deltaMass": -70,
+        "predictedMass": 0
+    },
+    {
+        "id": "rear-fus",
+        "name": "Rear Fuse",
+        "type": "body",
+        "x": 16.5,
+        "y": -2.05,
+        "z": 2.6881229400634767,
+        "sx": 41,
+        "sy": 4.1,
+        "sz": 1.4,
+        "rho": 0.4504910352283988,
+        "color": "#95a5a6",
+        "lockedX": false,
+        "lockedY": true,
+        "lockedZ": false,
+        "anchorX": "min",
+        "anchorY": "center",
+        "anchorZ": "center",
+        "showLabel": true,
+        "isHollow": true,
+        "wallT": 0.1,
+        "isMirrored": false,
+        "rotX": 0,
+        "rotY": 0,
+        "rotZ": 0,
+        "lockedMass": true,
+        "lockedRho": false,
+        "thrustAuto": false,
+        "thrust": 0,
+        "propDia": 5,
+        "propPitch": 3,
+        "motorKV": 2300,
+        "battCells": 3,
+        "budgetMass": 28,
         "measuredMass": 0,
         "notes": "",
-        "valA": 68,
+        "valA": 20,
         "valB": 0,
-        "deltaMass": -68,
+        "deltaMass": -20,
         "predictedMass": 0
     },
     {
@@ -2338,6 +2494,47 @@ Depends on:
         "predictedMass": 0
     },
     {
+        "id": "comp-1779044380002",
+        "name": "Battery",
+        "type": "body",
+        "x": -11.427639770507813,
+        "y": -2,
+        "z": -3,
+        "sx": 8,
+        "sy": 4,
+        "sz": 4,
+        "rho": 1.171875,
+        "color": "#ff0000",
+        "lockedX": false,
+        "lockedY": true,
+        "lockedZ": false,
+        "anchorX": "min",
+        "anchorY": "center",
+        "anchorZ": "center",
+        "showLabel": true,
+        "isHollow": false,
+        "wallT": 0.2,
+        "isMirrored": false,
+        "rotX": 0,
+        "rotY": 0,
+        "rotZ": 0,
+        "lockedMass": true,
+        "lockedRho": false,
+        "thrustAuto": false,
+        "thrust": 0,
+        "propDia": 5,
+        "propPitch": 3,
+        "motorKV": 2300,
+        "battCells": 3,
+        "budgetMass": 150,
+        "measuredMass": 0,
+        "notes": "",
+        "valA": 150,
+        "valB": 0,
+        "deltaMass": -150,
+        "predictedMass": 0
+    },
+    {
         "id": "comp-1784062659261",
         "name": "Tail Motor and ESC",
         "type": "body",
@@ -2376,6 +2573,48 @@ Depends on:
         "valA": 50,
         "valB": 0,
         "deltaMass": -50,
+        "predictedMass": 0
+    },
+    {
+        "id": "comp-1779299043963",
+        "name": "Motor Mounts",
+        "type": "body",
+        "x": -7,
+        "y": -26.5,
+        "z": -1.449644136428833,
+        "sx": 20.5,
+        "sy": 3,
+        "sz": 2,
+        "rho": 0.3252032520325203,
+        "color": "#00ff00",
+        "lockedX": false,
+        "lockedY": true,
+        "lockedZ": false,
+        "anchorX": "min",
+        "anchorY": "center",
+        "anchorZ": "center",
+        "showLabel": true,
+        "isHollow": false,
+        "wallT": 0.2,
+        "isMirrored": true,
+        "rotX": 0,
+        "rotY": 0,
+        "rotZ": 0,
+        "lockedMass": true,
+        "lockedRho": false,
+        "isHidden": false,
+        "thrustAuto": false,
+        "thrust": 0,
+        "propDia": 5,
+        "propPitch": 3,
+        "motorKV": 2300,
+        "battCells": 3,
+        "budgetMass": 80,
+        "measuredMass": 0,
+        "notes": "",
+        "valA": 80,
+        "valB": 0,
+        "deltaMass": -80,
         "predictedMass": 0
     },
     {
@@ -2458,48 +2697,6 @@ Depends on:
         "valA": 10,
         "valB": 8,
         "deltaMass": -2,
-        "predictedMass": 0
-    },
-    {
-        "id": "comp-1779299043963",
-        "name": "Motor Mounts",
-        "type": "body",
-        "x": -7,
-        "y": -26.5,
-        "z": -1.449644136428833,
-        "sx": 20.5,
-        "sy": 3,
-        "sz": 2,
-        "rho": 0.3252032520325203,
-        "color": "#00ff00",
-        "lockedX": false,
-        "lockedY": true,
-        "lockedZ": false,
-        "anchorX": "min",
-        "anchorY": "center",
-        "anchorZ": "center",
-        "showLabel": true,
-        "isHollow": false,
-        "wallT": 0.2,
-        "isMirrored": true,
-        "rotX": 0,
-        "rotY": 0,
-        "rotZ": 0,
-        "lockedMass": true,
-        "lockedRho": false,
-        "isHidden": false,
-        "thrustAuto": false,
-        "thrust": 0,
-        "propDia": 5,
-        "propPitch": 3,
-        "motorKV": 2300,
-        "battCells": 3,
-        "budgetMass": 80,
-        "measuredMass": 0,
-        "notes": "",
-        "valA": 80,
-        "valB": 0,
-        "deltaMass": -80,
         "predictedMass": 0
     },
     {
@@ -2587,17 +2784,17 @@ Depends on:
         "predictedMass": 0
     },
     {
-        "id": "comp-1779313505716",
-        "name": "Tail Clamp",
+        "id": "comp-1779044975978",
+        "name": "Rear Landing Gear",
         "type": "body",
-        "x": 51.041806793212885,
-        "y": -1.95,
-        "z": 2,
+        "x": 10.418050765991211,
+        "y": -5,
+        "z": -9.75,
         "sx": 10,
-        "sy": 3.9,
-        "sz": 3,
-        "rho": 0.1282051282051282,
-        "color": "#00ff00",
+        "sy": 10,
+        "sz": 10,
+        "rho": 0.06,
+        "color": "#808080",
         "lockedX": false,
         "lockedY": true,
         "lockedZ": false,
@@ -2613,60 +2810,20 @@ Depends on:
         "rotZ": 0,
         "lockedMass": false,
         "lockedRho": false,
+        "isHidden": true,
         "thrustAuto": false,
         "thrust": 0,
         "propDia": 5,
         "propPitch": 3,
         "motorKV": 2300,
         "battCells": 3,
-        "budgetMass": 15,
+        "budgetMass": 80,
         "measuredMass": 0,
-        "notes": "If stabs are ASA Im thinking this can be lighter than before (20g -> 15g)",
-        "valA": 15,
+        "notes": "",
+        "valA": 60,
         "valB": 0,
-        "deltaMass": -15,
+        "deltaMass": -60,
         "predictedMass": 0
-    },
-    {
-        "id": "comp-1783459208570",
-        "name": "Exta Weight Post Assembly",
-        "type": "body",
-        "x": 10.04,
-        "y": -2.5,
-        "z": -2.5,
-        "sx": 5,
-        "sy": 5,
-        "sz": 5,
-        "rho": 0.32,
-        "color": "#f1c40f",
-        "lockedX": true,
-        "lockedY": true,
-        "lockedZ": true,
-        "anchorX": "min",
-        "anchorY": "center",
-        "anchorZ": "center",
-        "showLabel": false,
-        "isHollow": false,
-        "wallT": 0.2,
-        "isMirrored": false,
-        "rotX": 0,
-        "rotY": 0,
-        "rotZ": 0,
-        "lockedMass": false,
-        "lockedRho": false,
-        "budgetMass": 95,
-        "measuredMass": 0,
-        "notes": "Buffer",
-        "valA": 40,
-        "valB": 0,
-        "deltaMass": -40,
-        "predictedMass": 0,
-        "thrustAuto": false,
-        "thrust": 0,
-        "propDia": 5,
-        "propPitch": 3,
-        "motorKV": 2300,
-        "battCells": 3
     },
     {
         "id": "comp-1784681822333",
@@ -2701,6 +2858,47 @@ Depends on:
         "valB": 0,
         "deltaMass": -30,
         "notes": "Includes Servo",
+        "thrustAuto": false,
+        "thrust": 0,
+        "propDia": 5,
+        "propPitch": 3,
+        "motorKV": 2300,
+        "battCells": 3
+    },
+    {
+        "id": "comp-1783459208570",
+        "name": "Exta Weight Post Assembly",
+        "type": "body",
+        "x": 10.04,
+        "y": -2.5,
+        "z": -2.5,
+        "sx": 5,
+        "sy": 5,
+        "sz": 5,
+        "rho": 0.24,
+        "color": "#f1c40f",
+        "lockedX": true,
+        "lockedY": true,
+        "lockedZ": true,
+        "anchorX": "min",
+        "anchorY": "center",
+        "anchorZ": "center",
+        "showLabel": false,
+        "isHollow": false,
+        "wallT": 0.2,
+        "isMirrored": false,
+        "rotX": 0,
+        "rotY": 0,
+        "rotZ": 0,
+        "lockedMass": false,
+        "lockedRho": false,
+        "budgetMass": 95,
+        "measuredMass": 0,
+        "notes": "Buffer",
+        "valA": 30,
+        "valB": 0,
+        "deltaMass": -30,
+        "predictedMass": 0,
         "thrustAuto": false,
         "thrust": 0,
         "propDia": 5,
@@ -2805,6 +3003,67 @@ Depends on:
 			});
 		}
 		
+		let dragSrcEl = null;
+
+		function handleDragStart(e) {
+			dragSrcEl = this;
+			e.dataTransfer.effectAllowed = 'move';
+			e.dataTransfer.setData('text/plain', this.dataset.id);
+			this.classList.add('dragging');
+		}
+
+		function handleDragOver(e) {
+			if (e.preventDefault) e.preventDefault(); // Allows the drop
+			e.dataTransfer.dropEffect = 'move';
+			
+			document.querySelectorAll('.comp-item').forEach(item => item.classList.remove('drag-over'));
+			if (this !== dragSrcEl) {
+				this.classList.add('drag-over');
+			}
+			return false;
+		}
+
+		function handleDragLeave(e) {
+			this.classList.remove('drag-over');
+		}
+
+		function handleDrop(e) {
+			if (e.stopPropagation) e.stopPropagation();
+			this.classList.remove('drag-over');
+
+			if (dragSrcEl !== this) {
+				const draggedId = e.dataTransfer.getData('text/plain');
+				const targetId = this.dataset.id;
+
+				const draggedIdx = components.findIndex(c => c.id === draggedId);
+				const targetIdx = components.findIndex(c => c.id === targetId);
+
+				if (draggedIdx > -1 && targetIdx > -1) {
+					// Swap the items in the array
+					const [movedItem] = components.splice(draggedIdx, 1);
+					components.splice(targetIdx, 0, movedItem);
+
+					// Refresh the UI to show the new order
+					updateComponentListUI();
+					saveState();
+					
+					// Force the spreadsheet to rerender in the new order if it's currently open
+					const spreadOverlay = document.getElementById('spreadsheet-overlay');
+					if (spreadOverlay && spreadOverlay.style.display !== 'none') {
+						renderSpreadsheet();
+					}
+				}
+			}
+			return false;
+		}
+
+		function handleDragEnd(e) {
+			this.classList.remove('dragging');
+			document.querySelectorAll('.comp-item').forEach(item => {
+				item.classList.remove('drag-over');
+			});
+		}
+		
 		let projectVariables = {};
         let projectEquations = {};
 
@@ -2828,7 +3087,12 @@ Depends on:
 
         function evaluateEquations() {
 			sysEquations.forEach(eq => {
-				if (!eq.targetId || !eq.equation) return;
+				let targets = eq.targets || [];
+				// Legacy save file migration
+				if (eq.targetId && targets.length === 0) targets = [{id: eq.targetId, label: eq.targetLabel}];
+				
+				if (targets.length === 0 || !eq.equation) return;
+				
 				let safeEq = eq.equation;
 				sysVariables.forEach(v => {
 					let displayVal = v.value;
@@ -2845,13 +3109,13 @@ Depends on:
 				});
 				try {
 					const result = Function('"use strict";return (' + safeEq + ')')();
-					applyTargetValue(eq.targetId, result);
+					targets.forEach(t => applyTargetValue(t.id, result));
 				} catch(e) { 
 					console.error("Equation error", e); 
 				}
 			});
 
-			// Also force Variables that target properties directly to update their displays
+			// Force Variables that target properties directly to update their displays
 			sysVariables.forEach(v => {
 				if (v.targetId) {
 					let displayVal = v.value;
@@ -2968,10 +3232,15 @@ Depends on:
 			if (spreadColA === targetProfile) spreadColA = 'budget';
 			if (spreadColB === targetProfile) spreadColB = 'budget';
 			
-			// Clean up orphaned equations attached to the deleted mass profile
-			sysEquations = sysEquations.filter(eq => !eq.targetId || !eq.targetId.endsWith(`-${targetProfile}`));
-			sysVariables.forEach(v => {
-				if (v.targetId && v.targetId.endsWith(`-${targetProfile}`)) v.targetId = '';
+			// Clean up orphaned targets attached to the deleted mass profile
+			sysEquations.forEach(eq => {
+				if (eq.targets) {
+					eq.targets = eq.targets.filter(t => !t.id.endsWith(`-${targetProfile}`));
+				}
+				if (eq.targetId && eq.targetId.endsWith(`-${targetProfile}`)) {
+					eq.targetId = null;
+					eq.targetLabel = null;
+				}
 			});
 			renderVariablesTab();
 			
@@ -3038,15 +3307,17 @@ Depends on:
 			
 			// Migrate Equation Targets to the new profile name
 			sysEquations.forEach(eq => {
+				if (eq.targets) {
+					eq.targets.forEach(t => {
+						if (t.id && t.id.endsWith(`-${oldProfile}`)) {
+							t.id = t.id.replace(`-${oldProfile}`, `-${safeNewName}`);
+							t.label = t.label.replace(`(${oldProfile})`, `(${safeNewName})`);
+						}
+					});
+				}
 				if (eq.targetId && eq.targetId.endsWith(`-${oldProfile}`)) {
 					eq.targetId = eq.targetId.replace(`-${oldProfile}`, `-${safeNewName}`);
 					eq.targetLabel = eq.targetLabel.replace(`(${oldProfile})`, `(${safeNewName})`);
-				}
-			});
-			sysVariables.forEach(v => {
-				if (v.targetId && v.targetId.endsWith(`-${oldProfile}`)) {
-					v.targetId = v.targetId.replace(`-${oldProfile}`, `-${safeNewName}`);
-					v.targetLabel = v.targetLabel.replace(`(${oldProfile})`, `(${safeNewName})`);
 				}
 			});
 			renderVariablesTab();
@@ -3483,12 +3754,28 @@ Depends on:
 						const eqId = parseInt(eyedropperAxis.split('-')[1]);
 						const eq = sysEquations.find(e => e.id === eqId);
 						if (eq) {
-							eq.targetId = `${selectedComponentId}:${finalInputId}`;
-							eq.targetLabel = `${selectedComponentId} - ${finalLabel}`;
+							if (!eq.targets) eq.targets = [];
+							
+							// On-the-fly legacy migration
+							if (eq.targetId) {
+								if (!eq.targets.some(t => t.id === eq.targetId)) {
+									eq.targets.push({id: eq.targetId, label: eq.targetLabel});
+								}
+								eq.targetId = null;
+								eq.targetLabel = null;
+							}
+
+							const newTargetId = `${selectedComponentId}:${finalInputId}`;
+							// Prevent duplicate assignment of the same property
+							if (!eq.targets.some(t => t.id === newTargetId)) {
+								eq.targets.push({ id: newTargetId, label: `${selectedComponentId} - ${finalLabel}` });
+							}
+							
 							renderVariablesTab();
 							evaluateEquations();
+							applyInputStyles(); // Ensure UI gets locked immediately
 						}
-					} else {
+					} else if (eyedropperAxis.startsWith('var-')) {
 						const varId = parseInt(eyedropperAxis.split('-')[1]);
 						const v = sysVariables.find(x => x.id === varId);
 						if (v) {
@@ -3873,7 +4160,7 @@ Depends on:
 		}
 
         function addSysEquation() {
-			sysEquations.push({ id: Date.now(), targetId: null, targetLabel: null, equation: '', nickname: '' });
+			sysEquations.push({ id: Date.now(), targets: [], equation: '', nickname: '' });
 			renderVariablesTab();
 			applyInputStyles();
 		}
@@ -3901,16 +4188,25 @@ Depends on:
         }
 
         function removeSysEq(id) {
-            const eq = sysEquations.find(e => e.id === id);
             sysEquations = sysEquations.filter(e => e.id !== id);
-            if (eq && eq.targetId) {
-                const targetInput = document.getElementById(eq.targetId);
-                if (targetInput) {
-                    targetInput.classList.remove('driven-value');
-                    targetInput.disabled = false;
-                }
-            }
             renderVariablesTab();
+            applyInputStyles(); 
+            saveState();
+        }
+		
+		function removeEqTarget(eqId, targetIdStr) {
+            const eq = sysEquations.find(e => e.id === eqId);
+            if (eq) {
+                if (eq.targets) eq.targets = eq.targets.filter(t => t.id !== targetIdStr);
+                if (eq.targetId === targetIdStr) {
+                    eq.targetId = null;
+                    eq.targetLabel = null;
+                }
+                renderVariablesTab();
+                applyInputStyles();
+                evaluateEquations();
+                saveState();
+            }
         }
         		
 		function getGeometryInputs() {
@@ -3971,8 +4267,23 @@ Depends on:
 			const eqList = document.getElementById('eq-def-list');
 			eqList.innerHTML = '';
 			sysEquations.forEach(eq => {
+				let targets = eq.targets || [];
+				if (eq.targetId && targets.length === 0) targets = [{id: eq.targetId, label: eq.targetLabel}];
+				
+				let targetsHtml = targets.map(t => `
+					<div class="target-pill">
+						<span style="overflow:hidden; text-overflow:ellipsis; max-width:140px;" title="${t.label}">${t.label}</span>
+						<span class="target-pill-remove" onclick="removeEqTarget(${eq.id}, '${t.id}')">✖</span>
+					</div>
+				`).join('');
+
 				eqList.innerHTML += `<tr>
-					<td style="padding: 2px 4px 2px 0;"><button class="btn-sm" onclick="startEyedropper('eq-${eq.id}')" style="width: 100%; text-align: center;">${eq.targetLabel || 'Target'}</button></td>
+					<td style="padding: 4px; min-width: 140px; vertical-align: top;">
+						<div style="display:flex; flex-wrap:wrap; gap:2px; margin-bottom:4px;">
+							${targetsHtml}
+						</div>
+						<button class="btn-sm" onclick="startEyedropper('eq-${eq.id}')" style="width: 100%; text-align: center;">+ Add Target</button>
+					</td>
 					<td style="padding: 2px; text-align: center; color: var(--accent-yellow); font-weight: bold; font-size: 1.2em;">=</td>
 					<td style="padding: 2px 4px;"><input type="text" value="${eq.equation}" onchange="updateSystemProperty('eq', ${eq.id}, 'equation', this.value)" placeholder="e.g. wing * 2"></td>
 					<td style="padding: 2px 4px;"><input type="text" value="${eq.nickname || ''}" onchange="updateSystemProperty('eq', ${eq.id}, 'nickname', this.value)" placeholder="Note..."></td>
@@ -4383,18 +4694,35 @@ Depends on:
             components.forEach(c => {
                 const item = document.createElement('div');
                 item.className = `comp-item ${c.id === selectedComponentId ? 'selected' : ''}`;
+                
+                // --- NEW DRAG CONFIG ---
+                item.draggable = true;
+                item.dataset.id = c.id;
+                
                 const rho = safeParse(c.rho);
                 let displayMass = getEffectiveMassGrams(c) * getMassScalar();
                 if (getIsMirrored(c)) displayMass *= 2;
                 
                 item.innerHTML = `
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; opacity: ${c.isHidden ? '0.5' : '1'};">${c.name}${getIsMirrored(c) ? ' ⧓' : ''}</span>
+					<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
+						<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+						<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: ${c.isHidden ? '0.5' : '1'};">${c.name}${getIsMirrored(c) ? ' ⧓' : ''}</span>
+					</div>
 					<div style="display:flex; align-items:center; flex-shrink:0;">
 						<span onclick="toggleVisibility('${c.id}', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: ${c.isHidden ? '0.2' : '1'};">👁️</span>
 						<span style="font-size:0.8em;color:var(--text-dim); opacity: ${c.isHidden ? '0.5' : '1'}; margin-right: 4px;">${displayMass.toFixed(2)}${unitScales.mass}</span>
 						<span class="comp-item-copy" onclick="copyComponentById('${c.id}', event)" title="Duplicate Component">📋</span>
 					</div>`;
+					
                 item.onclick = (e) => { e.stopPropagation(); selectComponent(c.id); };
+                
+                // --- BIND DRAG EVENTS ---
+                item.addEventListener('dragstart', handleDragStart, false);
+                item.addEventListener('dragover', handleDragOver, false);
+                item.addEventListener('dragleave', handleDragLeave, false);
+                item.addEventListener('drop', handleDrop, false);
+                item.addEventListener('dragend', handleDragEnd, false);
+                
                 list.appendChild(item);
             });
         }
@@ -4431,7 +4759,12 @@ Depends on:
 					}
 				}
 
-				const eq = sysEquations.find(e => e.targetId === currentTargetCombo);
+				const eq = sysEquations.find(e => {
+					let targets = e.targets || [];
+					if (e.targetId && targets.length === 0) targets = [{id: e.targetId, label: e.targetLabel}];
+					return targets.some(t => t.id === currentTargetCombo);
+				});
+				
 				if (eq) {
 					input.classList.add('driven-value');
 					input.disabled = true;
@@ -7010,8 +7343,8 @@ Depends on:
 				activeMassProfile = 'budget';
 				spreadColA = 'budget';
 				spreadColB = 'measured';
-				sysVariables = [{"id":1784600455135,"name":"WingSpan","value":120,"targetId":"main-wing:wing-b","targetLabel":"main-wing - WING-B","unit":"cm"}];     
-				sysEquations = [{"id":1784600465712,"targetId":"comp-1779241854755:prop-sy","targetLabel":"comp-1779241854755 - WIDTH - CM","equation":"WingSpan","nickname":"Spar Length = Wingspan"}];    
+				sysVariables = [{"id":1784600455135,"name":"WingSpan","value":120,"targetId":"main-wing:wing-b","targetLabel":"main-wing - WING-B","unit":"cm"},{"id":1785100538470,"name":"ServoMass","value":12,"targetId":"","unit":"none"}];     
+				sysEquations = [{"id":1784600465712,"targetId":null,"targetLabel":null,"equation":"WingSpan","nickname":"Spar Length = Wingspan","targets":[{"id":"comp-1779241854755:prop-sy","label":"comp-1779241854755 - WIDTH - CM"}]},{"id":1785100640508,"targets":[{"id":"comp-1779044494428:prop-mass-val-budget","label":"comp-1779044494428 - PROP-MASS-VAL (budget)"},{"id":"comp-1779044465220:prop-mass-val-budget","label":"comp-1779044465220 - PROP-MASS-VAL (budget)"}],"equation":"ServoMass","nickname":"For single servos"},{"id":1785100692151,"targets":[{"id":"comp-1779044508866:prop-mass-val-budget","label":"comp-1779044508866 - PROP-MASS-VAL (budget)"},{"id":"comp-1779298878926:prop-mass-val-budget","label":"comp-1779298878926 - PROP-MASS-VAL (budget)"}],"equation":"ServoMass*2","nickname":"For mirrired servos"}];    
 
 				setTimeout(() => {
 					if (typeof rebuildMassProfileUI === 'function') rebuildMassProfileUI();
