@@ -7,7 +7,61 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&amp;family=Lato:wght@400;700&amp;display=swap" rel="stylesheet">
 <style>
-        .vertex-handle {
+		.outliner-group {
+			display: flex;
+			flex-direction: column;
+			border-left: 1px dotted var(--border-grey);
+			margin-left: 12px;
+			padding-left: 6px;
+			margin-top: 2px;
+		}
+
+		.outliner-item {
+			display: flex;
+			align-items: center;
+			padding: 2px 4px;
+			font-size: 0.75em;
+			cursor: pointer;
+			user-select: none;
+			color: var(--text-main);
+			border-radius: 2px;
+		}
+
+		.outliner-item:hover {
+				background: rgba(255, 255, 255, 0.05);
+		}
+
+		.outliner-item.selected {
+				background: rgba(255, 198, 0, 0.15);
+				color: var(--accent-yellow);
+		}
+
+		.outliner-icon {
+			width: 16px;
+			text-align: center;
+			display: inline-block;
+			margin-right: 4px;
+			color: var(--text-dim);
+			cursor: pointer;
+		}
+
+		.outliner-icon:hover {
+			color: var(--accent-yellow);
+		}
+
+		.outliner-radio {
+			margin: 0 6px 0 0;
+			cursor: pointer;
+		}
+
+		.outliner-label {
+			flex: 1;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	
+		.vertex-handle {
 			fill: var(--accent-yellow);
 			stroke: var(--bg-black);
 			stroke-width: 2px;
@@ -601,11 +655,11 @@
 <input id="project-title" type="text" value="Prototype 1.1">
 <div class="metric-box" title="Total aircraft mass including the wing and all components.">Total Mass: <span id="top-mass" style="color:var(--accent-yellow)">1000.00</span> <span class="unit-mass">g</span></div>
 <div class="metric-box" title="Thrust to Weight Ratio. 1.0 is a safe number to aim for.">TWR: <span id="top-twr" style="color: rgb(46, 204, 113);">1.56</span></div>
-<div class="metric-box" title="Actual center of gravity location measured from behind the wing leading edge.">CG: <span id="top-actual-cg" style="color:var(--accent-yellow)">8.97</span> <span class="unit-dim">cm</span></div>
+<div class="metric-box" title="Actual center of gravity location measured from behind the wing leading edge.">CG: <span id="top-actual-cg" style="color:var(--accent-yellow)">9.20</span> <span class="unit-dim">cm</span></div>
 <div class="metric-box" title="Recommended geometric CG based on approximately 33% of the mean aerodynamic chord.">Geo CG: <span id="top-rec-cg" style="color:#2ecc71">7.42</span> <span class="unit-dim">cm</span></div>
 <div class="metric-box" title="Wing loading. Higher values generally increase speed and stability but reduce low-speed performance. A lower wing loading means a floatier plane.">WL: <span id="top-wl" style="color:var(--accent-yellow)">37.04</span> <span id="top-wl-unit">g/dm²</span></div>
 <div class="metric-box" title="Cubic wing loading. Useful for estimating aircraft flight characteristics and handling. The higher the number the sportier the plane and the harder it is to fly.">CWL: <span id="top-cwl" style="color:var(--accent-yellow)">7.1</span> <span id="top-flight-type" style="color:var(--text-dim); font-size:0.9em; margin-left:4px;">(Sport)</span></div>
-<div class="metric-box" title="Static margin indicates pitch stability. Positive values are generally more stable.">SM: <span id="top-sm" style="color: rgb(46, 204, 113);">10.8%</span><span id="top-sm-guide" style="font-size: 0.9em; margin-left: 4px; color: rgb(46, 204, 113);">(Stable)</span></div>
+<div class="metric-box" title="Static margin indicates pitch stability. Positive values are generally more stable.">SM: <span id="top-sm" style="color: rgb(46, 204, 113);">9.8%</span><span id="top-sm-guide" style="font-size: 0.9em; margin-left: 4px; color: rgb(46, 204, 113);">(Stable)</span></div>
 <div class="metric-box" title="Horizontal tail volume coefficient. Measures horizontal stabilizer effectiveness. Greater than 0.3 is good.">Vh: <span id="top-vh" style="color: rgb(46, 204, 113);">0.428</span><span id="top-vh-guide" style="font-size: 0.9em; margin-left: 4px; color: rgb(46, 204, 113);">(Good)</span></div>
 <div class="metric-box" title="Vertical tail volume coefficient. Measures vertical stabilizer effectiveness. Greater than 0.3 is good.">Vv: <span id="top-vv" style="color: rgb(46, 204, 113);">0.031</span><span id="top-vv-guide" style="font-size: 0.9em; margin-left: 4px; color: rgb(46, 204, 113);">(Good)</span></div>
 
@@ -613,7 +667,7 @@
     <button class="btn-sm" onclick="exportConfig()" title="Save model data as a JSON file">Save JSON</button>
     <button class="btn-sm" onclick="exportStandaloneHTML()" style="background: var(--accent-yellow); color: #000;" title="Save entire tool and model as a self-contained HTML file">Save HTML</button>
     <button class="btn-sm" onclick="document.getElementById('import-file').click()" title="Load model data from JSON">Load</button>
-    <input accept=".json,text/plain" id="import-file" onchange="importConfig(this)" style="display:none;" type="file" value="C:\fakepath\Prototype 1.1 v5.2.json">
+    <input accept=".json,text/plain" id="import-file" onchange="importConfig(this)" style="display:none;" type="file" value="C:\fakepath\Prototype 1.1 v5.3.json">
     <button class="btn-sm" onclick="toggleSettingsMenu()" style="padding: 2px 6px; font-size: 1.1em; line-height: 1;">⚙️</button>
 </div>
 
@@ -692,194 +746,142 @@
 					<button class="btn-sm" onclick="addNewComponent()" style="padding: 2px 6px; font-size: 0.7em;">+ Add</button>
 				</div>
 			</div>
-            <div id="comp-list"><div class="comp-item ">
-			<div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-				<span style="opacity: 1;">Main Wing Panel</span>
-				<div style="display:flex; align-items:center;">
-					<span onclick="toggleVisibility('main-wing', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 8px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--accent-yellow); opacity: 1;">90.00g</span>
-				</div>
-			</div></div><div class="comp-item selected" draggable="true" data-id="horiz-stab">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Horizontal Stab</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('horiz-stab', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">25.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('horiz-stab', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="vert-stab">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Vertical Stab</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('vert-stab', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">12.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('vert-stab', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1779313505716">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Tail Clamp</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1779313505716', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">15.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1779313505716', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1779044494428">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Elevator Servo</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1779044494428', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">12.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1779044494428', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1779044465220">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Rudder Servo</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1779044465220', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">12.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1779044465220', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1779044508866">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Aileron Servos ⧓</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1779044508866', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">48.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1779044508866', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1779298878926">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Tilt Servos ⧓</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1779298878926', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">48.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1779298878926', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="front-fus">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Front Fuselage + Front Gear</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('front-fus', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">70.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('front-fus', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="rear-fus">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Rear Fuse</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('rear-fus', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">20.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('rear-fus', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1779231114708">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Motors and ESCs ⧓</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1779231114708', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">200.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1779231114708', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1779044380002">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Battery</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1779044380002', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">150.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1779044380002', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1784062659261">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Tail Motor and ESC</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1784062659261', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">50.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1784062659261', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1779299043963">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Motor Mounts ⧓</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1779299043963', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">160.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1779299043963', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1779241854755">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Spar</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1779241854755', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">50.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1779241854755', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1779242396440">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Spar Rear</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1779242396440', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">10.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1779242396440', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1779313212955">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">GPS</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1779313212955', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">66.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1779313212955', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1779313389645">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 0.5;">Electronics (FC, wires, Connectors)</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1779313389645', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 0.2;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 0.5; margin-right: 4px;">70.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1779313389645', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1779044975978">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 0.5;">Rear Landing Gear</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1779044975978', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 0.2;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 0.5; margin-right: 4px;">60.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1779044975978', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1784681822333">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Payload Mechanism</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1784681822333', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">30.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1784681822333', event)" title="Duplicate Component">📋</span>
-				</div></div><div class="comp-item " draggable="true" data-id="comp-1783459208570">
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: 1;">Exta Weight Post Assembly</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('comp-1783459208570', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: 1;">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: 1; margin-right: 4px;">30.00g</span>
-					<span class="comp-item-copy" onclick="copyComponentById('comp-1783459208570', event)" title="Duplicate Component">📋</span>
-				</div></div></div>
+            <div id="comp-list"><div><span style="font-size: 0.7em; color: var(--text-dim); font-weight: bold; text-transform: uppercase; padding-left: 4px; display: inline-block; margin-top: 8px;">Configurations</span></div><div>
+		<div class="outliner-item" style="background: var(--panel-grey); border: 1px solid var(--border-grey); margin-top: 2px;">
+			<input type="radio" class="outliner-radio" style="width: auto;" name="active_config" checked="checked" onclick="activateConfig('config-default', event)">
+			
+			<input type="text" value="Config 1" onchange="renameConfig('config-default', this.value, event)" onclick="event.stopPropagation()" style="flex: 1; background: var(--bg-black); border: 1px solid var(--border-grey); color: var(--accent-yellow); font-weight: bold; outline: none; margin: 0 4px; padding: 2px 4px; border-radius: 2px; font-size: 0.9em; min-width: 50px;">
+				   
+			<span class="outliner-icon" onclick="toggleConfigExpand('config-default', event)">▼</span>
+			<span class="outliner-icon" onclick="duplicateConfig('config-default', event)" title="Duplicate">📋</span>
+			<span class="outliner-icon" onclick="deleteConfig('config-default', event)" title="Delete" style="color:#e74c3c;">✖</span>
+		</div><div class="outliner-group"><div class="outliner-item " onclick="selectComponent('main-wing', true)" draggable="false" data-id="main-wing">
+				<span style="width:12px;display:inline-block;"></span>
+				<span class="outliner-icon" onclick="toggleVisibility('main-wing', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Main Wing Panel</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">90.00g</span>
+				
+			</div><div class="outliner-item " onclick="selectComponent('horiz-stab', true)" draggable="true" data-id="horiz-stab">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('horiz-stab', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Horizontal Stab</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">25.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('horiz-stab', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('vert-stab', true)" draggable="true" data-id="vert-stab">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('vert-stab', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Vertical Stab</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">12.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('vert-stab', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1779313505716', true)" draggable="true" data-id="comp-1779313505716">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1779313505716', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Tail Clamp</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">15.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1779313505716', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1779044494428', true)" draggable="true" data-id="comp-1779044494428">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1779044494428', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Elevator Servo</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">12.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1779044494428', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1779044465220', true)" draggable="true" data-id="comp-1779044465220">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1779044465220', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Rudder Servo</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">12.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1779044465220', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1779044508866', true)" draggable="true" data-id="comp-1779044508866">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1779044508866', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Aileron Servos ⧓</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">48.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1779044508866', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1779298878926', true)" draggable="true" data-id="comp-1779298878926">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1779298878926', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Tilt Servos ⧓</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">48.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1779298878926', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('front-fus', true)" draggable="true" data-id="front-fus">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('front-fus', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Front Fuselage + Front Gear</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">70.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('front-fus', event)">📋</span>
+			</div><div class="outliner-item selected" onclick="selectComponent('rear-fus', true)" draggable="true" data-id="rear-fus">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('rear-fus', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Rear Fuse</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">20.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('rear-fus', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1779231114708', true)" draggable="true" data-id="comp-1779231114708">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1779231114708', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Motors and ESCs ⧓</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">200.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1779231114708', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1779044380002', true)" draggable="true" data-id="comp-1779044380002">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1779044380002', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Battery</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">150.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1779044380002', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1784062659261', true)" draggable="true" data-id="comp-1784062659261">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1784062659261', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Tail Motor and ESC</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">50.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1784062659261', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1779299043963', true)" draggable="true" data-id="comp-1779299043963">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1779299043963', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Motor Mounts ⧓</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">160.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1779299043963', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1779241854755', true)" draggable="true" data-id="comp-1779241854755">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1779241854755', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Spar</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">50.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1779241854755', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1779242396440', true)" draggable="true" data-id="comp-1779242396440">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1779242396440', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Spar Rear</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">10.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1779242396440', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1779313212955', true)" draggable="true" data-id="comp-1779313212955">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1779313212955', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">GPS</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">66.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1779313212955', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1779313389645', true)" draggable="true" data-id="comp-1779313389645">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1779313389645', event)" style="opacity: 0.2">👁️</span>
+				<span class="outliner-label" style="opacity: 0.5">Electronics (FC, wires, Connectors)</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">70.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1779313389645', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1779044975978', true)" draggable="true" data-id="comp-1779044975978">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1779044975978', event)" style="opacity: 0.2">👁️</span>
+				<span class="outliner-label" style="opacity: 0.5">Rear Landing Gear</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">60.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1779044975978', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1784681822333', true)" draggable="true" data-id="comp-1784681822333">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1784681822333', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Payload Mechanism</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">30.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1784681822333', event)">📋</span>
+			</div><div class="outliner-item " onclick="selectComponent('comp-1783459208570', true)" draggable="true" data-id="comp-1783459208570">
+				<span class="drag-handle" title="Drag to reorder">⋮</span>
+				<span class="outliner-icon" onclick="toggleVisibility('comp-1783459208570', event)" style="opacity: 1">👁️</span>
+				<span class="outliner-label" style="opacity: 1">Exta Weight Post Assembly</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">30.00g</span>
+				<span class="outliner-icon" onclick="copyComponentById('comp-1783459208570', event)">📋</span>
+			</div></div></div></div>
         </div>
     </div>
 
@@ -926,12 +928,12 @@
 						<div id="pg-y-axes" style="display: flex; flex-direction: column; gap: 10px;"><div style="background: linear-gradient(145deg, rgba(255,255,255,calc(var(--grad-opacity) * 0.13)) 0%, rgba(0,0,0,var(--grad-opacity)) 100%), var(--panel-grey); border: 1px solid rgb(52, 152, 219); padding: 8px; border-radius: 6px; backdrop-filter: blur(4px);">
 					<div style="display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center;">
 						<span style="color: #3498db; font-size: 0.7em; font-weight: bold; text-transform: uppercase;">Y1</span>
-						<button id="pg-btn-y-1785179143740" class="btn-sm" onclick="startEyedropper('y-1785179143740')" style="width: 100%; border-color: #3498db; color: #3498db; background: rgba(0,0,0,0.5); font-size: 0.7em; padding: 2px 4px;">
+						<button id="pg-btn-y-1785202564299" class="btn-sm" onclick="startEyedropper('y-1785202564299')" style="width: 100%; border-color: #3498db; color: #3498db; background: rgba(0,0,0,0.5); font-size: 0.7em; padding: 2px 4px;">
 							SELECT VARIABLE
 						</button>
 						<div style="display: flex; gap: 6px; align-items: center;">
-							<span style="cursor: pointer; opacity: 1; filter: grayscale(0);" onclick="toggleYAxisVisibility(1785179143740)">👁️</span>
-							<span style="cursor: pointer; color: #e74c3c; font-size: 1em;" onclick="removeYAxisBox(1785179143740)">✖</span>
+							<span style="cursor: pointer; opacity: 1; filter: grayscale(0);" onclick="toggleYAxisVisibility(1785202564299)">👁️</span>
+							<span style="cursor: pointer; color: #e74c3c; font-size: 1em;" onclick="removeYAxisBox(1785202564299)">✖</span>
 						</div>
 					</div>
 				</div></div>
@@ -940,7 +942,7 @@
 					</div>
 				</div>
 			</div>
-            <svg id="visualizer" preserveAspectRatio="xMidYMid meet" viewBox="-39.5 -72 114 144" style="display: block;">
+            <svg id="visualizer" preserveAspectRatio="xMidYMid meet" viewBox="-39.504219426346765 -72 114.05063311616121 144" style="display: block;">
                 <defs>
                     <pattern height="10" id="gridPattern" patternUnits="userSpaceOnUse" width="10">
                         <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255, 255, 255, 0.15)" stroke-width="0.9" vector-effect="non-scaling-stroke"></path>
@@ -948,9 +950,9 @@
                 </defs>
                 <rect fill="url(#gridPattern)" height="10000%" id="bg-grid-fill" pointer-events="none" width="10000%" x="-5000%" y="-5000%"></rect>
                 <g id="wing-layer"><path d="M 0 0 L 0 -60 L 22.499999999999954 -60 L 22.5 0 Z M 0 0 L 0 60 L 22.499999999999954 60 L 22.5 0 Z" fill="#1b1b1b" stroke="#888" stroke-width="1" class="interactive-shape " transform="translate(0, 0) scale(0.9986295347545738, 1) translate(0, 0)"></path></g>
-                <g id="components-layer"><g class="interactive-shape"><g opacity="0.4"><polygon points="51,-19 65,-19 65,19 51,19" fill="#7f8c8d" stroke="#7f8c8d" stroke-width="0.5"></polygon></g><path d="M 51 -19 L 65 -19 M 65 -19 L 65 19 M 65 19 L 51 19 M 51 19 L 51 -19 " fill="none" stroke="var(--accent-yellow)" stroke-width="2" stroke-linecap="round" class="active-part"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="51.041806793212885,-0.3 64.04180679321288,-0.3 64.04180679321288,0.3 51.041806793212885,0.3" fill="#ffffff" stroke="#ffffff" stroke-width="0.5"></polygon></g><path d="M 51.041806793212885 -0.3 L 64.04180679321288 -0.3 M 64.04180679321288 -0.3 L 64.04180679321288 0.3 M 64.04180679321288 0.3 L 51.041806793212885 0.3 M 51.041806793212885 0.3 L 51.041806793212885 -0.3 " fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="51.041806793212885,-1.95 61.041806793212885,-1.95 61.041806793212885,1.95 51.041806793212885,1.95" fill="#00ff00" stroke="#00ff00" stroke-width="0.5"></polygon></g><path d="M 51.041806793212885 -1.95 L 61.041806793212885 -1.95 M 61.041806793212885 -1.95 L 61.041806793212885 1.95 M 61.041806793212885 1.95 L 51.041806793212885 1.95 M 51.041806793212885 1.95 L 51.041806793212885 -1.95 " fill="none" stroke="#00ff00" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="55.838481426239014,3 57.838481426239014,3 57.838481426239014,4 55.838481426239014,4" fill="#0000ff" stroke="#0000ff" stroke-width="0.5"></polygon></g><path d="M 55.838481426239014 3 L 57.838481426239014 3 M 57.838481426239014 3 L 57.838481426239014 4 M 57.838481426239014 4 L 55.838481426239014 4 M 55.838481426239014 4 L 55.838481426239014 3 " fill="none" stroke="#0000ff" stroke-width="1" stroke-linecap="round"></path></g><text x="56.838481426239014" y="3.5" class="part-label" style="font-size: 1.7065542898074404px;">Elevator Servo</text><g class="interactive-shape"><g opacity="0.4"><polygon points="55.838481426239014,-4 57.838481426239014,-4 57.838481426239014,-3 55.838481426239014,-3" fill="#0000ff" stroke="#0000ff" stroke-width="0.5"></polygon></g><path d="M 55.838481426239014 -4 L 57.838481426239014 -4 M 57.838481426239014 -4 L 57.838481426239014 -3 M 57.838481426239014 -3 L 55.838481426239014 -3 M 55.838481426239014 -3 L 55.838481426239014 -4 " fill="none" stroke="#0000ff" stroke-width="1" stroke-linecap="round"></path></g><text x="56.838481426239014" y="-3.5" class="part-label" style="font-size: 1.7065542898074404px;">Rudder Servo</text><g class="interactive-shape"><g opacity="0.4"><polygon points="11.642518043518066,-31 13.642518043518066,-31 13.642518043518066,-30 11.642518043518066,-30" fill="#0517fa" stroke="#0517fa" stroke-width="0.5"></polygon></g><path d="M 11.642518043518066 -31 L 13.642518043518066 -31 M 13.642518043518066 -31 L 13.642518043518066 -30 M 13.642518043518066 -30 L 11.642518043518066 -30 M 11.642518043518066 -30 L 11.642518043518066 -31 " fill="none" stroke="#0517fa" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.2"><polygon points="11.642518043518066,30 13.642518043518066,30 13.642518043518066,31 11.642518043518066,31" fill="#0517fa" stroke="#0517fa" stroke-width="0.5"></polygon></g><path d="M 11.642518043518066 30 L 13.642518043518066 30 M 13.642518043518066 30 L 13.642518043518066 31 M 13.642518043518066 31 L 11.642518043518066 31 M 11.642518043518066 31 L 11.642518043518066 30 " fill="none" stroke="#0517fa" stroke-width="1" stroke-linecap="round" stroke-dasharray="2,2"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="-9,-23.5 -7,-23.5 -7,-22.5 -9,-22.5" fill="#f1c40f" stroke="#f1c40f" stroke-width="0.5"></polygon></g><path d="M -9 -23.5 L -7 -23.5 M -7 -23.5 L -7 -22.5 M -7 -22.5 L -9 -22.5 M -9 -22.5 L -9 -23.5 " fill="none" stroke="#f1c40f" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.2"><polygon points="-9,22.5 -7,22.5 -7,23.5 -9,23.5" fill="#f1c40f" stroke="#f1c40f" stroke-width="0.5"></polygon></g><path d="M -9 22.5 L -7 22.5 M -7 22.5 L -7 23.5 M -7 23.5 L -9 23.5 M -9 23.5 L -9 22.5 " fill="none" stroke="#f1c40f" stroke-width="1" stroke-linecap="round" stroke-dasharray="2,2"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="-15.5,-4 -5.774860262870789,-4 -5.774860262870789,4 -15.5,4" fill="#6b6b6b" stroke="#6b6b6b" stroke-width="0.5"></polygon><polygon points="-5.774860262870789,-4 16.5,-4 16.5,4 -5.774860262870789,4" fill="#6b6b6b" stroke="#6b6b6b" stroke-width="0.5"></polygon></g><path d="M -15.5 -4 L -5.774860262870789 -4 M -5.774860262870789 4 L -15.5 4 M -15.5 4 L -15.5 -4 M -5.774860262870789 -4 L 16.5 -4 M 16.5 -4 L 16.5 4 M 16.5 4 L -5.774860262870789 4 " fill="none" stroke="#6b6b6b" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="16.5,-4 31.221738815307617,-3.032026731967926 31.221738815307617,3.032026731967926 16.5,4" fill="#95a5a6" stroke="#95a5a6" stroke-width="0.5"></polygon><polygon points="31.221738815307617,-3.032026731967926 65,-0.7580794572830198 65,0.7580794572830198 31.221738815307617,3.032026731967926" fill="#95a5a6" stroke="#95a5a6" stroke-width="0.5"></polygon></g><path d="M 16.5 -4 L 31.221738815307617 -3.032026731967926 M 31.221738815307617 3.032026731967926 L 16.5 4 M 16.5 4 L 16.5 -4 M 31.221738815307617 -3.032026731967926 L 65 -0.7580794572830198 M 65 -0.7580794572830198 L 65 0.7580794572830198 M 65 0.7580794572830198 L 31.221738815307617 3.032026731967926 " fill="none" stroke="#95a5a6" stroke-width="1" stroke-linecap="round"></path></g><text x="37.573912938435875" y="0" class="part-label" style="font-size: 1.7065542898074404px;">Rear Fuse</text><g class="interactive-shape"><g opacity="0.4"><polygon points="-9,-26.5 -7,-26.5 -7,-23.5 -9,-23.5" fill="#e817be" stroke="#e817be" stroke-width="0.5"></polygon></g><path d="M -9 -26.5 L -7 -26.5 M -7 -26.5 L -7 -23.5 M -7 -23.5 L -9 -23.5 M -9 -23.5 L -9 -26.5 " fill="none" stroke="#e817be" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.2"><polygon points="-9,23.5 -7,23.5 -7,26.5 -9,26.5" fill="#e817be" stroke="#e817be" stroke-width="0.5"></polygon></g><path d="M -9 23.5 L -7 23.5 M -7 23.5 L -7 26.5 M -7 26.5 L -9 26.5 M -9 26.5 L -9 23.5 " fill="none" stroke="#e817be" stroke-width="1" stroke-linecap="round" stroke-dasharray="2,2"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="-11.427639770507813,-2 -3.427639770507813,-2 -3.427639770507813,2 -11.427639770507813,2" fill="#ff0000" stroke="#ff0000" stroke-width="0.5"></polygon></g><path d="M -11.427639770507813 -2 L -3.427639770507813 -2 M -3.427639770507813 -2 L -3.427639770507813 2 M -3.427639770507813 2 L -11.427639770507813 2 M -11.427639770507813 2 L -11.427639770507813 -2 " fill="none" stroke="#ff0000" stroke-width="1" stroke-linecap="round"></path></g><text x="-7.427639770507813" y="0" class="part-label" style="font-size: 1.7065542898074404px;">Battery</text><g class="interactive-shape"><g opacity="0.4"><polygon points="31.88768768310547,-1.5 34.88768768310547,-1.5 34.88768768310547,1.5 31.88768768310547,1.5" fill="#e817be" stroke="#e817be" stroke-width="0.5"></polygon></g><path d="M 31.88768768310547 -1.5 L 34.88768768310547 -1.5 M 34.88768768310547 -1.5 L 34.88768768310547 1.5 M 34.88768768310547 1.5 L 31.88768768310547 1.5 M 31.88768768310547 1.5 L 31.88768768310547 -1.5 " fill="none" stroke="#e817be" stroke-width="1" stroke-linecap="round"></path></g><text x="33.38768768310547" y="0" class="part-label" style="font-size: 1.7065542898074404px;">Tail Motor and ESC</text><g class="interactive-shape"><g opacity="0.4"><polygon points="-7,-26.5 13.5,-26.5 13.5,-23.5 -7,-23.5" fill="#00ff00" stroke="#00ff00" stroke-width="0.5"></polygon></g><path d="M -7 -26.5 L 13.5 -26.5 M 13.5 -26.5 L 13.5 -23.5 M 13.5 -23.5 L -7 -23.5 M -7 -23.5 L -7 -26.5 " fill="none" stroke="#00ff00" stroke-width="1" stroke-linecap="round"></path></g><text x="3.25" y="-25" class="part-label" style="font-size: 1.7065542898074404px;">Motor Mounts</text><g class="interactive-shape"><g opacity="0.2"><polygon points="-7,23.5 13.5,23.5 13.5,26.5 -7,26.5" fill="#00ff00" stroke="#00ff00" stroke-width="0.5"></polygon></g><path d="M -7 23.5 L 13.5 23.5 M 13.5 23.5 L 13.5 26.5 M 13.5 26.5 L -7 26.5 M -7 26.5 L -7 23.5 " fill="none" stroke="#00ff00" stroke-width="1" stroke-linecap="round" stroke-dasharray="2,2"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="6,-60 7,-60 7,60 6,60" fill="#dfdfdf" stroke="#dfdfdf" stroke-width="0.5"></polygon></g><path d="M 6 -60 L 7 -60 M 7 -60 L 7 60 M 7 60 L 6 60 M 6 60 L 6 -60 " fill="none" stroke="#dfdfdf" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="12.8,-30 13.5,-30 13.5,30 12.8,30" fill="#dfdfdf" stroke="#dfdfdf" stroke-width="0.5"></polygon></g><path d="M 12.8 -30 L 13.5 -30 M 13.5 -30 L 13.5 30 M 13.5 30 L 12.8 30 M 12.8 30 L 12.8 -30 " fill="none" stroke="#dfdfdf" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="-1.0210990905761719,-3 4.978900909423828,-3 4.978900909423828,3 -1.0210990905761719,3" fill="#000000" stroke="#000000" stroke-width="0.5"></polygon></g><path d="M -1.0210990905761719 -3 L 4.978900909423828 -3 M 4.978900909423828 -3 L 4.978900909423828 3 M 4.978900909423828 3 L -1.0210990905761719 3 M -1.0210990905761719 3 L -1.0210990905761719 -3 " fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round"></path></g><text x="1.9789009094238281" y="0" class="part-label" style="font-size: 1.7065542898074404px;">GPS</text><g class="interactive-shape"><g opacity="0.4"><polygon points="0,-5 10,-5 10,5 0,5" fill="#f1c40f" stroke="#f1c40f" stroke-width="0.5"></polygon></g><path d="M 0 -5 L 10 -5 M 10 -5 L 10 5 M 10 5 L 0 5 M 0 5 L 0 -5 " fill="none" stroke="#f1c40f" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="10.04,-2.5 15.04,-2.5 15.04,2.5 10.04,2.5" fill="#f1c40f" stroke="#f1c40f" stroke-width="0.5"></polygon></g><path d="M 10.04 -2.5 L 15.04 -2.5 M 15.04 -2.5 L 15.04 2.5 M 15.04 2.5 L 10.04 2.5 M 10.04 2.5 L 10.04 -2.5 " fill="none" stroke="#f1c40f" stroke-width="1" stroke-linecap="round"></path></g><line stroke="#e73ce1" stroke-width="2" stroke-dasharray="6,4" x1="70.213708" y1="0" x2="-86.213708" y2="0"></line></g>
+                <g id="components-layer"><g class="interactive-shape"><g opacity="0.4"><polygon points="51.041419322958085,-19 65.04219426346768,-19 65.04219426346768,19 51.041419322958085,19" fill="#7f8c8d" stroke="#7f8c8d" stroke-width="0.5"></polygon></g><path d="M 51.041419322958085 -19 L 65.04219426346768 -19 M 65.04219426346768 -19 L 65.04219426346768 19 M 65.04219426346768 19 L 51.041419322958085 19 M 51.041419322958085 19 L 51.041419322958085 -19 " fill="none" stroke="#7f8c8d" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="51.041806793212885,-0.3 64.04180679321288,-0.3 64.04180679321288,0.3 51.041806793212885,0.3" fill="#ffffff" stroke="#ffffff" stroke-width="0.5"></polygon></g><path d="M 51.041806793212885 -0.3 L 64.04180679321288 -0.3 M 64.04180679321288 -0.3 L 64.04180679321288 0.3 M 64.04180679321288 0.3 L 51.041806793212885 0.3 M 51.041806793212885 0.3 L 51.041806793212885 -0.3 " fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="51.041806793212885,-1.95 61.041806793212885,-1.95 61.041806793212885,1.95 51.041806793212885,1.95" fill="#00ff00" stroke="#00ff00" stroke-width="0.5"></polygon></g><path d="M 51.041806793212885 -1.95 L 61.041806793212885 -1.95 M 61.041806793212885 -1.95 L 61.041806793212885 1.95 M 61.041806793212885 1.95 L 51.041806793212885 1.95 M 51.041806793212885 1.95 L 51.041806793212885 -1.95 " fill="none" stroke="#00ff00" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="55.838481426239014,3 57.838481426239014,3 57.838481426239014,4 55.838481426239014,4" fill="#0000ff" stroke="#0000ff" stroke-width="0.5"></polygon></g><path d="M 55.838481426239014 3 L 57.838481426239014 3 M 57.838481426239014 3 L 57.838481426239014 4 M 57.838481426239014 4 L 55.838481426239014 4 M 55.838481426239014 4 L 55.838481426239014 3 " fill="none" stroke="#0000ff" stroke-width="1" stroke-linecap="round"></path></g><text x="56.838481426239014" y="3.5" class="part-label" style="font-size: 1.9307262899000506px;">Elevator Servo</text><g class="interactive-shape"><g opacity="0.4"><polygon points="55.838481426239014,-4 57.838481426239014,-4 57.838481426239014,-3 55.838481426239014,-3" fill="#0000ff" stroke="#0000ff" stroke-width="0.5"></polygon></g><path d="M 55.838481426239014 -4 L 57.838481426239014 -4 M 57.838481426239014 -4 L 57.838481426239014 -3 M 57.838481426239014 -3 L 55.838481426239014 -3 M 55.838481426239014 -3 L 55.838481426239014 -4 " fill="none" stroke="#0000ff" stroke-width="1" stroke-linecap="round"></path></g><text x="56.838481426239014" y="-3.5" class="part-label" style="font-size: 1.9307262899000506px;">Rudder Servo</text><g class="interactive-shape"><g opacity="0.4"><polygon points="11.642518043518066,-31 13.642518043518066,-31 13.642518043518066,-30 11.642518043518066,-30" fill="#0517fa" stroke="#0517fa" stroke-width="0.5"></polygon></g><path d="M 11.642518043518066 -31 L 13.642518043518066 -31 M 13.642518043518066 -31 L 13.642518043518066 -30 M 13.642518043518066 -30 L 11.642518043518066 -30 M 11.642518043518066 -30 L 11.642518043518066 -31 " fill="none" stroke="#0517fa" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.2"><polygon points="11.642518043518066,30 13.642518043518066,30 13.642518043518066,31 11.642518043518066,31" fill="#0517fa" stroke="#0517fa" stroke-width="0.5"></polygon></g><path d="M 11.642518043518066 30 L 13.642518043518066 30 M 13.642518043518066 30 L 13.642518043518066 31 M 13.642518043518066 31 L 11.642518043518066 31 M 11.642518043518066 31 L 11.642518043518066 30 " fill="none" stroke="#0517fa" stroke-width="1" stroke-linecap="round" stroke-dasharray="2,2"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="-9,-23.5 -7,-23.5 -7,-22.5 -9,-22.5" fill="#f1c40f" stroke="#f1c40f" stroke-width="0.5"></polygon></g><path d="M -9 -23.5 L -7 -23.5 M -7 -23.5 L -7 -22.5 M -7 -22.5 L -9 -22.5 M -9 -22.5 L -9 -23.5 " fill="none" stroke="#f1c40f" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.2"><polygon points="-9,22.5 -7,22.5 -7,23.5 -9,23.5" fill="#f1c40f" stroke="#f1c40f" stroke-width="0.5"></polygon></g><path d="M -9 22.5 L -7 22.5 M -7 22.5 L -7 23.5 M -7 23.5 L -9 23.5 M -9 23.5 L -9 22.5 " fill="none" stroke="#f1c40f" stroke-width="1" stroke-linecap="round" stroke-dasharray="2,2"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="-15.5,-4 -6.32621693611145,-4 -6.32621693611145,4 -15.5,4" fill="#6b6b6b" stroke="#6b6b6b" stroke-width="0.5"></polygon><polygon points="-6.32621693611145,-4 16.5,-4 16.5,4 -6.32621693611145,4" fill="#6b6b6b" stroke="#6b6b6b" stroke-width="0.5"></polygon></g><path d="M -15.5 -4 L -6.32621693611145 -4 M -6.32621693611145 4 L -15.5 4 M -15.5 4 L -15.5 -4 M -6.32621693611145 -4 L 16.5 -4 M 16.5 -4 L 16.5 4 M 16.5 4 L -6.32621693611145 4 " fill="none" stroke="#6b6b6b" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="16.5,-4 28.238925652457965,-3.2323166966438293 28.238925652457965,3.2323166966438293 16.5,4" fill="#95a5a6" stroke="#95a5a6" stroke-width="0.5"></polygon><polygon points="28.238925652457965,-3.2323166966438293 65.00731602659562,-0.7580794572830198 65.00731602659562,0.7580794572830198 28.238925652457965,3.2323166966438293" fill="#95a5a6" stroke="#95a5a6" stroke-width="0.5"></polygon></g><path d="M 16.5 -4 L 28.238925652457965 -3.2323166966438293 M 28.238925652457965 3.2323166966438293 L 16.5 4 M 16.5 4 L 16.5 -4 M 28.238925652457965 -3.2323166966438293 L 65.00731602659562 -0.7580794572830198 M 65.00731602659562 -0.7580794572830198 L 65.00731602659562 0.7580794572830198 M 65.00731602659562 0.7580794572830198 L 28.238925652457965 3.2323166966438293 " fill="none" stroke="var(--accent-yellow)" stroke-width="2" stroke-linecap="round" class="active-part"></path></g><text x="36.58208055968453" y="0" class="part-label" style="font-size: 1.9307262899000506px;">Rear Fuse</text><g class="interactive-shape"><g opacity="0.4"><polygon points="-9,-26.5 -7,-26.5 -7,-23.5 -9,-23.5" fill="#e817be" stroke="#e817be" stroke-width="0.5"></polygon></g><path d="M -9 -26.5 L -7 -26.5 M -7 -26.5 L -7 -23.5 M -7 -23.5 L -9 -23.5 M -9 -23.5 L -9 -26.5 " fill="none" stroke="#e817be" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.2"><polygon points="-9,23.5 -7,23.5 -7,26.5 -9,26.5" fill="#e817be" stroke="#e817be" stroke-width="0.5"></polygon></g><path d="M -9 23.5 L -7 23.5 M -7 23.5 L -7 26.5 M -7 26.5 L -9 26.5 M -9 26.5 L -9 23.5 " fill="none" stroke="#e817be" stroke-width="1" stroke-linecap="round" stroke-dasharray="2,2"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="-11.427639770507813,-2 -3.427639770507813,-2 -3.427639770507813,2 -11.427639770507813,2" fill="#ff0000" stroke="#ff0000" stroke-width="0.5"></polygon></g><path d="M -11.427639770507813 -2 L -3.427639770507813 -2 M -3.427639770507813 -2 L -3.427639770507813 2 M -3.427639770507813 2 L -11.427639770507813 2 M -11.427639770507813 2 L -11.427639770507813 -2 " fill="none" stroke="#ff0000" stroke-width="1" stroke-linecap="round"></path></g><text x="-7.427639770507813" y="0" class="part-label" style="font-size: 1.9307262899000506px;">Battery</text><g class="interactive-shape"><g opacity="0.4"><polygon points="36.56433868408203,-1.5 39.56433868408203,-1.5 39.56433868408203,1.5 36.56433868408203,1.5" fill="#e817be" stroke="#e817be" stroke-width="0.5"></polygon></g><path d="M 36.56433868408203 -1.5 L 39.56433868408203 -1.5 M 39.56433868408203 -1.5 L 39.56433868408203 1.5 M 39.56433868408203 1.5 L 36.56433868408203 1.5 M 36.56433868408203 1.5 L 36.56433868408203 -1.5 " fill="none" stroke="#e817be" stroke-width="1" stroke-linecap="round"></path></g><text x="38.06433868408203" y="0" class="part-label" style="font-size: 1.9307262899000506px;">Tail Motor and ESC</text><g class="interactive-shape"><g opacity="0.4"><polygon points="-7,-26.5 13.5,-26.5 13.5,-23.5 -7,-23.5" fill="#00ff00" stroke="#00ff00" stroke-width="0.5"></polygon></g><path d="M -7 -26.5 L 13.5 -26.5 M 13.5 -26.5 L 13.5 -23.5 M 13.5 -23.5 L -7 -23.5 M -7 -23.5 L -7 -26.5 " fill="none" stroke="#00ff00" stroke-width="1" stroke-linecap="round"></path></g><text x="3.25" y="-25" class="part-label" style="font-size: 1.9307262899000506px;">Motor Mounts</text><g class="interactive-shape"><g opacity="0.2"><polygon points="-7,23.5 13.5,23.5 13.5,26.5 -7,26.5" fill="#00ff00" stroke="#00ff00" stroke-width="0.5"></polygon></g><path d="M -7 23.5 L 13.5 23.5 M 13.5 23.5 L 13.5 26.5 M 13.5 26.5 L -7 26.5 M -7 26.5 L -7 23.5 " fill="none" stroke="#00ff00" stroke-width="1" stroke-linecap="round" stroke-dasharray="2,2"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="6,-60 7,-60 7,60 6,60" fill="#dfdfdf" stroke="#dfdfdf" stroke-width="0.5"></polygon></g><path d="M 6 -60 L 7 -60 M 7 -60 L 7 60 M 7 60 L 6 60 M 6 60 L 6 -60 " fill="none" stroke="#dfdfdf" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="12.8,-30 13.5,-30 13.5,30 12.8,30" fill="#dfdfdf" stroke="#dfdfdf" stroke-width="0.5"></polygon></g><path d="M 12.8 -30 L 13.5 -30 M 13.5 -30 L 13.5 30 M 13.5 30 L 12.8 30 M 12.8 30 L 12.8 -30 " fill="none" stroke="#dfdfdf" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="-1.0210990905761719,-3 4.978900909423828,-3 4.978900909423828,3 -1.0210990905761719,3" fill="#000000" stroke="#000000" stroke-width="0.5"></polygon></g><path d="M -1.0210990905761719 -3 L 4.978900909423828 -3 M 4.978900909423828 -3 L 4.978900909423828 3 M 4.978900909423828 3 L -1.0210990905761719 3 M -1.0210990905761719 3 L -1.0210990905761719 -3 " fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round"></path></g><text x="1.9789009094238281" y="0" class="part-label" style="font-size: 1.9307262899000506px;">GPS</text><g class="interactive-shape"><g opacity="0.4"><polygon points="0,-5 10,-5 10,5 0,5" fill="#f1c40f" stroke="#f1c40f" stroke-width="0.5"></polygon></g><path d="M 0 -5 L 10 -5 M 10 -5 L 10 5 M 10 5 L 0 5 M 0 5 L 0 -5 " fill="none" stroke="#f1c40f" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="10.04,-2.5 15.04,-2.5 15.04,2.5 10.04,2.5" fill="#f1c40f" stroke="#f1c40f" stroke-width="0.5"></polygon></g><path d="M 10.04 -2.5 L 15.04 -2.5 M 15.04 -2.5 L 15.04 2.5 M 15.04 2.5 L 10.04 2.5 M 10.04 2.5 L 10.04 -2.5 " fill="none" stroke="#f1c40f" stroke-width="1" stroke-linecap="round"></path></g><line stroke="#e73ce1" stroke-width="2" stroke-dasharray="6,4" x1="70.213708" y1="0" x2="-86.213708" y2="0"></line></g>
                 <g id="mac-layer" pointer-events="none"><line x1="0" y1="-29.999999999999993" x2="22.499999999999975" y2="-29.999999999999993" stroke="#2ecc71" stroke-width="1"></line><line x1="0" y1="29.999999999999993" x2="22.499999999999975" y2="29.999999999999993" stroke="#2ecc71" stroke-width="1"></line><line x1="7.424999999999992" y1="-29.999999999999993" x2="7.424999999999992" y2="29.999999999999993" stroke="#2ecc71" stroke-width="0.5" stroke-dasharray="2,2"></line></g>
-                <g id="cg-layer" pointer-events="none"><g><circle cx="7.424999999999992" cy="0" r="0.8529121421520237" fill="#000" stroke="#fff" stroke-width="0.14215202369200394"></circle><path d="M 7.424999999999992 0 L 7.424999999999992 -0.8529121421520237 A 0.8529121421520237 0.8529121421520237 0 0 1 8.277912142152015 0 Z" fill="#2ecc71"></path><path d="M 7.424999999999992 0 L 7.424999999999992 0.8529121421520237 A 0.8529121421520237 0.8529121421520237 0 0 1 6.5720878578479685 0 Z" fill="#2ecc71"></path><line x1="6.287783810463961" y1="0" x2="8.562216189536024" y2="0" stroke="#fff" stroke-width="0.14215202369200394"></line><line x1="7.424999999999992" y1="-1.1372161895360315" x2="7.424999999999992" y2="1.1372161895360315" stroke="#fff" stroke-width="0.14215202369200394"></line></g><g><circle cx="8.967801695251465" cy="0" r="0.8529121421520237" fill="#000" stroke="#fff" stroke-width="0.14215202369200394"></circle><path d="M 8.967801695251465 0 L 8.967801695251465 -0.8529121421520237 A 0.8529121421520237 0.8529121421520237 0 0 1 9.820713837403488 0 Z" fill="#f1c40f"></path><path d="M 8.967801695251465 0 L 8.967801695251465 0.8529121421520237 A 0.8529121421520237 0.8529121421520237 0 0 1 8.114889553099442 0 Z" fill="#f1c40f"></path><line x1="7.830585505715434" y1="0" x2="10.105017884787497" y2="0" stroke="#fff" stroke-width="0.14215202369200394"></line><line x1="8.967801695251465" y1="-1.1372161895360315" x2="8.967801695251465" y2="1.1372161895360315" stroke="#fff" stroke-width="0.14215202369200394"></line></g></g>
+                <g id="cg-layer" pointer-events="none"><g><circle cx="7.424999999999992" cy="0" r="0.9653631284916201" fill="#000" stroke="#fff" stroke-width="0.16089385474860335"></circle><path d="M 7.424999999999992 0 L 7.424999999999992 -0.9653631284916201 A 0.9653631284916201 0.9653631284916201 0 0 1 8.390363128491613 0 Z" fill="#2ecc71"></path><path d="M 7.424999999999992 0 L 7.424999999999992 0.9653631284916201 A 0.9653631284916201 0.9653631284916201 0 0 1 6.459636871508372 0 Z" fill="#2ecc71"></path><line x1="6.1378491620111655" y1="0" x2="8.712150837988819" y2="0" stroke="#fff" stroke-width="0.16089385474860335"></line><line x1="7.424999999999992" y1="-1.2871508379888268" x2="7.424999999999992" y2="1.2871508379888268" stroke="#fff" stroke-width="0.16089385474860335"></line></g><g><circle cx="9.202752575396572" cy="0" r="0.9653631284916201" fill="#000" stroke="#fff" stroke-width="0.16089385474860335"></circle><path d="M 9.202752575396572 0 L 9.202752575396572 -0.9653631284916201 A 0.9653631284916201 0.9653631284916201 0 0 1 10.168115703888192 0 Z" fill="#f1c40f"></path><path d="M 9.202752575396572 0 L 9.202752575396572 0.9653631284916201 A 0.9653631284916201 0.9653631284916201 0 0 1 8.23738944690495 0 Z" fill="#f1c40f"></path><line x1="7.915601737407744" y1="0" x2="10.489903413385399" y2="0" stroke="#fff" stroke-width="0.16089385474860335"></line><line x1="9.202752575396572" y1="-1.2871508379888268" x2="9.202752575396572" y2="1.2871508379888268" stroke="#fff" stroke-width="0.16089385474860335"></line></g></g>
             </svg>
             <div id="legend" style="display: flex;">
                 <div class="legend-item"><div class="legend-color" style="background: #2ecc71; height: 2px;"></div> MAC Projection</div>
@@ -958,7 +960,7 @@
                 <div class="legend-item"><div class="quad-icon" style="--c1:#2ecc71; --c2:#000;"></div> Wing 33% MAC Center</div>
                 <div class="legend-item"><div class="legend-color" style="background: transparent; border-top: 2px dashed #e73ce1; height: 0; width: 15px;"></div> Thrust Vector</div>
             </div>
-			<div id="shortcuts-legend" style="position: absolute; bottom: 10px; right: 10px; background: rgba(0, 0, 0, 0.85); padding: 8px; border-radius: 4px; font-size: 0.65em; border: 1px solid var(--border-grey); color: var(--text-dim); pointer-events: none; text-align: left; display: flex; flex-direction: column; gap: 4px; z-index: 10;"><div style="color: var(--accent-yellow); font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid var(--border-grey); padding-bottom: 2px;">Shortcuts</div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:#fff; font-family:monospace; font-weight:bold;">H</kbd></span> <span>Hide Part</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:#fff; font-family:monospace; font-weight:bold;">F</kbd></span> <span>Focus Part</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:#fff; font-family:monospace; font-weight:bold;">I</kbd></span> <span>Isolate (Edit)</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:#fff; font-family:monospace; font-weight:bold;">Ctrl+H</kbd></span> <span>Unhide All</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:#fff; font-family:monospace; font-weight:bold;">Ctrl+Z</kbd></span> <span>Undo</span></div></div>
+			<div id="shortcuts-legend" style="position: absolute; bottom: 10px; right: 10px; background: rgba(0, 0, 0, 0.85); padding: 8px; border-radius: 4px; font-size: 0.65em; border: 1px solid var(--border-grey); color: var(--text-dim); pointer-events: none; text-align: left; display: flex; flex-direction: column; gap: 4px; z-index: 10;"><div style="color: var(--accent-yellow); font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid var(--border-grey); padding-bottom: 2px;">Shortcuts</div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">H</kbd></span> <span>Hide Part</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">F</kbd></span> <span>Focus Part</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">I</kbd></span> <span>Isolate (Edit)</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+H</kbd></span> <span>Unhide All</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+Z</kbd></span> <span>Undo</span></div></div>
             <div id="graph-overlay" style="display: none; position: absolute; inset: 0px; background: var(--bg-black); z-index: 20; padding: 20px; flex-direction: column;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <h3 style="margin: 0; color: var(--accent-yellow); font-family: 'Poppins', sans-serif;">Lift Coefficient (C_L) vs Angle of Attack</h3>
@@ -1626,13 +1628,14 @@ Drag (CD): 0.0098</title></circle>
 				<div style="flex: 1; color: #fff; font-size: 0.9em; line-height: 1.6;">
 					<h4 style="color: var(--accent-yellow); border-bottom: 1px solid var(--border-grey); padding-bottom: 4px;">Aircraft Design Tool</h4>
 					<p><!-- INSERT VERSION TEXT HERE -->
-						Version 5.2| July 27th, 2026 | Victor R | Google Gemini was used to create this tool
+						Version 5.3| July 27th, 2026 | Victor R | Google Gemini was used to create this tool
 					</p>
 
 					<h4 style="color: var(--accent-yellow); border-bottom: 1px solid var(--border-grey); padding-bottom: 4px; margin-top: 20px;">Features</h4>
 					<p><!-- INSERT FEATURES TEXT HERE -->
 						</p><ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0;">
 							<li style="margin-bottom: 8px;"><strong>Rendering:</strong> Renders top, side and front view of a simplified model of your airplane so you can visualize the CG location, mean chord and the scale of your design.</li>
+							<li style="margin-bottom: 8px;"><strong>Configurations and mass presets:</strong> Allows you to have multiple versions of you rplane in one file with multiple mass presets so you can easily compare designs.</li>
 							<li style="margin-bottom: 8px;"><strong>Main math:</strong> Calculates your mass, CG, Tail sizing and more.</li>
 							<li style="margin-bottom: 8px;"><strong>Extra math:</strong> Calculates your coefficient of lift and drag from a NACA 4 digit code. Also gives ballpark numbers for important speeds like stall, takeoff and cruise.</li>
 							<li style="margin-bottom: 8px;"><strong>Variables and Equations:</strong> Use variables to drive equations and equations to drive properties (Can drive more than one thing with one equation). Want to automatically make the spar the same length as your wingspan? Your wingspan can drive the spar length!</li>
@@ -1693,13 +1696,13 @@ Drag (CD): 0.0098</title></circle>
         <h2>Properties Panel</h2>
     
     <div id="props-standard" style="display: block;">
-        <div class="input-group"><label>Component Name</label><input id="prop-name" type="text" value="Horizontal Stab"></div>
+        <div class="input-group"><label>Component Name</label><input id="prop-name" type="text" value="Rear Fuse"></div>
         
         <div class="input-group">
             <label>Aerodynamic Role</label>
             <select id="prop-type" style="background: var(--bg-black);">
-                <option value="body">Fuselage / Body</option>
-                <option value="hstab" selected="true">Horizontal Stabilizer</option>
+                <option value="body" selected="true">Fuselage / Body</option>
+                <option value="hstab">Horizontal Stabilizer</option>
                 <option value="vstab">Vertical Stabilizer</option>
                 <option value="motor">Motor / Propulsion</option>
             </select>
@@ -1730,7 +1733,7 @@ Drag (CD): 0.0098</title></circle>
         </div>
 
         <div class="input-group-inline">
-            <input id="prop-show-label" type="checkbox">
+            <input id="prop-show-label" type="checkbox" checked="checked">
             <label for="prop-show-label" style="margin-bottom:0; cursor:pointer;">Show Name Label</label>
         </div>
         <div class="input-group-inline" style="border-top: 1px solid var(--border-grey); padding-top: 6px; justify-content: space-between;">
@@ -1744,7 +1747,7 @@ Drag (CD): 0.0098</title></circle>
 			</div>
 		</div>
         <div class="input-group-inline" style="border-top: 1px solid var(--border-grey); padding-top: 6px;">
-            <input id="prop-is-hollow" type="checkbox">
+            <input id="prop-is-hollow" type="checkbox" checked="checked">
             <label for="prop-is-hollow" style="margin-bottom:0; cursor:pointer;">Hollow Component</label>
         </div>
         <div class="input-group"><label>Wall Thickness (<span class="unit-label-dim">cm</span>)</label><input id="prop-wall-t" step="0.05" type="number" value="0.100"></div>
@@ -1755,7 +1758,7 @@ Drag (CD): 0.0098</title></circle>
 				<div>
 					<label style="font-size: 0.55em; color: var(--text-dim);">X Coord</label>
 					<div class="input-composite">
-						<input id="prop-x" step="0.1" type="number" value="58.00" data-mech-locked="false">
+						<input id="prop-x" step="0.1" type="number" value="40.75" data-mech-locked="false">
 						<svg class="lock-icon" id="lock-x" viewBox="0 0 24 24"><use href="#icon-lock"></use></svg>
 					</div>
 				</div>
@@ -1769,7 +1772,7 @@ Drag (CD): 0.0098</title></circle>
 				<div>
 					<label style="font-size: 0.55em; color: var(--text-dim);">Z Coord</label>
 					<div class="input-composite">
-						<input id="prop-z" step="0.1" type="number" value="3.50" data-mech-locked="false">
+						<input id="prop-z" step="0.1" type="number" value="-0.98" data-mech-locked="false">
 						<svg class="lock-icon" id="lock-z" viewBox="0 0 24 24"><use href="#icon-lock"></use></svg>
 					</div>
 				</div>
@@ -1786,26 +1789,26 @@ Drag (CD): 0.0098</title></circle>
         <div style="border-top: 1px solid var(--border-grey); padding-top: 6px; margin-bottom: 6px;">
 			<label style="margin-bottom: 4px; color: var(--accent-yellow);">Dimensions</label>
 			<div class="input-row-3col">
-				<div><label style="font-size: 0.55em; color: var(--text-dim);">Length (X)</label><input id="prop-sx" step="0.1" type="number" value="14.00" style="opacity: 1;" data-mech-locked="false"></div>
-				<div><label style="font-size: 0.55em; color: var(--text-dim);">Width (Y)</label><input id="prop-sy" step="0.1" type="number" value="38.00" style="opacity: 1;" class="" data-mech-locked="false"></div>
-				<div><label style="font-size: 0.55em; color: var(--text-dim);">Height (Z)</label><input id="prop-sz" step="0.1" type="number" value="0.50" style="opacity: 1;" data-mech-locked="false"></div>
+				<div><label style="font-size: 0.55em; color: var(--text-dim);">Length (X)</label><input id="prop-sx" step="0.1" type="number" value="48.51" style="opacity: 1;" data-mech-locked="false"></div>
+				<div><label style="font-size: 0.55em; color: var(--text-dim);">Width (Y)</label><input id="prop-sy" step="0.1" type="number" value="8.00" style="opacity: 1;" class="" data-mech-locked="false"></div>
+				<div><label style="font-size: 0.55em; color: var(--text-dim);">Height (Z)</label><input id="prop-sz" step="0.1" type="number" value="10.14" style="opacity: 1;" data-mech-locked="false"></div>
 			</div>
 		</div>
         <div class="input-group">
             <label>Mass - <span class="unit-mass">g</span></label>
             <div class="input-composite">
-                <input id="prop-mass-val" step="0.01" type="number" value="25.00" class="" style="opacity: 0.5; cursor: not-allowed;" data-mech-locked="true" disabled="">
+                <input id="prop-mass-val" step="0.01" type="number" value="20.00" class="" style="opacity: 0.5; cursor: not-allowed;" data-mech-locked="true" disabled="">
                 <svg class="lock-icon locked" id="lock-mass" viewBox="0 0 24 24"><use href="#icon-lock"></use></svg>
             </div>
         </div>
         <div class="input-group">
             <label>Density (<span class="unit-label-mass">g</span>/<span class="unit-label-dim">cm</span>³)</label>
             <div class="input-composite">
-                <input id="prop-rho" step="0.0001" type="number" value="0.09398" style="opacity: 1;" data-mech-locked="false">
+                <input id="prop-rho" step="0.0001" type="number" value="0.21629" style="opacity: 1;" data-mech-locked="false">
                 <svg class="lock-icon" id="lock-rho" viewBox="0 0 24 24"><use href="#icon-lock"></use></svg>
             </div>
         </div>
-        <div class="input-group"><label>Colour</label><input id="prop-color" style="height:26px; padding:2px;" type="color" value="#7f8c8d"></div>
+        <div class="input-group"><label>Colour</label><input id="prop-color" style="height:26px; padding:2px;" type="color" value="#95a5a6"></div>
         <button class="btn-sm" id="prop-delete" style="width:100%; margin-top:6px; border-color:#e74c3c; color:#e74c3c;">Delete Component</button>
     </div>
 
@@ -2141,13 +2144,27 @@ Depends on:
     "lockedar": false,
     "linkChords": true
 };
+
+		let globalComponents = [];
+		let configurations = [
+			{
+				id: 'config-' + Date.now(),
+				name: 'Base Configuration',
+				isActive: true,
+				isExpanded: true,
+				wing: wingData,  // Wing specific to this config
+				components: []   // Parts specific to this config
+			}
+		];
+
+
         
         let components = [
     {
         "id": "horiz-stab",
         "name": "Horizontal Stab",
         "type": "hstab",
-        "x": 51,
+        "x": 51.041806793212885,
         "y": -19,
         "z": 3.25,
         "sx": 14,
@@ -2166,7 +2183,7 @@ Depends on:
         "wallT": 0.1,
         "isMirrored": false,
         "rotX": 0,
-        "rotY": 0,
+        "rotY": -4,
         "rotZ": 0,
         "lockedMass": true,
         "lockedRho": false,
@@ -2187,7 +2204,7 @@ Depends on:
         "tz": 0.5,
         "dy": 0,
         "dz": 0,
-        "isSymmetrical": true,
+        "isSymmetrical": false,
         "sections": [
             {
                 "x": 0,
@@ -2203,8 +2220,7 @@ Depends on:
                 "dy": 0,
                 "dz": 0
             }
-        ],
-        "budgetIsMirrored": false
+        ]
     },
     {
         "id": "vert-stab",
@@ -2216,7 +2232,7 @@ Depends on:
         "sx": 13,
         "sy": 0.6,
         "sz": 16,
-        "rho": 0.09615384615384617,
+        "rho": 0.09615384615384616,
         "color": "#ffffff",
         "lockedX": false,
         "lockedY": true,
@@ -2250,7 +2266,7 @@ Depends on:
         "tz": 16,
         "dy": 0,
         "dz": 0,
-        "isSymmetrical": true,
+        "isSymmetrical": false,
         "sections": [
             {
                 "x": 0,
@@ -2266,8 +2282,7 @@ Depends on:
                 "dy": 0,
                 "dz": 0
             }
-        ],
-        "budgetIsMirrored": false
+        ]
     },
     {
         "id": "comp-1779313505716",
@@ -2294,7 +2309,7 @@ Depends on:
         "rotX": 0,
         "rotY": 0,
         "rotZ": 0,
-        "lockedMass": true,
+        "lockedMass": false,
         "lockedRho": false,
         "thrustAuto": false,
         "thrust": 0,
@@ -2589,7 +2604,7 @@ Depends on:
         "sx": 32,
         "sy": 8,
         "sz": 10,
-        "rho": 0.12089511953848658,
+        "rho": 0.11981994718942375,
         "color": "#6b6b6b",
         "lockedX": false,
         "lockedY": true,
@@ -2623,17 +2638,17 @@ Depends on:
         "tz": 10,
         "dy": 0,
         "dz": 0,
-        "isSymmetrical": true,
+        "isSymmetrical": false,
         "sections": [
             {
                 "x": 0,
                 "w": 1,
-                "h": 0.5816759824752807,
+                "h": 0.6444678544998169,
                 "dy": 0,
-                "dz": -0.09653631448745728
+                "dz": -0.07821706533432007
             },
             {
-                "x": 0.30391061678528786,
+                "x": 0.2866807207465172,
                 "w": 1,
                 "h": 1,
                 "dy": 0,
@@ -2646,8 +2661,7 @@ Depends on:
                 "dy": 0,
                 "dz": 0
             }
-        ],
-        "budgetIsMirrored": false
+        ]
     },
     {
         "id": "rear-fus",
@@ -2655,11 +2669,11 @@ Depends on:
         "type": "body",
         "x": 16.5,
         "y": -4,
-        "z": -6.185154533386228,
-        "sx": 48.5,
+        "z": -6.048515796661377,
+        "sx": 48.50731602659562,
         "sy": 8,
         "sz": 10.136638736724851,
-        "rho": 0.2199579166228089,
+        "rho": 0.2162918532039293,
         "color": "#95a5a6",
         "lockedX": false,
         "lockedY": true,
@@ -2704,11 +2718,11 @@ Depends on:
                 "dz": 0
             },
             {
-                "x": 0.303541006501188,
-                "w": 0.7580066829919815,
-                "h": 0.4287605568956533,
+                "x": 0.24200319898181422,
+                "w": 0.8080791741609573,
+                "h": 0.5000000000000002,
                 "dy": 0,
-                "dz": 0.2856197215521737
+                "dz": 0.2500000000000001
             },
             {
                 "x": 1,
@@ -2847,9 +2861,9 @@ Depends on:
         "id": "comp-1784062659261",
         "name": "Tail Motor and ESC",
         "type": "body",
-        "x": 32.38768768310547,
+        "x": 37.06433868408203,
         "y": -1.5,
-        "z": 3.951484203338623,
+        "z": -1.4370551109313965,
         "sx": 2,
         "sy": 3,
         "sz": 3,
@@ -3287,16 +3301,16 @@ Depends on:
         "type": "body",
         "x": 0,
         "y": -5,
-        "z": -5.5,
+        "z": -5,
         "sx": 10,
         "sy": 10,
-        "sz": 3,
-        "rho": 0.1,
+        "sz": 10,
+        "rho": 0.03,
         "measuredMass": 0,
         "predictedMass": 0,
         "color": "#f1c40f",
         "lockedX": false,
-        "lockedY": true,
+        "lockedY": false,
         "lockedZ": false,
         "anchorX": "min",
         "anchorY": "center",
@@ -3405,7 +3419,137 @@ Depends on:
         ]
     }
 ];
+
+
+		// Returns the active config (fallback to index 0 just in case)
+		function getActiveConfig() {
+			return configurations.find(cfg => cfg.isActive) || configurations[0];
+		}
+
+		// Switches the active configuration
+		function activateConfig(cfgId, event) {
+			if (event) event.stopPropagation();
+			configurations.forEach(cfg => cfg.isActive = (cfg.id === cfgId));
+			
+			// Sync the legacy global pointers so the UI and Math Engine don't crash
+			const active = getActiveConfig();
+			wingData = active.wing;
+			components = active.components; // <-- This was the missing link!
+			selectedComponentId = wingData.id; 
+			
+			updateComponentListUI();
+			calculateAndDraw();
+			saveState();
+		}
+
+		// Master Helper: Merges globals and active config parts for the math engine
+		function getAllActiveParts() {
+			return [...globalComponents, ...components];
+		}
 		
+		function renameConfig(cfgId, newName, event) {
+			if (event) event.stopPropagation();
+			const cfg = configurations.find(c => c.id === cfgId);
+			if (cfg) {
+				cfg.name = newName.trim() || "Unnamed Config";
+				saveState();
+			}
+		}
+
+		function toggleConfigExpand(cfgId, event) {
+			if (event) event.stopPropagation();
+			const cfg = configurations.find(c => c.id === cfgId);
+			if (cfg) cfg.isExpanded = !cfg.isExpanded;
+			updateComponentListUI();
+		}
+
+		function deleteConfig(cfgId, event) {
+			if (event) event.stopPropagation();
+			if (configurations.length <= 1) return alert("You must have at least one configuration.");
+
+			const cfgToDelete = configurations.find(c => c.id === cfgId);
+			if (cfgToDelete.isActive) {
+				alert("Cannot delete the currently active configuration. Switch to another one first.");
+				return;
+			}
+
+			if (confirm(`Are you sure you want to delete '${cfgToDelete.name}'?`)) {
+				configurations = configurations.filter(c => c.id !== cfgId);
+				updateComponentListUI();
+				calculateAndDraw();
+				saveState();
+			}
+		}
+
+		function duplicateConfig(cfgId, event) {
+			if (event) event.stopPropagation();
+			const sourceCfg = configurations.find(c => c.id === cfgId);
+			if (!sourceCfg) return;
+
+			const shouldInherit = confirm(`Duplicate '${sourceCfg.name}'?\n\nOK: Inherit variables and equations.\nCancel: Detach from all variables and equations.`);
+
+			// Deep clone the configuration
+			const clone = JSON.parse(JSON.stringify(sourceCfg));
+			clone.id = 'config-' + Date.now();
+			clone.name = sourceCfg.name + " (Copy)";
+			clone.isActive = false;
+
+			// Generate new unique IDs for the wing and all components inside the clone
+			const idMap = {}; // Maps old IDs to new IDs
+
+			const newWingId = 'wing-' + Date.now() + Math.floor(Math.random() * 1000);
+			idMap[clone.wing.id] = newWingId;
+			clone.wing.id = newWingId;
+
+			clone.components.forEach(c => {
+				const newId = 'comp-' + Date.now() + Math.floor(Math.random() * 1000);
+				idMap[c.id] = newId;
+				c.id = newId;
+			});
+
+			// If inheriting, wire up the equation/variable engine to the new IDs
+			if (shouldInherit) {
+				// Clone variables pointing to these components
+				const newVars = [];
+				sysVariables.forEach(v => {
+					if (v.targetId) {
+						const [compId, inputId] = v.targetId.split(':');
+						if (idMap[compId]) {
+							const clonedVar = JSON.parse(JSON.stringify(v));
+							clonedVar.id = Date.now() + Math.floor(Math.random() * 1000);
+							clonedVar.targetId = `${idMap[compId]}:${inputId}`;
+							newVars.push(clonedVar);
+						}
+					}
+				});
+				sysVariables.push(...newVars);
+
+				// Clone equations pointing to these components
+				const newEqs = [];
+				sysEquations.forEach(eq => {
+					let matches = false;
+					const clonedEq = JSON.parse(JSON.stringify(eq));
+					clonedEq.id = Date.now() + Math.floor(Math.random() * 1000);
+
+					if (clonedEq.targets) {
+						clonedEq.targets.forEach(t => {
+							const [compId, inputId] = t.id.split(':');
+							if (idMap[compId]) {
+								t.id = `${idMap[compId]}:${inputId}`;
+								matches = true;
+							}
+						});
+					}
+					if (matches) newEqs.push(clonedEq);
+				});
+				sysEquations.push(...newEqs);
+			}
+
+			configurations.push(clone);
+			updateComponentListUI();
+			syncMathEngine();
+			saveState();
+		}
 		
 		function syncMathEngine() {
 			renderVariablesTab();
@@ -3528,18 +3672,18 @@ Depends on:
             let html = `<div style="color: var(--accent-yellow); font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid var(--border-grey); padding-bottom: 2px;">Shortcuts</div>`;
             
             if (selectedComponentId) {
-                html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:#fff; font-family:monospace; font-weight:bold;">H</kbd></span> <span>Hide Part</span></div>`;
-                html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:#fff; font-family:monospace; font-weight:bold;">F</kbd></span> <span>${isFocused ? 'Unfocus' : 'Focus'} Part</span></div>`;
+                html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">H</kbd></span> <span>Hide Part</span></div>`;
+                html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">F</kbd></span> <span>${isFocused ? 'Unfocus' : 'Focus'} Part</span></div>`;
                 if (selectedComponentId !== 'main-wing') {
-                    html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:#fff; font-family:monospace; font-weight:bold;">I</kbd></span> <span>${isIsolated ? 'Exit Isolation' : 'Isolate (Edit)'}</span></div>`;
+                    html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">I</kbd></span> <span>${isIsolated ? 'Exit Isolation' : 'Isolate (Edit)'}</span></div>`;
                 }
             }
-            html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:#fff; font-family:monospace; font-weight:bold;">Ctrl+H</kbd></span> <span>Unhide All</span></div>`;
-            html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:#fff; font-family:monospace; font-weight:bold;">Ctrl+Z</kbd></span> <span>Undo</span></div>`;
+            html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+H</kbd></span> <span>Unhide All</span></div>`;
+            html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+Z</kbd></span> <span>Undo</span></div>`;
 
             if (isIsolated && selectedComponentId !== 'main-wing') {
-                html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:#fff; font-family:monospace; font-weight:bold;">Ctrl+R</kbd></span> <span>Loop Cut</span></div>`;
-                html += `<div style="display:flex; justify-content:space-between; gap:15px; margin-top:4px; border-top:1px solid var(--border-grey); padding-top:4px;"><span><kbd style="color:#fff; font-family:monospace; font-weight:bold;">Hold Ctrl</kbd></span> <span>Disable Snapping</span></div>`;
+                html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+R</kbd></span> <span>Loop Cut</span></div>`;
+                html += `<div style="display:flex; justify-content:space-between; gap:15px; margin-top:4px; border-top:1px solid var(--border-grey); padding-top:4px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Hold Ctrl</kbd></span> <span>Disable Snapping</span></div>`;
             }
 
             legend.innerHTML = html;
@@ -3593,7 +3737,7 @@ Depends on:
 			
 			if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'r' && isIsolated && selectedComponentId !== 'main-wing') {
                 e.preventDefault();
-                const active = components.find(c => c.id === selectedComponentId);
+                const active = getAllActiveParts().find(c => c.id === selectedComponentId);
                 if (active && active.sections) {
                     // Find the widest visual gap and slice it perfectly down the middle
                     let maxGap = 0; let insertIdx = 1;
@@ -3663,35 +3807,34 @@ Depends on:
         }
 
         function handleDrop(e) {
-            e.stopPropagation();
-            e.preventDefault(); // Prevent browser routing
-            this.classList.remove('drag-over');
+			e.stopPropagation(); e.preventDefault();
+			this.classList.remove('drag-over');
 
-            if (dragSrcEl && dragSrcEl !== this) {
-                const draggedId = dragSrcEl.dataset.id;
-                const targetId = this.dataset.id;
+			if (dragSrcEl && dragSrcEl !== this) {
+				const draggedId = dragSrcEl.dataset.id;
+				const targetId = this.dataset.id;
 
-                const draggedIdx = components.findIndex(c => c.id === draggedId);
-                const targetIdx = components.findIndex(c => c.id === targetId);
+				// Determine if the part is moving within Globals or within the Config
+				let dArr = globalComponents.find(c => c.id === draggedId) ? globalComponents : components;
+				let tArr = globalComponents.find(c => c.id === targetId) ? globalComponents : components;
 
-                if (draggedIdx > -1 && targetIdx > -1) {
-                    // Swap the items in the array
-                    const [movedItem] = components.splice(draggedIdx, 1);
-                    components.splice(targetIdx, 0, movedItem);
+				const dIdx = dArr.findIndex(c => c.id === draggedId);
+				const tIdx = tArr.findIndex(c => c.id === targetId);
 
-                    // Refresh both the UI and the Canvas Z-ordering
-                    updateComponentListUI();
-                    calculateAndDraw();
-                    saveState();
-                    
-                    const spreadOverlay = document.getElementById('spreadsheet-overlay');
-                    if (spreadOverlay && spreadOverlay.style.display !== 'none' && typeof renderSpreadsheet === 'function') {
-                        renderSpreadsheet();
-                    }
-                }
-            }
-            return false;
-        }
+				if (dIdx > -1 && tIdx > -1) {
+					const [movedItem] = dArr.splice(dIdx, 1);
+					tArr.splice(tIdx, 0, movedItem);
+
+					updateComponentListUI();
+					calculateAndDraw();
+					saveState();
+					
+					const spreadOverlay = document.getElementById('spreadsheet-overlay');
+					if (spreadOverlay && spreadOverlay.style.display !== 'none') renderSpreadsheet();
+				}
+			}
+			return false;
+		}
 
         function handleDragEnd(e) {
             this.classList.remove('dragging');
@@ -4293,14 +4436,7 @@ Depends on:
 
 		function drawLocalOrigin(layer, c, view) {
 			// Only draw if we are in isolated mode AND it's the active part
-			if (!isIsolated || c.id !== selectedComponentId) return; 
-
-			// Convert dropdown strings to math multipliers based on your system
-			const getOffset = (anchor, size) => {
-				if (anchor === 'center') return size / 2;
-				if (anchor === 'max') return size;
-				return 0; // 'min'
-			};
+			if (!isIsolated || c.id !== selectedComponentId) return;
 
 			// Calculate absolute 3D center
 			let ox = safeParse(c.x) + safeParse(c.sx) / 2;
@@ -4313,15 +4449,28 @@ Depends on:
 			else if (view === 'side') { px = ox; py = -oz; }
 			else if (view === 'front') { px = oy; py = -oz; }
 
+			// Extract the visual scale from the SVG to keep the indicator a fixed size on the monitor
+			let svgScale = 1;
+			const svg = document.getElementById('visualizer');
+			if (svg) {
+				const ctm = layer.getScreenCTM();
+				if (ctm) svgScale = 1 / ctm.a;
+			}
+
+			const rOuter = 8 * svgScale;
+			const rInner = 2 * svgScale;
+			const lineL = 12 * svgScale;
+			const strW = 1.5 * svgScale;
+
 			// Generate the SVG Crosshair
 			const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-			g.style.pointerEvents = "none"; 
+			g.style.pointerEvents = "none";
 			g.innerHTML = `
-				<circle cx="${px}" cy="${py}" r="1.5" fill="none" stroke="var(--accent-yellow)" stroke-width="0.3"/>
-				<circle cx="${px}" cy="${py}" r="0.4" fill="var(--accent-yellow)"/>
-				<line x1="${px-2.5}" y1="${py}" x2="${px+2.5}" y2="${py}" stroke="var(--accent-yellow)" stroke-width="0.3"/>
-				<line x1="${px}" y1="${py-2.5}" x2="${px}" y2="${py+2.5}" stroke="var(--accent-yellow)" stroke-width="0.3"/>
-			`;
+			<circle cx="${px}" cy="${py}" r="${rOuter}" fill="none" stroke="var(--accent-yellow)" stroke-width="${strW}"/>
+			<circle cx="${px}" cy="${py}" r="${rInner}" fill="var(--accent-yellow)"/>
+			<line x1="${px - lineL}" y1="${py}" x2="${px + lineL}" y2="${py}" stroke="var(--accent-yellow)" stroke-width="${strW}"/>
+			<line x1="${px}" y1="${py - lineL}" x2="${px}" y2="${py + lineL}" stroke="var(--accent-yellow)" stroke-width="${strW}"/>
+		`;
 			layer.appendChild(g);
 		}
 
@@ -4845,15 +4994,23 @@ Depends on:
 
             // 4. Mass & Density Resolution
             const newVol = getWingVolumeCm3('budget');
-            
+            const wingMassInput = document.getElementById('wing-mass-display');
+            const isMassDriven = wingMassInput && wingMassInput.classList.contains('driven-value');
+            const effectivelyLockedMass = isL('mass') || isMassDriven;
+
             if (changedProp === 'rho') {
                 wingData.rho = newVal;
             } else if (activeMassProfile === 'budget') {
                 if (changedProp === 'mass') {
                     if (!isL('rho') && newVol > 0) wingData.rho = newVal / newVol;
                 } else {
-                    if (isL('mass') && newVol > 0 && !isL('rho')) {
+                    if (effectivelyLockedMass && newVol > 0 && !isL('rho')) {
                         wingData.rho = targetMass / newVol;
+                        const rhoInput = document.getElementById('wing-rho');
+                        if (rhoInput && document.activeElement !== rhoInput) {
+                            const conversionFactor = getMassScalar() / Math.pow(getDimScalar(), 3);
+                            rhoInput.value = (wingData.rho * conversionFactor).toFixed(5);
+                        }
                     }
                 }
             } else {
@@ -5042,11 +5199,24 @@ Depends on:
 			let [compId, inputId] = targetCombo.split(':');
 
 			// Safely handle global top-bar targets
-			if (!inputId) {
-				const el = document.getElementById(compId);
-				if (el && el.tagName !== 'INPUT') el.innerText = Number(val).toFixed(2);
-				return;
-			}
+            if (!inputId) {
+                const el = document.getElementById(compId);
+                if (el) {
+                    if (el.tagName === 'INPUT') {
+                        if (document.activeElement !== el) el.value = Number(val).toFixed(4); // Keep precision
+                    } else {
+                        el.innerText = Number(val).toFixed(2);
+                    }
+                }
+
+                // Keep the underlying variable object in sync so it doesn't revert
+                if (compId.startsWith('var-input-')) {
+                    const varId = parseInt(compId.replace('var-input-', ''));
+                    const vObj = sysVariables.find(v => v.id === varId);
+                    if (vObj) vObj.value = val;
+                }
+                return;
+            }
 
 			let targetProfile = null;
 			if (inputId.startsWith('prop-mass-val-')) {
@@ -5058,29 +5228,40 @@ Depends on:
 			}
 
 			const comp = (compId === 'main-wing' || (typeof wingData !== 'undefined' && compId === wingData.id)) 
-						 ? wingData : components.find(c => c.id === compId);
+						 ? wingData : getAllActiveParts().find(c => c.id === compId);
 			if (!comp) return;
 
-			// Apply Mass Directly to Object
-			if (targetProfile) {
-				const mScale = getMassScalar();
-				let targetMassGrams = val / mScale;
-				
-				if (targetProfile === 'budget') {
-					if (getIsMirrored(comp, 'budget')) targetMassGrams /= 2;
-					const volume = comp === wingData ? getWingVolumeCm3('budget') : getComponentVolumeCm3(comp, 'budget');
-					if (volume > 0) comp.rho = targetMassGrams / volume;
-				} else {
-					comp[`${targetProfile}Mass`] = targetMassGrams;
-				}
-				
-				// Sync UI passively
-				if (targetProfile === activeMassProfile && compId === selectedComponentId) {
-					const el = document.getElementById(inputId);
-					if (el && document.activeElement !== el) el.value = Number(val).toFixed(2);
-				}
-				return;
-			}
+            // Apply Mass Directly to Object
+            if (targetProfile) {
+                const mScale = getMassScalar();
+                let targetMassGrams = val / mScale;
+
+                if (targetProfile === 'budget') {
+                    if (getIsMirrored(comp, 'budget')) targetMassGrams /= 2;
+                    const volume = comp === wingData ? getWingVolumeCm3('budget') : getComponentVolumeCm3(comp, 'budget');
+                    if (volume > 0) {
+                        comp.rho = targetMassGrams / volume;
+
+                        // Sync Density UI passively 
+                        if (compId === selectedComponentId && activeMassProfile === 'budget') {
+                            const rhoInput = comp === wingData ? document.getElementById('wing-rho') : document.getElementById('prop-rho');
+                            if (rhoInput && document.activeElement !== rhoInput) {
+                                const conversionFactor = getMassScalar() / Math.pow(getDimScalar(), 3);
+                                rhoInput.value = (comp.rho * conversionFactor).toFixed(5);
+                            }
+                        }
+                    }
+                } else {
+                    comp[`${targetProfile}Mass`] = targetMassGrams;
+                }
+
+                // Sync Mass UI passively
+                if (targetProfile === activeMassProfile && compId === selectedComponentId) {
+                    const el = document.getElementById(inputId);
+                    if (el && document.activeElement !== el) el.value = Number(val).toFixed(2);
+                }
+                return;
+            }
 
 			// Apply Geometry Directly to Object
 			const propMap = {
@@ -5181,23 +5362,27 @@ Depends on:
             el.addEventListener('change', saveState);
         });
 
-        function recalculateMassOrDensity(p) {
-			if (p.lockedMass && !p.lockedRho) {
+		function recalculateMassOrDensity(p) {
+			const massInput = document.getElementById('prop-mass-val');
+			const isMassDriven = massInput && massInput.classList.contains('driven-value');
+			const effectivelyLockedMass = p.lockedMass || isMassDriven;
+
+			if (effectivelyLockedMass && !p.lockedRho) {
 				// Only back-calculate density if we are explicitly editing the geometric budget
 				if (activeMassProfile === 'budget') {
 					const volume = getComponentVolumeCm3(p);
 					if (volume > 0) {
-						let targetMassGrams = safeParse(document.getElementById('prop-mass-val').value) / getMassScalar();
+						let targetMassGrams = safeParse(massInput.value) / getMassScalar();
 						if (p.isMirrored) targetMassGrams /= 2;
 						p.rho = targetMassGrams / volume;
 						const conversionFactor = getMassScalar() / Math.pow(getDimScalar(), 3);
 						document.getElementById('prop-rho').value = (p.rho * conversionFactor).toFixed(5);
 					}
 				}
-			} else if (!p.lockedMass) {
+			} else if (!effectivelyLockedMass) {
 				// Safely update the mass display based on the active profile
 				let totalCompMassGrams = getEffectiveMassGrams(p);
-				document.getElementById('prop-mass-val').value = (totalCompMassGrams * getMassScalar()).toFixed(2);
+				if (massInput) massInput.value = (totalCompMassGrams * getMassScalar()).toFixed(2);
 			}
 		}
 		
@@ -5216,7 +5401,7 @@ Depends on:
         document.getElementById('lock-z').onclick = () => { toggleLock('z'); saveState(); };
 
         function toggleLock(axis) {
-            const activePart = components.find(c => c.id === selectedComponentId);
+            const activePart = getAllActiveParts().find(c => c.id === selectedComponentId);
             if (!activePart) return;
             const key = `locked${axis.toUpperCase()}`;
             activePart[key] = !activePart[key];
@@ -5228,7 +5413,7 @@ Depends on:
         document.getElementById('lock-rho').onclick = () => { toggleExtendedLock('rho'); saveState(); };
 
         function toggleExtendedLock(type) {
-            const activePart = components.find(c => c.id === selectedComponentId);
+            const activePart = getAllActiveParts().find(c => c.id === selectedComponentId);
             if (!activePart) return;
             if (type === 'mass') activePart.lockedMass = !activePart.lockedMass;
             if (type === 'rho') activePart.lockedRho = !activePart.lockedRho;
@@ -5237,7 +5422,7 @@ Depends on:
         }
 
         document.getElementById('prop-type').addEventListener('change', (e) => {
-            const p = components.find(c => c.id === selectedComponentId);
+            const p = getAllActiveParts().find(c => c.id === selectedComponentId);
             if (!p) return;
             p.type = e.target.value;
             updatePropertiesPanel(); 
@@ -5246,7 +5431,7 @@ Depends on:
         });
 
         document.getElementById('prop-show-label').onchange = (e) => {
-            const activePart = components.find(c => c.id === selectedComponentId);
+            const activePart = getAllActiveParts().find(c => c.id === selectedComponentId);
             if (!activePart) return;
             activePart.showLabel = e.target.checked;
             calculateAndDraw();
@@ -5254,7 +5439,7 @@ Depends on:
         };
 
         document.getElementById('prop-is-mirrored').onchange = (e) => {
-			const activePart = components.find(c => c.id === selectedComponentId);
+			const activePart = getAllActiveParts().find(c => c.id === selectedComponentId);
 			if (!activePart) return;
 			
 			const isNowMirrored = e.target.checked;
@@ -5293,7 +5478,7 @@ Depends on:
 		};
 
 		document.getElementById('prop-is-symmetrical').onchange = (e) => {
-			const activePart = components.find(c => c.id === selectedComponentId);
+			const activePart = getAllActiveParts().find(c => c.id === selectedComponentId);
 			if (!activePart) return;
 			
 			const isNowSymmetrical = e.target.checked;
@@ -5317,7 +5502,7 @@ Depends on:
 		};
 
         document.getElementById('prop-is-hollow').onchange = (e) => {
-			const activePart = components.find(c => c.id === selectedComponentId);
+			const activePart = getAllActiveParts().find(c => c.id === selectedComponentId);
 			if (!activePart) return;
 			
 			const isNowHollow = e.target.checked;
@@ -5331,7 +5516,7 @@ Depends on:
 		};
 
         document.getElementById('prop-wall-t').oninput = (e) => {
-            const activePart = components.find(c => c.id === selectedComponentId);
+            const activePart = getAllActiveParts().find(c => c.id === selectedComponentId);
             if (!activePart) return;
             activePart.wallT = safeParse(e.target.value) / getDimScalar();
             
@@ -5457,90 +5642,135 @@ Depends on:
 		}
 
         function deleteComponentById(id, event) {
-            if (event) event.stopPropagation();
-            components = components.filter(c => c.id !== id);
-            if (selectedComponentId === id) {
-                selectComponent('main-wing', true);
-            } else {
-                updateComponentListUI();
-                calculateAndDraw();
-            }
-            saveState();
-        }
+			if (event) event.stopPropagation();
+			// Scrub from both arrays safely
+			globalComponents = globalComponents.filter(c => c.id !== id);
+			components = components.filter(c => c.id !== id);
+			
+			if (selectedComponentId === id) selectComponent('main-wing', true);
+			else { updateComponentListUI(); calculateAndDraw(); }
+			saveState();
+		}
 
-        function copyComponentById(id, event) {
-            if (event) event.stopPropagation();
-            const originalIndex = components.findIndex(c => c.id === id);
-            if (originalIndex === -1) return;
-            
-            const origin = components[originalIndex];
-            const clone = JSON.parse(JSON.stringify(origin));
-            clone.id = 'comp-' + Date.now();
-            clone.name = origin.name + " (Copy)";
-            
-            components.splice(originalIndex + 1, 0, clone);
-            selectComponent(clone.id, true);
-            saveState();
-        }
+		function copyComponentById(id, event) {
+			if (event) event.stopPropagation();
+			const gIdx = globalComponents.findIndex(c => c.id === id);
+			const cIdx = components.findIndex(c => c.id === id);
+			
+			let origin, targetArray, insertIndex;
+			if (gIdx !== -1) { origin = globalComponents[gIdx]; targetArray = globalComponents; insertIndex = gIdx; }
+			else if (cIdx !== -1) { origin = components[cIdx]; targetArray = components; insertIndex = cIdx; }
+			else return;
+			
+			const clone = JSON.parse(JSON.stringify(origin));
+			clone.id = 'comp-' + Date.now();
+			clone.name = origin.name + " (Copy)";
+			
+			targetArray.splice(insertIndex + 1, 0, clone);
+			selectComponent(clone.id, true);
+			saveState();
+		}
 
-        function updateComponentListUI() {
-            const list = document.getElementById('comp-list'); list.innerHTML = '';
-            const wingItem = document.createElement('div');
-            wingItem.className = `comp-item ${wingData.id === selectedComponentId ? 'selected' : ''}`;
-            
-            const computedWingMass = getEffectiveMassGrams(wingData) * getMassScalar();
-            const wingVis = isEffectivelyVisible('main-wing', wingData.isHidden);
-			wingItem.innerHTML = `
-			<div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-				<span style="opacity: ${wingVis ? '1' : '0.5'};">Main Wing Panel</span>
-				<div style="display:flex; align-items:center;">
-					<span onclick="toggleVisibility('main-wing', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 8px; font-size: 1.1em; opacity: ${wingVis ? '1' : '0.2'};">👁️</span>
-					<span style="font-size:0.8em;color:var(--accent-yellow); opacity: ${wingVis ? '1' : '0.5'};">${computedWingMass.toFixed(2)}${unitScales.mass}</span>
-				</div>
+		function updateComponentListUI() {
+			const list = document.getElementById('comp-list');
+			list.innerHTML = '';
+
+			const renderItem = (c, isWing, isGlobal) => {
+				const isSelected = (c.id === selectedComponentId);
+				const isVis = isEffectivelyVisible(c.id, c.isHidden);
+				let mass = getEffectiveMassGrams(c) * getMassScalar();
+				if (!isWing && getIsMirrored(c)) mass *= 2;
+
+				const name = isWing ? "Main Wing Panel" : c.name + (getIsMirrored(c) ? ' ⧓' : '');
+
+				return `
+			<div class="outliner-item ${isSelected ? 'selected' : ''}" 
+				 onclick="selectComponent('${c.id}', true)" 
+				 draggable="${!isWing}" data-id="${c.id}">
+				${!isWing ? `<span class="drag-handle" title="Drag to reorder">⋮</span>` : `<span style="width:12px;display:inline-block;"></span>`}
+				<span class="outliner-icon" onclick="toggleVisibility('${c.id}', event)" style="opacity: ${isVis ? '1' : '0.2'}">👁️</span>
+				<span class="outliner-label" style="opacity: ${isVis ? '1' : '0.5'}">${name}</span>
+				<span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">${mass.toFixed(2)}${unitScales.mass}</span>
+				${!isWing ? `<span class="outliner-icon" onclick="copyComponentById('${c.id}', event)">📋</span>` : ''}
 			</div>`;
-            
-            // Camera lock flag passed here
-            wingItem.onclick = (e) => { e.stopPropagation(); selectComponent(wingData.id, true); };
-            list.appendChild(wingItem);
+			};
 
-            components.forEach(c => {
-                const item = document.createElement('div');
-                item.className = `comp-item ${c.id === selectedComponentId ? 'selected' : ''}`;
-                
-                item.draggable = true;
-                item.dataset.id = c.id;
-                
-                let displayMass = getEffectiveMassGrams(c) * getMassScalar();
-                if (getIsMirrored(c)) displayMass *= 2;
-                
-                const cVis = isEffectivelyVisible(c.id, c.isHidden);
-				item.innerHTML = `
-				<div style="display:flex; align-items:center; flex:1; min-width: 0; margin-right: 6px;">
-					<span class="drag-handle" title="Drag to reorder">⋮⋮</span>
-					<span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity: ${cVis ? '1' : '0.5'};">${c.name}${getIsMirrored(c) ? ' ⧓' : ''}</span>
-				</div>
-				<div style="display:flex; align-items:center; flex-shrink:0;">
-					<span onclick="toggleVisibility('${c.id}', event)" title="Toggle Visibility" style="cursor:pointer; margin-right: 6px; font-size: 1.1em; opacity: ${cVis ? '1' : '0.2'};">👁️</span>
-					<span style="font-size:0.8em;color:var(--text-dim); opacity: ${cVis ? '1' : '0.5'}; margin-right: 4px;">${displayMass.toFixed(2)}${unitScales.mass}</span>
-					<span class="comp-item-copy" onclick="copyComponentById('${c.id}', event)" title="Duplicate Component">📋</span>
-				</div>`;
-					
-                // Camera lock flag passed here
-                item.onclick = (e) => { e.stopPropagation(); selectComponent(c.id, true); };
-                
-                item.addEventListener('dragstart', handleDragStart, false);
-                item.addEventListener('dragenter', handleDragEnter, false);
-                item.addEventListener('dragover', handleDragOver, false);
-                item.addEventListener('dragleave', handleDragLeave, false);
-                item.addEventListener('drop', handleDrop, false);
-                item.addEventListener('dragend', handleDragEnd, false);
-                
-                list.appendChild(item);
-            });
-        }
+			// 1. Render Global Components
+			if (globalComponents.length > 0) {
+				const globHeader = document.createElement('div');
+				globHeader.innerHTML = `<span style="font-size: 0.7em; color: var(--text-dim); font-weight: bold; text-transform: uppercase; padding-left: 4px;">Global Parts</span>`;
+				list.appendChild(globHeader);
+
+				globalComponents.forEach(c => {
+					const tempDiv = document.createElement('div');
+					tempDiv.innerHTML = renderItem(c, false, true);
+					const item = tempDiv.firstElementChild;
+
+					item.addEventListener('dragstart', handleDragStart, false);
+					item.addEventListener('dragenter', handleDragEnter, false);
+					item.addEventListener('dragover', handleDragOver, false);
+					item.addEventListener('dragleave', handleDragLeave, false);
+					item.addEventListener('drop', handleDrop, false);
+					item.addEventListener('dragend', handleDragEnd, false);
+
+					list.appendChild(item);
+				});
+			}
+
+			// 2. Render Configurations
+			const confHeader = document.createElement('div');
+			confHeader.innerHTML = `<span style="font-size: 0.7em; color: var(--text-dim); font-weight: bold; text-transform: uppercase; padding-left: 4px; display: inline-block; margin-top: 8px;">Configurations</span>`;
+			list.appendChild(confHeader);
+
+			configurations.forEach(cfg => {
+				const wrapper = document.createElement('div');
+
+				wrapper.innerHTML = `
+		<div class="outliner-item" style="background: var(--panel-grey); border: 1px solid var(--border-grey); margin-top: 2px;">
+			<input type="radio" class="outliner-radio" style="width: auto;" name="active_config" ${cfg.isActive ? 'checked' : ''} onclick="activateConfig('${cfg.id}', event)">
+			
+			<input type="text" value="${cfg.name}" 
+				   onchange="renameConfig('${cfg.id}', this.value, event)" 
+				   onclick="event.stopPropagation()" 
+				   style="flex: 1; background: var(--bg-black); border: 1px solid var(--border-grey); color: var(--accent-yellow); font-weight: bold; outline: none; margin: 0 4px; padding: 2px 4px; border-radius: 2px; font-size: 0.9em; min-width: 50px;">
+				   
+			<span class="outliner-icon" onclick="toggleConfigExpand('${cfg.id}', event)">${cfg.isExpanded ? '▼' : '▶'}</span>
+			<span class="outliner-icon" onclick="duplicateConfig('${cfg.id}', event)" title="Duplicate">📋</span>
+			<span class="outliner-icon" onclick="deleteConfig('${cfg.id}', event)" title="Delete" style="color:#e74c3c;">✖</span>
+		</div>`;
+
+				if (cfg.isExpanded) {
+					const groupDiv = document.createElement('div');
+					groupDiv.className = 'outliner-group';
+
+					const wingDiv = document.createElement('div');
+					wingDiv.innerHTML = renderItem(cfg.wing, true, false);
+					groupDiv.appendChild(wingDiv.firstElementChild);
+
+					cfg.components.forEach(c => {
+						const tempDiv = document.createElement('div');
+						tempDiv.innerHTML = renderItem(c, false, false);
+						const item = tempDiv.firstElementChild;
+
+						// Keep dragging active for items inside configs
+						item.addEventListener('dragstart', handleDragStart, false);
+						item.addEventListener('dragenter', handleDragEnter, false);
+						item.addEventListener('dragover', handleDragOver, false);
+						item.addEventListener('dragleave', handleDragLeave, false);
+						item.addEventListener('drop', handleDrop, false);
+						item.addEventListener('dragend', handleDragEnd, false);
+
+						groupDiv.appendChild(item);
+					});
+					wrapper.appendChild(groupDiv);
+				}
+				list.appendChild(wrapper);
+			});
+		}
 		
 		function applyInputStyles() {
-			const inputs = document.querySelectorAll('#props-wing input[type="number"], #props-standard input[type="number"]');
+			// Added `#var-def-list input[type="number"]` to the selector
+			const inputs = document.querySelectorAll('#props-wing input[type="number"], #props-standard input[type="number"], #var-def-list input[type="number"]');
 			let equationsNeedEval = false;
 
 			inputs.forEach(input => {
@@ -5548,7 +5778,11 @@ Depends on:
 				input.removeAttribute('title');
 
 				let currentTargetCombo = `${selectedComponentId}:${input.id}`;
-				if (input.id === 'prop-mass-val' || input.id === 'wing-mass-display') {
+
+				// If it's a variable input, its target ID is just its HTML id
+				if (input.id.startsWith('var-input-')) {
+					currentTargetCombo = input.id;
+				} else if (input.id === 'prop-mass-val' || input.id === 'wing-mass-display') {
 					currentTargetCombo = `${selectedComponentId}:${input.id}-${activeMassProfile}`;
 				}
 
@@ -5558,21 +5792,20 @@ Depends on:
 				if (v) {
 					input.classList.add('source-value');
 					titleText.push(`Drives variable: ${v.name}`);
-					
+
 					const currentVal = parseFloat(input.value) || 0;
 					const newVarVal = convertDisplayToVariableUnit(currentVal, v.unit);
-										
 				}
 
 				const eq = sysEquations.find(e => {
 					let targets = e.targets || [];
-					if (e.targetId && targets.length === 0) targets = [{id: e.targetId, label: e.targetLabel}];
+					if (e.targetId && targets.length === 0) targets = [{ id: e.targetId, label: e.targetLabel }];
 					return targets.some(t => t.id === currentTargetCombo);
 				});
-				
+
 				if (eq) {
 					input.classList.add('driven-value');
-					input.disabled = true;
+					input.disabled = true; // Locks the UI
 					titleText.push(`Driven by equation: ${eq.equation}`);
 				} else {
 					input.disabled = input.dataset.mechLocked === 'true';
@@ -5727,7 +5960,7 @@ Depends on:
                 wingForm.style.display = 'none'; 
                 standardForm.style.display = 'block';
                 
-                const activePart = components.find(c => c.id === selectedComponentId);
+                const activePart = getAllActiveParts().find(c => c.id === selectedComponentId);
                 if (!activePart) return;
 
                 document.getElementById('prop-name').value = activePart.name;
@@ -5845,15 +6078,20 @@ Depends on:
 					massEl.style.cursor = activePart.lockedMass ? 'not-allowed' : '';
 				}
 
+                const iconMass = document.getElementById('lock-mass');
+                if (iconMass) iconMass.classList.toggle('locked', !!activePart.lockedMass);
+
 				const rhoEl = document.getElementById('prop-rho');
 				if (rhoEl) {
 					rhoEl.dataset.mechLocked = activePart.lockedRho ? 'true' : 'false';
 					rhoEl.disabled = !!activePart.lockedRho;
 					rhoEl.style.opacity = activePart.lockedRho ? '0.5' : '1';
 					rhoEl.style.cursor = activePart.lockedRho ? 'not-allowed' : '';
-}
-            }
-			
+				}
+
+                const iconRho = document.getElementById('lock-rho');
+                if (iconRho) iconRho.classList.toggle('locked', !!activePart.lockedRho);
+            }			
 			applyInputStyles();
         }
 
@@ -5996,57 +6234,80 @@ Depends on:
 				sysVariables = data.sysVariables || [];
 				sysEquations = data.sysEquations || [];
 
-				if(data.wing) {
-					wingData = data.wing;
-					if (document.getElementById('airfoil-aoa')) {
-						document.getElementById('airfoil-aoa').value = wingData.aoa !== undefined ? wingData.aoa : 2;
-					}
-					if (wingData.syncAirfoil === undefined) wingData.syncAirfoil = false;
+				// Restore Config Tree or migrate legacy flat files
+				if (data.configurations) {
+					configurations = data.configurations;
+					globalComponents = data.globalComponents || [];
+				} else {
+					// Legacy Migration
+					configurations = [{
+						id: 'config-default',
+						name: 'Config 1',
+						isActive: true,
+						isExpanded: true,
+						wing: data.wing || wingData,
+						components: data.components || []
+					}];
+					globalComponents = [];
 				}
-				if(data.components) {
-					components = data.components.map(c => {
-						if (c.rotX === undefined) c.rotX = 0;
-						if (c.rotY === undefined) c.rotY = 0;
-						if (c.rotZ === undefined) c.rotZ = 0;
-						if (c.lockedMass === undefined) c.lockedMass = false;
-						if (c.lockedRho === undefined) c.lockedRho = false;
-						if (c.anchorZ === undefined) c.anchorZ = 'center';
-						
-						if (c.thrustAuto === undefined) c.thrustAuto = false;
-						if (c.thrust === undefined) c.thrust = 0;
-						if (c.propDia === undefined) c.propDia = 5;
-						if (c.propPitch === undefined) c.propPitch = 3;
-						if (c.motorKV === undefined) c.motorKV = 2300;
-						if (c.battCells === undefined) c.battCells = 3;
 
-						// Legacy fallback: convert old frustum params into a 2-segment array
-						if (c.sections === undefined) {
-							c.sections = [
-								{ x: 0, w: 1, h: 1, dy: 0, dz: 0 },
-								{ 
-									x: 1, 
-									w: c.sy > 0 ? (c.ty !== undefined ? c.ty : c.sy) / c.sy : 1, 
-									h: c.sz > 0 ? (c.tz !== undefined ? c.tz : c.sz) / c.sz : 1, 
-									dy: c.sy > 0 ? (c.dy || 0) / c.sy : 0, 
-									dz: c.sz > 0 ? (c.dz || 0) / c.sz : 0 
-								}
-							];
-						}
+				// --- CRITICAL RESTORATION: Legacy Component Migrator ---
+				function migrateLegacyComponent(c) {
+					if (c.rotX === undefined) c.rotX = 0;
+					if (c.rotY === undefined) c.rotY = 0;
+					if (c.rotZ === undefined) c.rotZ = 0;
+					if (c.lockedMass === undefined) c.lockedMass = false;
+					if (c.lockedRho === undefined) c.lockedRho = false;
+					if (c.anchorZ === undefined) c.anchorZ = 'center';
+					if (c.thrustAuto === undefined) c.thrustAuto = false;
+					if (c.thrust === undefined) c.thrust = 0;
+					if (c.propDia === undefined) c.propDia = 5;
+					if (c.propPitch === undefined) c.propPitch = 3;
+					if (c.motorKV === undefined) c.motorKV = 2300;
+					if (c.battCells === undefined) c.battCells = 3;
 
-						// Add legacy fallback for lofted properties
-						if (c.ty === undefined) c.ty = c.sy;
-						if (c.tz === undefined) c.tz = c.sz;
-						if (c.dy === undefined) c.dy = 0;
-						if (c.dz === undefined) c.dz = 0;
-						if (c.isSymmetrical === undefined) c.isSymmetrical = false;
+					// Legacy fallback: convert old frustum params into a 2-segment loop cut array
+					if (c.sections === undefined) {
+						c.sections = [
+							{ x: 0, w: 1, h: 1, dy: 0, dz: 0 },
+							{ 
+								x: 1, 
+								w: c.sy > 0 ? (c.ty !== undefined ? c.ty : c.sy) / c.sy : 1, 
+								h: c.sz > 0 ? (c.tz !== undefined ? c.tz : c.sz) / c.sz : 1, 
+								dy: c.sy > 0 ? (c.dy || 0) / c.sy : 0, 
+								dz: c.sz > 0 ? (c.dz || 0) / c.sz : 0 
+							}
+						];
+					}
 
-						if (c.type === undefined) {
-							if (c.name.toLowerCase().includes('stab') && c.sy > c.sz) c.type = 'hstab';
-							else if (c.name.toLowerCase().includes('stab') && c.sz > c.sy) c.type = 'vstab';
-							else c.type = 'body';
-						}
-						return c;
-					});
+					if (c.ty === undefined) c.ty = c.sy;
+					if (c.tz === undefined) c.tz = c.sz;
+					if (c.dy === undefined) c.dy = 0;
+					if (c.dz === undefined) c.dz = 0;
+					if (c.isSymmetrical === undefined) c.isSymmetrical = false;
+
+					if (c.type === undefined) {
+						if (c.name.toLowerCase().includes('stab') && c.sy > c.sz) c.type = 'hstab';
+						else if (c.name.toLowerCase().includes('stab') && c.sz > c.sy) c.type = 'vstab';
+						else c.type = 'body';
+					}
+					return c;
+				}
+
+				// Apply migration to all parts to guarantee they have geometry sections
+				globalComponents = globalComponents.map(migrateLegacyComponent);
+				configurations.forEach(cfg => {
+					if (cfg.components) cfg.components = cfg.components.map(migrateLegacyComponent);
+					if (cfg.wing && cfg.wing.syncAirfoil === undefined) cfg.wing.syncAirfoil = false;
+				});
+
+				// Ensure the legacy pointers are set for the active config
+				const active = getActiveConfig();
+				wingData = active.wing;
+				components = active.components;
+
+				if (document.getElementById('airfoil-aoa')) {
+					document.getElementById('airfoil-aoa').value = wingData.aoa !== undefined ? wingData.aoa : 2;
 				}
 				
 				rebuildMassProfileUI();
@@ -6115,7 +6376,7 @@ Depends on:
         ['rotX', 'rotY', 'rotZ'].forEach(axis => {
             const el = document.getElementById(`prop-${axis}`);
             el.addEventListener('input', (e) => {
-                const p = components.find(c => c.id === selectedComponentId);
+                const p = getAllActiveParts().find(c => c.id === selectedComponentId);
                 if (!p) return;
                 p[axis] = safeParse(e.target.value);
                 calculateAndDraw();
@@ -6126,7 +6387,7 @@ Depends on:
         ['x', 'y', 'z'].forEach(axis => {
 			const el = document.getElementById(`prop-${axis}`);
 			el.addEventListener('input', (e) => {
-				const p = components.find(c => c.id === selectedComponentId);
+				const p = getAllActiveParts().find(c => c.id === selectedComponentId);
 				if (!p) return;
 				const inputCm = safeParse(e.target.value) / getDimScalar();
 				p[axis] = getInternalMinCoord(inputCm, p[`s${axis}`] || 0);
@@ -6139,7 +6400,7 @@ Depends on:
 			const el = document.getElementById(`prop-${field}`);
 			if (!el) return;
 			el.addEventListener('input', (e) => {
-				const p = components.find(c => c.id === selectedComponentId);
+				const p = getAllActiveParts().find(c => c.id === selectedComponentId);
 				if (!p || (p.lockedMass && p.lockedRho)) return;
 				
 				let currentDispSize = safeParse(p[field]);
@@ -6191,7 +6452,7 @@ Depends on:
 
         const compMassVal = document.getElementById('prop-mass-val');
 		compMassVal.addEventListener('input', (e) => {
-			const p = components.find(c => c.id === selectedComponentId);
+			const p = getAllActiveParts().find(c => c.id === selectedComponentId);
 			if (!p || (p.lockedMass && activeMassProfile === 'budget')) return;
 			
 			let targetMassGrams = safeParse(e.target.value) / getMassScalar();
@@ -6214,7 +6475,7 @@ Depends on:
 
         const compRhoVal = document.getElementById('prop-rho');
         compRhoVal.addEventListener('input', (e) => {
-            const p = components.find(c => c.id === selectedComponentId);
+            const p = getAllActiveParts().find(c => c.id === selectedComponentId);
             if (!p || p.lockedRho) return;
             const conversionFactor = getMassScalar() / Math.pow(getDimScalar(), 3);
             p.rho = safeParse(e.target.value) / conversionFactor;
@@ -6234,7 +6495,7 @@ Depends on:
         ['name', 'color'].forEach(prop => {
             const el = document.getElementById(`prop-${prop}`);
             el.addEventListener('input', (e) => {
-                const p = components.find(c => c.id === selectedComponentId);
+                const p = getAllActiveParts().find(c => c.id === selectedComponentId);
                 if (!p) return;
                 p[prop] = e.target.value;
                 updateComponentListUI(); calculateAndDraw();
@@ -6246,7 +6507,7 @@ Depends on:
         const thrustCheckbox = document.getElementById('prop-thrust-auto');
         if (thrustCheckbox) {
             thrustCheckbox.addEventListener('change', (e) => {
-                const p = components.find(c => c.id === selectedComponentId);
+                const p = getAllActiveParts().find(c => c.id === selectedComponentId);
                 if (p) p.thrustAuto = e.target.checked;
                 updatePropertiesPanel();
                 calculateAndDraw();
@@ -6261,7 +6522,7 @@ Depends on:
             const el = document.getElementById(elId);
             if (el) {
                 el.addEventListener('input', (e) => {
-                    const p = components.find(c => c.id === selectedComponentId);
+                    const p = getAllActiveParts().find(c => c.id === selectedComponentId);
                     if (p) {
                         p[objKey] = e.target.value === '' ? '' : safeParse(e.target.value);
                         
@@ -6331,14 +6592,14 @@ Depends on:
             dragging = true; dragComponentId = id; selectComponent(id);
             const p = getSVGPoint(e.clientX, e.clientY);
             dragStartX = p.x; dragStartY = p.y;
-            const active = components.find(c => c.id === dragComponentId);
+            const active = getAllActiveParts().find(c => c.id === dragComponentId);
             componentStartX = safeParse(active.x); componentStartY = safeParse(active.y); componentStartZ = safeParse(active.z);
         }
 		
 		function startVertexDrag(e, idx) {
 			e.stopPropagation();
 			if (!isIsolated || !selectedComponentId) return;
-			const active = components.find(c => c.id === selectedComponentId);
+			const active = getAllActiveParts().find(c => c.id === selectedComponentId);
 			if (!active) return;
 
 			draggingVertexIndex = idx;
@@ -6374,7 +6635,7 @@ Depends on:
 			let allSnapPoints = pts2D.filter((p, i) => i !== idx && p !== null);
 
             // Gather vertices from all OTHER components explicitly visible in the current view
-            components.forEach(c => {
+            getAllActiveParts().forEach(c => {
                 if (c.id === active.id) return;
                 
                 // Only snap to parts that are actively drawn on the screen right now
@@ -6419,27 +6680,27 @@ Depends on:
                 });
             }
 			
-			// Add the active component's local origin to the snap points
-			const getOffset = (anchor, size) => {
-				if (anchor === 'center') return size / 2;
-				if (anchor === 'max') return size;
-				return 0;
-			};
-			// Calculate absolute 3D center
-			let ox = safeParse(c.x) + safeParse(c.sx) / 2;
-			let oy = safeParse(c.y) + safeParse(c.sy) / 2;
-			let oz = safeParse(c.z) + safeParse(c.sz) / 2;
+            // Add the active component's local origin to the snap points
+            const getOffset = (anchor, size) => {
+                if (anchor === 'center') return size / 2;
+                if (anchor === 'max') return size;
+                return 0;
+            };
+            // Calculate absolute 3D center using 'active' instead of 'c'
+            let ox = safeParse(active.x) + safeParse(active.sx) / 2;
+            let oy = safeParse(active.y) + safeParse(active.sy) / 2;
+            let oz = safeParse(active.z) + safeParse(active.sz) / 2;
 
-			if (currentView === 'top') allSnapPoints.push({ u: ox, v: oy });
-			else if (currentView === 'side') allSnapPoints.push({ u: ox, v: -oz });
-			else if (currentView === 'front') allSnapPoints.push({ u: oy, v: -oz });
+            if (currentView === 'top') allSnapPoints.push({ u: ox, v: oy });
+            else if (currentView === 'side') allSnapPoints.push({ u: ox, v: -oz });
+            else if (currentView === 'front') allSnapPoints.push({ u: oy, v: -oz });
 
-			vDragInitState.snapPoints = allSnapPoints;
-		}
+            vDragInitState.snapPoints = allSnapPoints;
+        }
 		
 		function doDrag(e) {
             if (draggingVertexIndex !== -1) {
-                const active = components.find(c => c.id === selectedComponentId);
+                const active = getAllActiveParts().find(c => c.id === selectedComponentId);
                 const p = getSVGPoint(e.clientX, e.clientY);
                 
                 let rawMouseDu = p.x - vDragInitState.mouseStartU;
@@ -6542,7 +6803,7 @@ Depends on:
 
             // --- EXISTING DODRAG LOGIC (WHOLE COMPONENT DRAGGING) ---
             if (!dragging || !dragComponentId) return;
-            const active = components.find(c => c.id === dragComponentId);
+            const active = getAllActiveParts().find(c => c.id === dragComponentId);
             const p = getSVGPoint(e.clientX, e.clientY);
             const dx = p.x - dragStartX, dy = p.y - dragStartY;
             
@@ -6560,7 +6821,7 @@ Depends on:
             const activeSy = safeParse(active.sy);
             const activeSz = safeParse(active.sz);
 
-            components.forEach(c => {
+            getAllActiveParts().forEach(c => {
                 if (c.id === active.id) return;
                 const cx = safeParse(c.x), cy = safeParse(c.y), cz = safeParse(c.z);
                 const csx = safeParse(c.sx), csy = safeParse(c.sy), csz = safeParse(c.sz);
@@ -6788,7 +7049,7 @@ Depends on:
             
             let totalMomentX = wingMass * wingCGX, totalMomentZ = wingMass * wingCGZ, totalMass = wingMass;
             
-            components.forEach(c => {
+            getAllActiveParts().forEach(c => {
                 let totalCompMass = getEffectiveMassGrams(c);
 				let m = getIsMirrored(c) ? totalCompMass / 2 : totalCompMass;
                 let centerOffsetX = safeParse(c.x) + safeParse(c.sx) / 2;
@@ -6831,7 +7092,7 @@ Depends on:
             
 			// --- THRUST CALCULATIONS ---
             let totalThrust = 0; // Internal standard is natively Grams
-            components.forEach(c => {
+            getAllActiveParts().forEach(c => {
                 if (c.type === 'motor') {
                     let tGrams = 0;
                     if (c.thrustAuto) {
@@ -6870,7 +7131,7 @@ Depends on:
             let hstab_area = 0, hstab_ac_x = 0;
             let vstab_area = 0, vstab_ac_x = 0;
 
-            components.forEach(c => {
+            getAllActiveParts().forEach(c => {
                 const isMirroredMultiplier = getIsMirrored(c) ? 2 : 1;
                 if (c.type === 'hstab' || c.type === 'vstab') {
                     let S = 0;
@@ -7353,7 +7614,7 @@ Depends on:
                 if (minX === Infinity) { minX = -10; maxX = 10; minY = -10; maxY = 10; }
             } else {
                 minX = -30; maxX = Math.max(cr, 60); minY = -s || -30; maxY = s || 30;
-                components.forEach(c => {
+                getAllActiveParts().forEach(c => {
                     if (!isEffectivelyVisible(c.id, c.isHidden)) return;
                     [false, true].forEach(mirState => {
                         if (mirState && !getIsMirrored(c)) return;
@@ -7453,7 +7714,10 @@ Depends on:
             }
 
             // 2. UNIFIED COMPONENT RENDERING (MULTI-SEGMENT)
-			components.forEach(c => {
+			getAllActiveParts().forEach(c => {
+				// ADD THIS SAFETY GUARD: Ignores malformed/legacy parts missing the sections array
+				if (!c.sections) return; 
+
 				if (isIsolated && !isolatedSet.has(c.id)) return;
 				if (!isIsolated && c.isHidden) return;
 				
@@ -7464,6 +7728,7 @@ Depends on:
 					
 					// Master group holds everything so the whole part is clickable
 					const compGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+	
 					compGroup.setAttribute('class', 'interactive-shape');
 					compGroup.onmousedown = (e) => startDrag(e, c.id);
 
@@ -7593,7 +7858,7 @@ Depends on:
             }
             
             // --- RENDER THRUST LINES ---
-            components.forEach(c => {
+            getAllActiveParts().forEach(c => {
                 if (c.type === 'motor' && isEffectivelyVisible(c.id, c.isHidden)) {
                     const mx = safeParse(c.x) + safeParse(c.sx) / 2;
                     const my = getIsMirrored(c) ? 0 : safeParse(c.y) + safeParse(c.sy) / 2;
@@ -7788,7 +8053,7 @@ Depends on:
         document.querySelectorAll('#properties-panel input, #properties-panel select').forEach(el => {
             el.addEventListener('input', () => {
                 if (selectedComponentId !== 'main-wing' && !['prop-mass-val', 'prop-rho', 'prop-show-label', 'prop-is-hollow', 'prop-wall-t', 'prop-is-mirrored', 'prop-rotX', 'prop-rotY', 'prop-rotZ', 'prop-sx', 'prop-sy', 'prop-sz'].includes(el.id)) {
-                    const p = components.find(c => c.id === selectedComponentId);
+                    const p = getAllActiveParts().find(c => c.id === selectedComponentId);
                     if (p) {
                         recalculateMassOrDensity(p);
                     }
@@ -7918,7 +8183,7 @@ Depends on:
 					const volume = getWingVolumeCm3();
 					if (volume > 0) wingData.rho = targetMassGrams / volume;
 				} else {
-					const comp = components.find(c => c.id === id);
+					const comp = getAllActiveParts().find(c => c.id === id);
 					if (comp) {
 						if (comp.lockedMass) {
 							showTooltip(inputElement, "Locked");
@@ -7935,7 +8200,7 @@ Depends on:
 				if (id === 'main-wing' || (typeof wingData !== 'undefined' && id === wingData.id)) {
 					wingData[key] = val / mScale;
 				} else {
-					const comp = components.find(c => c.id === id);
+					const comp = getAllActiveParts().find(c => c.id === id);
 					if (comp) comp[key] = val / mScale;
 				}
 			}
@@ -8213,7 +8478,7 @@ Depends on:
 				if (id === 'main-wing' || id === wingData.id) {
 					wingData[field] = value;
 				} else {
-					const comp = components.find(c => c.id === id);
+					const comp = getAllActiveParts().find(c => c.id === id);
 					if (comp) comp[field] = value;
 				}
 				
@@ -8237,7 +8502,7 @@ Depends on:
 					const volume = getWingVolumeCm3();
 					if (volume > 0) wingData.rho = targetMassGrams / volume;
 				} else {
-					const comp = components.find(c => c.id === id);
+					const comp = getAllActiveParts().find(c => c.id === id);
 					if (comp) {
 						if (comp.lockedMass) {
 							showTooltip(inputElement, "Locked");
@@ -8256,7 +8521,7 @@ Depends on:
 				if (id === 'main-wing' || id === wingData.id) {
 					wingData[field] = val;
 				} else {
-					const comp = components.find(c => c.id === id);
+					const comp = getAllActiveParts().find(c => c.id === id);
 					if (comp) comp[field] = val;
 				}
 			}
