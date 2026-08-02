@@ -794,6 +794,11 @@
         </select>
     </div>
     
+	<div class="setting-row" style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+		<label for="sweep-steps" style="color: var(--text-dim);">Graph Sweep Steps:</label>
+		<input type="number" id="sweep-steps" value="100" min="10" max="1000" style="background: var(--bg-black); color: var(--text-light); border: 1px solid var(--border-grey);">
+	</div>
+	
     <div class="input-group" style="border-top: 1px solid var(--border-grey); padding-top: 6px;">
         <label>Label Screen Size (px)</label>
         <input id="settings-label-size" type="range" min="8" max="24" step="1" value="12">
@@ -4661,7 +4666,13 @@ function generateSweep() {
         configurations: JSON.stringify(App.state.configurations)
     };
     
-    const steps = 40;
+    // Read the user's requested steps from the preferences input
+    const stepsInput = document.getElementById('sweep-steps');
+    let steps = stepsInput ? parseInt(stepsInput.value, 10) : 80;
+    
+    // Fallback in case of invalid input
+    if (isNaN(steps) || steps <= 0) steps = 80;
+	
     activeYVars.forEach(yv => yv.data = []);
     App.state.graphSweep.isSimulating = true;
 
