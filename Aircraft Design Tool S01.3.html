@@ -34,7 +34,7 @@
         --text-dim: #999999;
         --input-grey: #121212;
 		--text-on-accent: #000000;
-		--grid-line: #222222;
+		--grid-line: rgba(255, 255, 255, 0.15);
     }
 
     /*=========================================================
@@ -60,48 +60,52 @@
     /*=========================================================
       3. LAYOUT
     =========================================================*/
-    #top-bar {
+#top-bar {
         background: linear-gradient(180deg, rgba(255,255,255,calc(var(--grad-opacity) * 0.2)) 0%, rgba(0,0,0,var(--grad-opacity)) 100%), var(--panel-grey);
         padding: 6px 12px;
         display: flex;
-        justify-content: space-around;
+        justify-content: flex-start;
         align-items: center;
+        flex-wrap: wrap; 
         border-bottom: 2px solid var(--accent-yellow);
         font-size: 0.85em;
-        font-weight: bold;
-        flex-shrink: 0;
-        flex-wrap: wrap;
         font-family: 'Poppins', sans-serif;
         z-index: 10;
-        gap: 10px;
-        transition: background 0.2s, border-color 0.2s;
+        gap: 6px 10px; 
+        width: 100%;
+        box-sizing: border-box;
+        position: relative; /* Required for absolute centering */
     }
-
-    #top-bar div.metric-box {
-        padding: 4px 8px;
+	
+	.metric-box {
+        padding: 0 8px; /* Removed vertical padding */
         border-radius: 4px;
-        background: linear-gradient(180deg, rgba(0,0,0,var(--grad-opacity)) 0%, rgba(255,255,255,calc(var(--grad-opacity) * 0.06)) 100%), var(--bg-black);
+        background: var(--bg-black);
         border: 1px solid var(--border-grey);
         white-space: nowrap;
-        transition: background 0.2s, border-color 0.2s;
-    }
-
-    #io-controls, #history-controls {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 4px;
+        font-size: 0.9em;
+        box-sizing: border-box;
     }
 
-    #main-container {
-        display: grid;
-        grid-template-columns: var(--left-width, 250px) 8px 1fr 8px var(--right-width, 250px);
-        grid-template-rows: 100%;
-        flex: 1;
-        padding: 6px;
-        box-sizing: border-box;
-        gap: 0;
-        overflow: hidden;
+	#io-controls {
+        display: flex;
+        gap: 6px;
+        margin-left: auto; /* Pins the controls to the far right of the active row */
     }
+
+	#main-container {
+		display: grid;
+		grid-template-columns: var(--metrics-width, 170px) 8px var(--left-width, 250px) 8px 1fr 8px var(--right-width, 250px);
+		grid-template-rows: 100%;
+		flex: 1;
+		padding: 6px;
+		box-sizing: border-box;
+		gap: 0;
+		overflow: hidden;
+	}
 
     .sidebar {
         background: linear-gradient(145deg, rgba(255,255,255,calc(var(--grad-opacity) * 0.13)) 0%, rgba(0,0,0,var(--grad-opacity)) 100%), var(--panel-grey);
@@ -183,7 +187,25 @@
     #mass-preset-controls button[title] {
         flex-shrink: 0;
     }
+	
+	/*=========================================================
+      TOP BAR HEIGHT ENFORCEMENT
+    =========================================================*/
+    #top-bar .btn-sm,
+    #top-bar #project-title,
+    #top-bar .metric-box {
+        height: 28px;
+        box-sizing: border-box;
+        margin: 0;
+    }
 
+    #top-bar .btn-sm {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 8px;
+    }
+	
     /*=========================================================
       4. TYPOGRAPHY
     =========================================================*/
@@ -209,18 +231,24 @@
         text-transform: uppercase;
     }
 
-    #project-title {
+#project-title {
         background: var(--bg-black);
         border: 1px solid var(--accent-yellow);
         color: var(--accent-yellow);
         font-family: 'Poppins', sans-serif;
         font-weight: 600;
-        font-size: 1em;
-        padding: 4px 10px;
+        font-size: 0.9em;
+        padding: 0 10px;
         border-radius: 4px;
-        width: 150px;
         outline: none;
-        transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+        transition: border-color 0.2s, color 0.2s, background-color 0.2s, width 0.2s;
+        
+        /* Centered and wide for standard mode */
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 300px;
+        text-align: center;
     }
 
     /*=========================================================
@@ -656,6 +684,83 @@
         0% { transform: translateY(-5px) rotate(-5deg); }
         100% { transform: translateY(5px) rotate(5deg); }
     }
+	
+	
+	/*=========================================================
+      METRICS SIDEBAR
+    =========================================================*/
+    .metrics-sidebar {
+        background: linear-gradient(145deg, rgba(255,255,255,calc(var(--grad-opacity) * 0.13)) 0%, rgba(0,0,0,var(--grad-opacity)) 100%), var(--panel-grey);
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        border: 1px solid var(--border-grey);
+        overflow-y: auto;
+        overflow-x: hidden; 
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .metric-list-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        background: var(--bg-black);
+        border: 1px solid var(--border-grey);
+        border-radius: 6px;
+        padding: 6px;
+    }
+    .metric-list-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.7em;
+        color: var(--accent-yellow);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 1px solid var(--border-grey);
+        padding-bottom: 2px;
+        margin-bottom: 4px;
+        font-weight: 600;
+    }
+    .metric-list-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.75em;
+    }
+    .metric-list-label {
+        color: var(--text-dim);
+    }
+    .metric-list-val {
+        font-weight: bold;
+        color: var(--text-main);
+        text-align: right;
+    }
+	
+	/*=========================================================
+      LAYOUT OVERRIDES
+    =========================================================*/
+	body.layout-top-metrics #project-title {
+        /* Restores inline flow and compact size when pills are active */
+        position: static;
+        transform: none;
+        width: 150px;
+        text-align: left;
+    }
+
+    body.layout-top-metrics #main-container {
+        grid-template-columns: var(--left-width, 250px) 8px 1fr 8px var(--right-width, 250px) !important;
+    }
+    body.layout-top-metrics #metrics-panel,
+    body.layout-top-metrics #resizer-metrics {
+        display: none !important;
+    }
+    
+    body.layout-top-metrics .metric-list-group {
+        min-width: 140px;
+        flex: 1 1 auto;
+        max-width: 220px;
+    }
 
     </style>
 
@@ -684,75 +789,141 @@
 <!-- ========================================================= -->
 
 <div id="top-bar">
-    <div id="history-controls">
+    <div id="history-controls" style="display: flex; gap: 6px;">
         <button class="btn-sm" id="btn-undo" onclick="undo()" title="Undo">↰</button>
         <button class="btn-sm" id="btn-redo" onclick="redo()" title="Redo" disabled="">↱</button>
     </div>
     
     <input id="project-title" type="text" value="Prototype 1.1">
-    
-    <div class="metric-box" title="Total aircraft mass including the wing and all components.">
-        Total Mass: <span id="top-mass">1000.00</span> <span class="unit-mass">g</span>
-    </div>
-    <div class="metric-box" title="Thrust to Weight Ratio. 1.0 is a safe number to aim for.">
-        TWR: <span id="top-twr" style="color: rgb(46, 204, 113);">1.56</span>
-    </div>
-    <div class="metric-box" title="Actual center of gravity location measured from behind the wing leading edge.">
-        CG: <span id="top-actual-cg">9.20</span> <span class="unit-dim">cm</span>
-    </div>
-    <div class="metric-box" title="Recommended geometric CG based on approximately 33% of the mean aerodynamic chord.">
-        Geo CG: <span id="top-rec-cg">7.42</span> <span class="unit-dim">cm</span>
-    </div>
-    <div class="metric-box" title="Wing loading. Higher values generally increase speed and stability but reduce low-speed performance. A lower wing loading means a floatier plane.">
-        WL: <span id="top-wl">37.04</span> <span id="top-wl-unit">g/dm²</span>
-    </div>
-    <div class="metric-box" title="Cubic wing loading. Useful for estimating aircraft flight characteristics and handling. The higher the number the sportier the plane and the harder it is to fly.">
-        CWL: <span id="top-cwl">7.1</span> <span id="top-flight-type" style="font-size:0.9em; margin-left:4px;">(Sport)</span>
-    </div>
-    <div class="metric-box" title="Static margin indicates pitch stability. Positive values are generally more stable.">
-        SM: <span id="top-sm" style="color: rgb(46, 204, 113);">9.8%</span><span id="top-sm-guide" style="font-size: 0.9em; margin-left: 4px; color: rgb(46, 204, 113);">(Stable)</span>
-    </div>
-    <div class="metric-box" title="Horizontal tail volume coefficient. Measures horizontal stabilizer effectiveness. Greater than 0.3 is good.">
-        Vh: <span id="top-vh" style="color: rgb(46, 204, 113);">0.428</span><span id="top-vh-guide" style="font-size: 0.9em; margin-left: 4px; color: rgb(46, 204, 113);">(Good)</span>
-    </div>
-    <div class="metric-box" title="Vertical tail volume coefficient. Measures vertical stabilizer effectiveness. Greater than 0.3 is good.">
-        Vv: <span id="top-vv" style="color: rgb(46, 204, 113);">0.031</span><span id="top-vv-guide" style="font-size: 0.9em; margin-left: 4px; color: rgb(46, 204, 113);">(Good)</span>
-    </div>
-	
-	<div class="top-stat" title="Normalized Roll Agility (Lower = faster roll response)" style="background: var(--bg-black); padding: 4px 8px; border: 1px solid var(--border-grey); border-radius: 4px; display: flex; align-items: center; gap: 4px;">
-		<span style="font-size: 0.75em; color: var(--text-dim); font-weight: bold;">Ixx(n):</span>
-		<span id="top-ixx-norm" style="color: var(--accent-yellow); font-weight: bold;">0.000</span>
-	</div>
-	<div class="top-stat" title="Normalized Pitch Agility (Lower = faster pitch response)" style="background: var(--bg-black); padding: 4px 8px; border: 1px solid var(--border-grey); border-radius: 4px; display: flex; align-items: center; gap: 4px;">
-		<span style="font-size: 0.75em; color: var(--text-dim); font-weight: bold;">Iyy(n):</span>
-		<span id="top-iyy-norm" style="color: var(--accent-yellow); font-weight: bold;">0.000</span>
-	</div>
-	<div class="top-stat" title="Normalized Yaw Agility (Lower = faster yaw response)" style="background: var(--bg-black); padding: 4px 8px; border: 1px solid var(--border-grey); border-radius: 4px; display: flex; align-items: center; gap: 4px;">
-		<span style="font-size: 0.75em; color: var(--text-dim); font-weight: bold;">Izz(n):</span>
-		<span id="top-izz-norm" style="color: var(--accent-yellow); font-weight: bold;">0.000</span>
-	</div>
 
-    <div id="io-controls">
+    <!-- Top Metrics Pills -->
+    <div id="top-metrics-pills" style="display: none;">
+        <div class="metric-box"><span style="color:var(--text-dim)">Total Mass:</span> <span data-sync="top-mass" style="font-weight:bold;color:var(--text-main)">1000.00</span><span class="unit-mass" style="color:var(--text-dim);font-size:0.8em;margin-left:2px;">g</span></div>
+        <div class="metric-box"><span style="color:var(--text-dim)">TWR:</span> <span data-sync="top-twr" style="font-weight:bold;">1.56</span></div>
+        <div class="metric-box"><span style="color:var(--text-dim)">CG:</span> <span data-sync="top-actual-cg" style="font-weight:bold;color:var(--text-main)">9.20</span><span class="unit-dim" style="color:var(--text-dim);font-size:0.8em;margin-left:2px;">cm</span></div>
+        <div class="metric-box"><span style="color:var(--text-dim)">Geo CG:</span> <span data-sync="top-rec-cg" style="font-weight:bold;color:var(--text-main)">7.42</span><span class="unit-dim" style="color:var(--text-dim);font-size:0.8em;margin-left:2px;">cm</span></div>
+        <div class="metric-box"><span style="color:var(--text-dim)">WL:</span> <span data-sync="top-wl" style="font-weight:bold;color:var(--text-main)">37.04</span><span data-sync="top-wl-unit" style="color:var(--text-dim);font-size:0.8em;margin-left:2px;">g/dm²</span></div>
+        <div class="metric-box"><span style="color:var(--text-dim)">CWL:</span> <span data-sync="top-cwl" style="font-weight:bold;color:var(--text-main)">7.1</span> <span data-sync="top-flight-type" style="color:var(--text-dim);font-size:0.8em;margin-left:2px;">(Sport)</span></div>
+        <div class="metric-box"><span style="color:var(--text-dim)">SM:</span> <span data-sync="top-sm" style="font-weight:bold;">9.8%</span> <span data-sync="top-sm-guide" style="font-size:0.8em;">(Stable)</span></div>
+        <div class="metric-box"><span style="color:var(--text-dim)">Vh:</span> <span data-sync="top-vh" style="font-weight:bold;">0.428</span> <span data-sync="top-vh-guide" style="font-size:0.8em;">(Good)</span></div>
+        <div class="metric-box"><span style="color:var(--text-dim)">Vv:</span> <span data-sync="top-vv" style="font-weight:bold;">0.031</span> <span data-sync="top-vv-guide" style="font-size:0.8em;">(Good)</span></div>
+        <div class="metric-box"><span style="color:var(--text-dim)">Ixx(n):</span> <span data-sync="top-ixx-norm" style="font-weight:bold;color:var(--accent-yellow)">0.033</span></div>
+        <div class="metric-box"><span style="color:var(--text-dim)">Iyy(n):</span> <span data-sync="top-iyy-norm" style="font-weight:bold;color:var(--accent-yellow)">1.043</span></div>
+        <div class="metric-box"><span style="color:var(--text-dim)">Izz(n):</span> <span data-sync="top-izz-norm" style="font-weight:bold;color:var(--accent-yellow)">0.065</span></div>
+    </div>
+
+    <div id="io-controls" style="display: flex; gap: 6px; margin-left: auto;">
         <button class="btn-sm" onclick="exportJSON()" title="Save model data as a JSON file">Save JSON</button>
         <button class="btn-sm" onclick="exportHTML()" style="background: var(--accent-yellow); color: var(--text-on-accent);" title="Save entire tool and model as a self-contained HTML file">Save HTML</button>
         <button class="btn-sm" onclick="document.getElementById('import-file').click()" title="Load model data from JSON">Load</button>
         <input accept=".json,text/plain" id="import-file" onchange="importJSON(this)" style="display:none;" type="file" value="">
-        <button class="btn-sm" onclick="toggleSettingsMenu()" style="padding: 2px 6px; font-size: 1.1em; line-height: 1;">⚙️</button>
+        <button class="btn-sm" onclick="toggleSettingsMenu()" style="font-size: 1.1em;" title="Settings">⚙️</button>
     </div>
 </div>
-
-<!-- ========================================================= -->
-<!-- SETTINGS MENU -->
-<!-- ========================================================= -->
-
-
 
 <!-- ========================================================= -->
 <!-- MAIN LAYOUT -->
 <!-- ========================================================= -->
 
-<div id="main-container" style="--right-width: 277px; --left-width: 273px;">
+<div id="main-container" style="--right-width: 277px; --left-width: 273px; --metrics-width: 170px;">
+
+    <!-- Left-most Sidebar: Metrics -->
+    <div class="metrics-sidebar" id="metrics-panel">
+        <h2 style="font-size: 0.85em; margin-bottom: 2px;">Plane Info</h2>
+        
+        <!-- Mass & Power -->
+        <div class="metric-list-group">
+            <div class="metric-list-title">Mass & Power</div>
+            <div class="metric-list-row" title="Total aircraft mass including the wing and all components.">
+                <span class="metric-list-label">Total Mass:</span>
+                <span class="metric-list-val"><span id="top-mass">1000.00</span><span class="unit-mass" style="font-size:0.8em; color:var(--text-dim); margin-left:2px;">g</span></span>
+            </div>
+            <div class="metric-list-row" title="Thrust to Weight Ratio. 1.0 is a safe number to aim for.">
+                <span class="metric-list-label">TWR:</span>
+                <span class="metric-list-val"><span id="top-twr" style="color: rgb(46, 204, 113);">1.56</span></span>
+            </div>
+        </div>
+
+        <!-- Balance -->
+        <div class="metric-list-group">
+            <div class="metric-list-title">Balance</div>
+            <div class="metric-list-row" title="Actual center of gravity location measured from behind the wing leading edge.">
+                <span class="metric-list-label">Act. CG:</span>
+                <span class="metric-list-val"><span id="top-actual-cg">9.20</span><span class="unit-dim" style="font-size:0.8em; color:var(--text-dim); margin-left:2px;">cm</span></span>
+            </div>
+            <div class="metric-list-row" title="Recommended geometric CG based on approximately 33% of the mean aerodynamic chord.">
+                <span class="metric-list-label">Rec. CG:</span>
+                <span class="metric-list-val"><span id="top-rec-cg">7.42</span><span class="unit-dim" style="font-size:0.8em; color:var(--text-dim); margin-left:2px;">cm</span></span>
+            </div>
+            <div class="metric-list-row" title="Static margin indicates pitch stability. Positive values are generally more stable.">
+                <span class="metric-list-label">Margin:</span>
+                <span class="metric-list-val"><span id="top-sm" style="color: rgb(46, 204, 113);">9.8%</span></span>
+            </div>
+            <div class="metric-list-row">
+                <span class="metric-list-label">Stability:</span>
+                <span class="metric-list-val"><span id="top-sm-guide" style="color: rgb(46, 204, 113);">(Stable)</span></span>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div class="metric-list-group">
+            <div class="metric-list-title">Loading</div>
+            <div class="metric-list-row" title="Wing loading. Higher values generally increase speed and stability but reduce low-speed performance.">
+                <span class="metric-list-label">Wing Ld:</span>
+                <span class="metric-list-val"><span id="top-wl">37.04</span><span id="top-wl-unit" style="font-size:0.8em; color:var(--text-dim); margin-left:2px;">g/dm²</span></span>
+            </div>
+            <div class="metric-list-row" title="Cubic wing loading. Useful for estimating aircraft flight characteristics and handling.">
+                <span class="metric-list-label">Cubic Ld:</span>
+                <span class="metric-list-val"><span id="top-cwl">7.1</span></span>
+            </div>
+            <div class="metric-list-row">
+                <span class="metric-list-label">Class:</span>
+                <span class="metric-list-val"><span id="top-flight-type" style="color:var(--text-dim);">(Sport)</span></span>
+            </div>
+        </div>
+
+        <!-- Tail Volume -->
+        <div class="metric-list-group">
+            <div class="metric-list-title">Tail Vol</div>
+            <div class="metric-list-row" title="Horizontal tail volume coefficient. Measures horizontal stabilizer effectiveness.">
+                <span class="metric-list-label">Horiz (Vh):</span>
+                <span class="metric-list-val"><span id="top-vh" style="color: rgb(46, 204, 113);">0.428</span></span>
+            </div>
+            <div class="metric-list-row">
+                <span class="metric-list-label">H. Rating:</span>
+                <span class="metric-list-val"><span id="top-vh-guide" style="color: rgb(46, 204, 113);">(Good)</span></span>
+            </div>
+            <div class="metric-list-row" title="Vertical tail volume coefficient. Measures vertical stabilizer effectiveness.">
+                <span class="metric-list-label">Vert (Vv):</span>
+                <span class="metric-list-val"><span id="top-vv" style="color: rgb(46, 204, 113);">0.031</span></span>
+            </div>
+            <div class="metric-list-row">
+                <span class="metric-list-label">V. Rating:</span>
+                <span class="metric-list-val"><span id="top-vv-guide" style="color: rgb(46, 204, 113);">(Good)</span></span>
+            </div>
+        </div>
+
+        <!-- Agility (n) -->
+        <div class="metric-list-group">
+            <div class="metric-list-title">Agility (n)</div>
+            <div class="metric-list-row" title="Normalized Roll Agility">
+                <span class="metric-list-label">Roll Ixx:</span>
+                <span class="metric-list-val"><span id="top-ixx-norm" style="color: var(--accent-yellow);">0.000</span></span>
+            </div>
+            <div class="metric-list-row" title="Normalized Pitch Agility">
+                <span class="metric-list-label">Pitch Iyy:</span>
+                <span class="metric-list-val"><span id="top-iyy-norm" style="color: var(--accent-yellow);">0.000</span></span>
+            </div>
+            <div class="metric-list-row" title="Normalized Yaw Agility">
+                <span class="metric-list-label">Yaw Izz:</span>
+                <span class="metric-list-val"><span id="top-izz-norm" style="color: var(--accent-yellow);">0.000</span></span>
+            </div>
+        </div>
+    </div>
     
+	<!-- Metrics Resizer -->
+    <div class="resizer" id="resizer-metrics"></div>
+
     <!-- Left Sidebar: Component List -->
     <div class="sidebar" id="sidebar">
         <div style="display: flex; flex-direction: column; height: 100%;">
@@ -968,7 +1139,7 @@
                             <!-- Rendered dynamically -->
                         </div>
 
-                        <button id="pg-btn-add-y" class="btn-sm" style="background: linear-gradient(180deg, rgba(255,255,255,calc(var(--grad-opacity) * 0.13)) 0%, rgba(0,0,0,calc(var(--grad-opacity) * 0.66)) 100%), var(--panel-grey); color: #fff; font-weight: bold; padding: 6px; border-color: var(--border-grey);">+ Add Dependent Variable</button>
+                        <button id="pg-btn-add-y" class="btn-sm" style="background: linear-gradient(180deg, rgba(255,255,255,calc(var(--grad-opacity) * 0.13)) 0%, rgba(0,0,0,calc(var(--grad-opacity) * 0.66)) 100%), var(--panel-grey); color: var(--text-main); font-weight: bold; padding: 6px; border-color: var(--border-grey);">+ Add Dependent Variable</button>
                     </div>
                 </div>
             </div>
@@ -977,10 +1148,10 @@
             <svg id="visualizer" preserveAspectRatio="xMidYMid meet" style="display: block;" viewBox="-39.504219426346765 -72 114.05063311616121 144">
                 <!-- Geometry is populated dynamically by renderAircraft() -->
                 <defs>
-                    <pattern height="10" id="gridPattern" patternUnits="userSpaceOnUse" width="10">
-                        <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255, 255, 255, 0.15)" stroke-width="0.9" vector-effect="non-scaling-stroke"></path>
-                    </pattern>
-                </defs>
+					<pattern height="10" id="gridPattern" patternUnits="userSpaceOnUse" width="10">
+						<path d="M 10 0 L 0 0 0 10" fill="none" stroke="var(--grid-line)" stroke-width="0.9" vector-effect="non-scaling-stroke"></path>
+					</pattern>
+				</defs>
                 <rect fill="url(#gridPattern)" height="10000%" id="bg-grid-fill" pointer-events="none" width="10000%" x="-5000%" y="-5000%"></rect>
                 
                 <g id="wing-layer"><path d="M 0 0 L 0 -60 L 22.499999999999954 -60 L 22.5 0 Z M 0 0 L 0 60 L 22.499999999999954 60 L 22.5 0 Z" fill="#1b1b1b" stroke="#888" stroke-width="1" class="interactive-shape active-part" transform="translate(0, 0) scale(0.9986295347545738, 1) translate(0, 0)"></path></g>
@@ -1306,7 +1477,7 @@ Drag (CD): 0.0098</title></circle></svg>
                 <label for="snap-threshold" style="color: var(--text-dim); font-size: 0.85em;">Snapping (cm):</label>
                 <input type="number" id="snap-threshold" value="0.8" min="0" max="10" step="0.1" style="background: var(--bg-black); color: var(--text-main); border: 1px solid var(--border-grey); width: 70px; padding: 2px 4px;">
             </div>
-            
+			            
             <div class="input-group" style="border-top: 1px solid var(--border-grey); padding-top: 6px;">
                 <label>Label Screen Size (px)</label>
                 <input id="settings-label-size" type="range" min="8" max="24" step="1" value="12" oninput="refresh()">
@@ -1338,6 +1509,11 @@ Drag (CD): 0.0098</title></circle></svg>
                     <input id="theme-dark-text" type="checkbox" onchange="updateThemeColors()">
                     <label for="theme-dark-text" style="margin-bottom:0; cursor:pointer;">Use Dark Text</label>
                 </div>
+				
+				<div class="input-group-inline" style="margin-top: 6px;">
+					<input id="theme-layout-top" type="checkbox" onchange="toggleMetricsLayout()">
+					<label for="theme-layout-top" style="margin-bottom:0; cursor:pointer;">Top-Bar Plane Info Layout</label>
+				</div>				
             </div>
         </div>
     
@@ -3284,25 +3460,37 @@ function renameMassProfileModel(oldProfile, safeNewName) {
 #
 ##############################################################*/
 
-function setUIData(id, value, precision = 2, suffix = '') {
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    // Expose the unadulterated float to the sweep engine
-    if (typeof value === 'number' && isFinite(value)) {
-        el.dataset.raw = value;
-    }
-
-    const displayVal = (typeof value === 'number' && isFinite(value)) 
-        ? value.toFixed(precision) 
-        : value;
-
-    if (el.tagName === 'INPUT') {
-        // Prevent cursor hijacking
-        if (document.activeElement !== el) el.value = displayVal + suffix;
+function toggleMetricsLayout() {
+    const useTopBar = document.getElementById('theme-layout-top').checked;
+    const body = document.body;
+    const pillsContainer = document.getElementById('top-metrics-pills');
+    
+    if (useTopBar) {
+        body.classList.add('layout-top-metrics');
+        // 'contents' flattens the children directly into the #top-bar flexbox
+        pillsContainer.style.display = 'contents'; 
     } else {
-        el.innerText = displayVal + suffix;
+        body.classList.remove('layout-top-metrics');
+        pillsContainer.style.display = 'none';
     }
+    
+    window.dispatchEvent(new Event('resize'));
+}
+
+function setUIData(id, value, precision = 2, suffix = '') {
+    const els = document.querySelectorAll(`#${id}, [data-sync="${id}"]`);
+    if (els.length === 0) return;
+    
+    els.forEach(el => {
+        if (typeof value === 'number' && isFinite(value)) el.dataset.raw = value;
+        const displayVal = (typeof value === 'number' && isFinite(value)) ? value.toFixed(precision) : value;
+        
+        if (el.tagName === 'INPUT') {
+            if (document.activeElement !== el) el.value = displayVal + suffix;
+        } else {
+            el.innerText = displayVal + suffix;
+        }
+    });
 }
 
 function isEffectivelyVisible(id, isHidden) {
@@ -4636,6 +4824,16 @@ function calculateAircraft() {
             if (el) { el.innerText = "DATA ERROR"; el.style.color = '#e74c3c'; }
         });
     }
+	
+	// Copy dynamic status colors to the pill layout
+    const colorSyncIds = ['top-twr', 'top-sm', 'top-sm-guide', 'top-vh', 'top-vh-guide', 'top-vv', 'top-vv-guide'];
+    colorSyncIds.forEach(id => {
+        const source = document.getElementById(id);
+        const targets = document.querySelectorAll(`[data-sync="${id}"]`);
+        if (source && targets.length > 0) {
+            targets.forEach(t => t.style.color = source.style.color);
+        }
+    });
 
     syncSpansToVariables();
 }
@@ -5381,11 +5579,14 @@ function renderAircraft() {
     const currentAoA = parseFloat(document.getElementById('airfoil-aoa').value) || 0;
     const pX = wingData.pivot || 0;
     
-    // Draw Wing
+	// Draw Wing
     if (currentView === 'top') {
         const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
         p.setAttribute('d', `M 0 0 L ${sweep} ${-s} L ${sweep+ct} ${-s} L ${cr} 0 Z M 0 0 L ${sweep} ${s} L ${sweep+ct} ${s} L ${cr} 0 Z`);
-        p.setAttribute('fill', currentWingColor); p.setAttribute('stroke', '#888'); p.setAttribute('stroke-width', '1');
+        p.setAttribute('fill', currentWingColor); 
+        p.setAttribute('fill-opacity', '0.4'); // Added transparency
+        p.setAttribute('stroke', '#888'); 
+        p.setAttribute('stroke-width', '1');
         p.setAttribute('class', `interactive-shape ${isActive(wingData.id)}`);
         p.onclick = (e) => { e.stopPropagation(); handleSelectComponent(wingData.id); };
         p.setAttribute('transform', `translate(${pX}, 0) scale(${Math.cos(currentAoA * Math.PI / 180)}, 1) translate(${-pX}, 0)`);
@@ -5393,7 +5594,9 @@ function renderAircraft() {
     } else if (currentView === 'side') {
         const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
         p.setAttribute('d', `${generateAirfoilSvgPath(sweep, -z_delta, ct, wingData.nacaTip)} ${generateAirfoilSvgPath(0, 0, cr, wingData.nacaRoot)}`);
-        p.setAttribute('fill', currentWingColor); p.setAttribute('stroke', '#888');
+        p.setAttribute('fill', currentWingColor); 
+        p.setAttribute('fill-opacity', '0.4'); // Added transparency
+        p.setAttribute('stroke', '#888');
         p.setAttribute('class', `interactive-shape ${isActive(wingData.id)}`);
         p.onclick = (e) => { e.stopPropagation(); handleSelectComponent(wingData.id); };
         p.setAttribute('transform', `rotate(${currentAoA}, ${pX}, 0)`); 
@@ -5407,7 +5610,9 @@ function renderAircraft() {
 
         const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
         p.setAttribute('d', `M ${-s} ${centerZTip - appTTip/2} L 0 ${centerZRoot - appTRoot/2} L ${s} ${centerZTip - appTTip/2} L ${s} ${centerZTip + appTTip/2} L 0 ${centerZRoot + appTRoot/2} L ${-s} ${centerZTip + appTTip/2} Z`);
-        p.setAttribute('fill', currentWingColor); p.setAttribute('stroke', '#888');
+        p.setAttribute('fill', currentWingColor); 
+        p.setAttribute('fill-opacity', '0.4'); // Added transparency
+        p.setAttribute('stroke', '#888');
         p.setAttribute('class', `interactive-shape ${isActive(wingData.id)}`);
         p.onclick = (e) => { e.stopPropagation(); handleSelectComponent(wingData.id); };
         if (isEffectivelyVisible('main-wing', wingData.isHidden)) wingLayer.appendChild(p);
@@ -6792,7 +6997,14 @@ function handleUpdateYBounds(id, type, val) {
 }
 
 function handleGlobalKeyDown(e) {
-    const { drag, viewParams } = App.ui;
+	
+	if (e.key === 'Escape' && App.ui.eyedropperAxis) {
+        App.ui.eyedropperAxis = null;
+        document.body.classList.remove('eyedropper-mode');
+        return;
+    }
+    
+	const { drag, viewParams } = App.ui;
     const { selectedComponentId } = App.state;
 
     if (e.key === 'Control') {
@@ -6980,18 +7192,18 @@ function updateThemeColors() {
     root.style.setProperty('--border-grey', borderVal);
     root.style.setProperty('--accent-yellow', highlightVal);
 
-    if (useDarkText) {
+if (useDarkText) {
         root.style.setProperty('--text-main', '#000000');
         root.style.setProperty('--text-dim', '#444444');
         root.style.setProperty('--input-grey', '#cccccc');
-		root.style.setProperty('--text-on-accent', '#ffffff');
-		root.style.setProperty('--grid-line', '#dddddd');
+        root.style.setProperty('--text-on-accent', '#ffffff');
+        root.style.setProperty('--grid-line', 'rgba(0, 0, 0, 0.15)'); // Transparent Black
     } else {
         root.style.setProperty('--text-main', '#ffffff');
         root.style.setProperty('--text-dim', '#999999');
         root.style.setProperty('--input-grey', '#121212');
-		root.style.setProperty('--text-on-accent', '#000000');
-		root.style.setProperty('--grid-line', '#222222');
+        root.style.setProperty('--text-on-accent', '#000000');
+        root.style.setProperty('--grid-line', 'rgba(255, 255, 255, 0.15)'); // Transparent White
     }
 
     refresh();
@@ -8190,7 +8402,7 @@ function bindGraphEvents() {
 
         let hoverHtml = `<line x1="${mouseX}" y1="${padTop}" x2="${mouseX}" y2="${h - padBottom}" stroke="var(--text-dim)" stroke-dasharray="4,4" stroke-width="1"/>`;
         hoverHtml += `<rect x="${mouseX - 20}" y="${h - padBottom + 2}" width="40" height="14" fill="var(--panel-grey)" rx="2"/>`;
-        hoverHtml += `<text x="${mouseX}" y="${h - padBottom + 12}" fill="#fff" font-size="10" text-anchor="middle" font-family="sans-serif">${dataX.toFixed(2)}</text>`;
+        hoverHtml += `<text x="${mouseX}" y="${h - padBottom + 12}" fill="var(--text-main)" font-size="10" text-anchor="middle" font-family="sans-serif">${dataX.toFixed(2)}</text>`;
 
         App.ui.graphSweepYVars.forEach(yv => {
             if (!yv.visible || !yv.data || yv.data.length === 0) return;
@@ -8792,9 +9004,40 @@ function bindGridResizers() {
         });
     }
 
+    function initMetricsResizer() {
+        const resizer = document.getElementById('resizer-metrics');
+        const container = document.getElementById('main-container');
+        
+        if (!resizer || !container) return;
+
+        resizer.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            resizer.classList.add('active');
+
+            function doDrag(e) {
+                const newWidth = Math.max(120, Math.min(e.clientX, 400));
+                container.style.setProperty('--metrics-width', newWidth + 'px');
+            }
+
+            function stopDrag() {
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+                resizer.classList.remove('active');
+                window.removeEventListener('mousemove', doDrag);
+                window.removeEventListener('mouseup', stopDrag);
+            }
+
+            window.addEventListener('mousemove', doDrag);
+            window.addEventListener('mouseup', stopDrag);
+        });
+    }
+
     initGridResizer('resizer-left', true);
     initGridResizer('resizer-right', false);
     initVarResizer();
+    initMetricsResizer();
 }
 
 function bindStaticUI() {
@@ -8895,6 +9138,11 @@ function initialize() {
 ##############################################################*/
 
 initialize();
+
+window.addEventListener('DOMContentLoaded', () => {
+    updateGradientStrength();
+    updateThemeColors(); 
+});
 
 </script>
 
