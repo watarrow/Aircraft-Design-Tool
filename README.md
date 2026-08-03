@@ -4,10 +4,8 @@ Save your design as a json to be able to migrate up versions.
 
 To use, download the latest html document. To get approximate stall speeds and such, download the airfoil-data.js too and place it in the same folder as the html. Double click to open in your browser and have fun! I recomend using it with 90% zoom on your browser.
 
-**Current bugs in S01.1:**
+**No bugs that I know of in S01.3:**
 
-No way to drag components outside or inside configs
+Planning to repopulatr information page soon
 
-Grid lines don't change colour properly when going to light mode
-
-There's probably more bugs that I don't know about
+Planning to add control surfaces
