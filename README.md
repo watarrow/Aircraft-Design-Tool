@@ -6,6 +6,6 @@ To use, download the latest html document. To get approximate stall speeds and s
 
 **No bugs that I know of in S01.3:**
 
-Planning to repopulatr information page soon
+Planning to repopulate information page soon
 
 Planning to add control surfaces
