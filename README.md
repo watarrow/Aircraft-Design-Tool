@@ -4,8 +4,10 @@ Save your design as a json to be able to migrate up versions.
 
 To use, download the latest html document. To get approximate stall speeds and such, download the airfoil-data.js too and place it in the same folder as the html. Double click to open in your browser and have fun! I recomend using it with 90% zoom on your browser.
 
-**No bugs that I know of in S01.3:**
-
-Planning to repopulate information page soon
+**No bugs that I know of in S01.5:**
 
 Planning to add control surfaces
+
+Planning to add component instances
+
+Planning to add ability to draw dimension lines
