@@ -807,9 +807,11 @@
         <div class="metric-box" title="Static margin indicates pitch stability. Positive values are generally more stable."><span style="color:var(--text-dim)">SM:</span> <span data-sync="top-sm" style="font-weight: bold; color: rgb(46, 204, 113);" data-raw="12.898084655059403">12.9%</span> <span data-sync="top-sm-guide" style="font-size: 0.8em; color: rgb(46, 204, 113);">(Stable)</span></div>
         <div class="metric-box" title="Horizontal tail volume coefficient. Measures horizontal stabilizer effectiveness."><span style="color:var(--text-dim)">Vh:</span> <span data-sync="top-vh" style="font-weight: bold; color: rgb(46, 204, 113);" data-raw="0.4283743409710175">0.428</span> <span data-sync="top-vh-guide" style="font-size: 0.8em; color: rgb(46, 204, 113);">(Good)</span></div>
         <div class="metric-box" title="Vertical tail volume coefficient. Measures vertical stabilizer effectiveness."><span style="color:var(--text-dim)">Vv:</span> <span data-sync="top-vv" style="font-weight: bold; color: rgb(46, 204, 113);" data-raw="0.031242888311692262">0.031</span> <span data-sync="top-vv-guide" style="font-size: 0.8em; color: rgb(46, 204, 113);">(Good)</span></div>
-        <div class="metric-box" title="Normalized Roll Agility"><span style="color:var(--text-dim)">Ixx(n):</span> <span data-sync="top-ixx-norm" style="font-weight:bold;color:var(--accent-yellow)" data-raw="0.03515972714056672">0.035</span> <span data-sync="top-ixx-guide" style="font-size: 0.8em; color: var(--text-dim); margin-left: 2px;">(Aerobatic)</span></div>
-        <div class="metric-box" title="Normalized Pitch Agility"><span style="color:var(--text-dim)">Iyy(n):</span> <span data-sync="top-iyy-norm" style="font-weight:bold;color:var(--accent-yellow)" data-raw="1.031047281021509">1.031</span> <span data-sync="top-iyy-guide" style="font-size: 0.8em; color: var(--text-dim); margin-left: 2px;">(Sport)</span></div>
-        <div class="metric-box" title="Normalized Yaw Agility"><span style="color:var(--text-dim)">Izz(n):</span> <span data-sync="top-izz-norm" style="font-weight:bold;color:var(--accent-yellow)" data-raw="0.06682338164993558">0.067</span> <span data-sync="top-izz-guide" style="font-size: 0.8em; color: var(--text-dim); margin-left: 2px;">(Aerobatic)</span></div>
+		<div class="metric-box" title="Normalized Roll Agility&#10;&#10;Reference Airframes:&#10;• Extra 300 (3D): ~0.018&#10;• P-51 Mustang (Fighter): ~0.035&#10;• Vans RV-8 (Sport): ~0.060&#10;• Cessna 152 (Trainer): ~0.085"><span style="color:var(--text-dim)">Ixx(n):</span> <span data-sync="top-ixx-norm" style="font-weight:bold;color:var(--accent-yellow)" data-raw="0.03515972714056672">0.035</span> <span data-sync="top-ixx-guide" style="font-size: 0.8em; color: var(--text-dim); margin-left: 2px;">(Aerobatic)</span></div>
+
+		<div class="metric-box" title="Normalized Pitch Agility&#10;&#10;Reference Airframes:&#10;• Extra 300 (3D): ~0.35&#10;• P-51 Mustang (Fighter): ~0.70&#10;• Vans RV-8 (Sport): ~1.10&#10;• Cessna 152 (Trainer): ~1.60"><span style="color:var(--text-dim)">Iyy(n):</span> <span data-sync="top-iyy-norm" style="font-weight:bold;color:var(--accent-yellow)" data-raw="1.031047281021509">1.031</span> <span data-sync="top-iyy-guide" style="font-size: 0.8em; color: var(--text-dim); margin-left: 2px;">(Sport)</span></div>
+
+		<div class="metric-box" title="Normalized Yaw Agility&#10;&#10;Reference Airframes:&#10;• Extra 300 (3D): ~0.030&#10;• P-51 Mustang (Fighter): ~0.055&#10;• Vans RV-8 (Sport): ~0.085&#10;• Cessna 152 (Trainer): ~0.120"><span style="color:var(--text-dim)">Izz(n):</span> <span data-sync="top-izz-norm" style="font-weight:bold;color:var(--accent-yellow)" data-raw="0.06682338164993558">0.067</span> <span data-sync="top-izz-guide" style="font-size: 0.8em; color: var(--text-dim); margin-left: 2px;">(Aerobatic)</span></div>
     </div>
 
     <div id="io-controls" style="display: flex; gap: 6px; margin-left: auto;">
@@ -1648,7 +1650,60 @@ Drag (CD): 0.0098</title></circle></svg>
                     <button class="btn-sm" id="btn-guide-close">Close</button>
                 </div>
                 <div id="guide-content" style="flex: 1; color: #fff; font-size: 0.9em; line-height: 1.6;">
-                    <!-- Content retained from previous iteration, safely static -->
+                    <div style="text-align: center; margin-bottom: 24px;">
+						<h2 style="color: var(--text-main); font-size: 1.5em; margin-bottom: 4px; border: none;">Aircraft Design Tool</h2>
+						<div style="color: var(--text-dim); font-size: 0.85em; font-family: 'Poppins', sans-serif;">
+							Version S01.5 | July 21st, 2026 | Victor R | Google Gemini was used to create this tool
+						</div>
+					</div>
+
+					<h3 style="color: var(--accent-yellow); border-bottom: 1px solid var(--border-grey); padding-bottom: 4px; margin-top: 16px;">Features</h3>
+					<ul style="padding-left: 20px; margin-bottom: 20px;">
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Rendering:</strong> Renders top, side and front view of a simplified model of your airplane so you can visualize the CG location, mean chord and the scale of your design.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Main math:</strong> Calculates your mass, CG, Tail sizing and more.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Extra math:</strong> Calculates your coefficient of lift and drag from a NACA 4 digit code. Also gives ballpark numbers for important speeds like stall, takeoff and cruise.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Variables and Equations:</strong> Use variables to drive equations and equations to drive properties. Want to automatically make the spar the same length as your wingspan? Your wingspan can drive the spar length!</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Mass tracking spreadsheet:</strong> Keep track of all your masses in one place and compare to different configurations using mass profiles.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Graph Sweep:</strong> Want to know how a dependent variable changes as you change an independent one? Graph sweep can do that! This feature is the most unstable at the moment.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Import/Export:</strong> Use "Save JSON" and "Load". Export as "Save HTML" for a self-contained file (not compatible between versions).</li>
+					</ul>
+
+					<h3 style="color: var(--accent-yellow); border-bottom: 1px solid var(--border-grey); padding-bottom: 4px; margin-top: 16px;">Limitations</h3>
+					<ul style="padding-left: 20px; margin-bottom: 20px;">
+						<li style="margin-bottom: 6px;">Math formulas limited to 3 nested brackets for simplicity.</li>
+						<li style="margin-bottom: 6px;">Restricted to NACA airfoils in the <code style="color: var(--text-main); background: rgba(255,255,255,0.1); padding: 2px 4px; border-radius: 3px;">airfoil-data.js</code> file.</li>
+						<li style="margin-bottom: 6px;">All components are treated as rectangular prisms.</li>
+						<li style="margin-bottom: 6px;">Simplified aero calculations are based on empirical formulas, not simulation.</li>
+						<li style="margin-bottom: 6px;">Constants in the variables page do not adjust to unit changes.</li>
+					</ul>
+
+					<h3 style="color: var(--accent-yellow); border-bottom: 1px solid var(--border-grey); padding-bottom: 4px; margin-top: 16px;">User Guide</h3>
+					<ul style="padding-left: 20px; margin-bottom: 20px;">
+						<li style="margin-bottom: 6px;">Switch layouts using the top view buttons (Top, Side, Front, Graph Sweep, Variables) and resize panels using the grid grab bars.</li>
+						<li style="margin-bottom: 6px;">Use the setting icon in the top right to change units, or customize the appearance of the tool.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Managing Parts:</strong> Use the + Add button in the Parts panel to insert a component, click any item to edit its dimensions, rotation, or mirroring, and use the eye icon to hide/show items.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Tracking Weights:</strong> Toggle between mass profiles using the top-right preset tabs, or open the spreadsheet table to compare columns side-by-side and export to CSV. To compare, click the down arrow and pick a profile. The columns can also be sorted by pressing the solid triangle icon.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Setting Up Equations:</strong> Open the Variables tab, create a variable or driven property, click the target button to use the eyedropper, and pick an input box to link them. Maximum of 3 nested brackets and symbols like +, -, *, /.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Running Sweeps:</strong> Head to Graph Sweep, pick a Y-axis target, add X-axis variables using the eyedropper crosshair to select a textbox. Define your bounds, and click Refresh to plot the curve. A jagged curve is due to the calculator rounding outputs.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Saving Work:</strong> Use Save JSON for a quick project file or Save HTML to pack the entire application into a single executable webpage. Saving as JSON allows you to transfer your design from one version of the design tool to a newer one.</li>
+					</ul>
+
+					<h3 style="color: var(--accent-yellow); border-bottom: 1px solid var(--border-grey); padding-bottom: 4px; margin-top: 16px;">Details</h3>
+					<ul style="padding-left: 20px; margin-bottom: 20px;">
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Center of Gravity:</strong> Calculated using the standard weighted mass moment sum: Xcg = Σ(mi × xi) / Σmi. Since parts are treated as solid rectangular blocks, their individual CGs are just dead center in their bounding boxes.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Tail Volume Coefficients:</strong> Uses classic empirical ratios. Horizontal volume (Vh) is (Sh × Lh) / (Sw × MAC). Vertical volume (Vv) is (Sv × Lv) / (Sw × b). Moment arms span from the main wing's aerodynamic center to the tail's aerodynamic center.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Aerodynamics & XFOIL:</strong> The tool parses your NACA 4-digit code to grab geometric specs. Lift (CL) and drag (CD) coefficients are pulled straight from a pre-baked XFOIL dataset for realistic viscous polars.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Drag Estimation:</strong> Built using the standard buildup method. Induced drag (CDi) uses the classic lifting-line approximation. Parasite drag ignores complex 3D interference, using flat-plate skin friction and basic thickness form factors instead.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Flight Speeds:</strong> Stall speed (Vs) comes directly from steady level flight equilibrium at standard sea level. Takeoff and cruise speeds are ballpark empirical multiples of Vs, don't expect true thrust/power curve intersections here.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Geometric Constraints:</strong> Wing sweep and taper math assume perfectly straight leading and trailing edges. Complex aero-like fuselage lift, wing-root downwash on the tail, and dynamic stability is ignored.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Graph Sweep Engine:</strong> Steps your chosen independent variable through defined bounds, forcing a recalculation of the whole equation web at every step to plot the points. Once done, it snaps everything back to its original state.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">What da heck is this giant HTML file?:</strong> The tool is a single HTML file running plain JavaScript. I decided to do this so it is easy to share and run. Kinda crazy to scroll through the code though.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Mass Discrepancies:</strong> Treating everything as uniform blocks ignores taper, hollowing, and point masses. If your real build has complex internal structures, your actual CG will definitely drift from this calculation.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Aerodynamic Oversights:</strong> Slapping 2D XFOIL data onto a 3D airframe overestimates lift and underestimates drag. The math does not account for finite span effects, tip vortices, and junction interference. There are probably a bunch of aerodynamic effects that I missed just because I didn't know about them. Overall, aero is not this tool's strong suit.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Software Fragility:</strong> Graph Sweep is the most buggy feature. Rapid updates can cause jagged plots due to rounding. Also, the variable parser has no cyclic protection; if two variables drive each other, the app will freeze. I also tested this with the fewest crazy scenarios.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Coordinate System:</strong> The workspace uses +X as forwards, +Y as right, +Z as up, with 0, 0, 0 located at the leading edge of the wing.</li>
+						<li style="margin-bottom: 6px;"><strong style="color: var(--text-main);">Local Dependencies:</strong> The tool works as a single HTML file, but the aerodynamics calculations require the <code style="color: var(--text-main); background: rgba(255,255,255,0.1); padding: 2px 4px; border-radius: 3px;">airfoil-data.js</code> file to be located in the exact same folder if as this HTML file.</li>
+					</ul>
                 </div>
             </div>
             
@@ -2141,16 +2196,16 @@ Trim = -[(Cm0 * S_w * MAC) + (CL_w * S_w * dx_CG)] / (S_t * L_t * 0.08)" style="
 #
 # AIRCRAFT DESIGN TOOL
 #
-# Version : S01.1
+# Version : S01.5
 #
 # Purpose
 #
-# A browser-based aircraft design environment with
+# A browser-based aircraft design tool with
 # interactive geometry editing, aerodynamic analysis,
 # mass properties, variable-driven design, and graph
 # sweeps.
 #
-# Design Philosophy
+# 
 #
 # • Single HTML file
 # • No dependencies
@@ -4049,19 +4104,21 @@ function evaluateEquations() {
         if (targets.length === 0 || !eq.equation) return;
         
         let safeEq = eq.equation;
-        App.state.sysVariables.forEach(v => {
-            let displayVal = v.value;
-            const safeUnit = v.unit || 'none';
-            if (safeUnit !== 'none') {
-                const internalVal = v.value * getUnitFactor(safeUnit);
-                const cat = getUnitCategory(safeUnit);
-                if (cat === 'dim') displayVal = internalVal * getDimScalar();
-                if (cat === 'mass') displayVal = internalVal * getMassScalar();
-                if (cat === 'speed') displayVal = internalVal * getSpeedScalar();
-            }
-            const regex = new RegExp(`\\b${v.name}\\b`, 'g');
-            safeEq = safeEq.replace(regex, displayVal);
-        });
+			App.state.sysVariables.forEach(v => {
+                if (!v.name) return; // FIX: Prevent empty strings from compiling into \b\b and corrupting equations
+                    
+                let displayVal = v.value;
+                const safeUnit = v.unit || 'none';
+                if (safeUnit !== 'none') {
+                    const internalVal = v.value * getUnitFactor(safeUnit);
+                    const cat = getUnitCategory(safeUnit);
+                    if (cat === 'dim') displayVal = internalVal * getDimScalar();
+                    if (cat === 'mass') displayVal = internalVal * getMassScalar();
+                    if (cat === 'speed') displayVal = internalVal * getSpeedScalar();
+                }
+                    const regex = new RegExp(`\\b${v.name}\\b`, 'g');
+                    safeEq = safeEq.replace(regex, displayVal);
+            });
         
         try {
             const result = Function('"use strict";return (' + safeEq + ')')();
@@ -4091,13 +4148,24 @@ function evaluateEquations() {
 }
 
 function addSysVariable() {
-    App.state.sysVariables.push({ id: Date.now(), name: 'newVar', value: 0, targetId: '', unit: 'none' });
+    App.state.sysVariables.push({ 
+        id: Date.now() + Math.floor(Math.random() * 10000), 
+        name: 'var_' + Math.floor(Math.random() * 10000), // FIX: Guarantees unique regex targets
+        value: 0, 
+        targetId: '', 
+        unit: 'none' 
+    });
     refresh();
     if (typeof saveHistory === 'function') saveHistory();
 }
 
 function addSysEquation() {
-    App.state.sysEquations.push({ id: Date.now(), targets: [], equation: '', nickname: '' });
+    App.state.sysEquations.push({ 
+        id: Date.now() + Math.floor(Math.random() * 10000), 
+        targets: [], 
+        equation: '', 
+        nickname: '' 
+    });
     refresh();
     if (typeof saveHistory === 'function') saveHistory();
 }
@@ -4115,12 +4183,12 @@ function updateSystemProperty(type, id, field, val) {
         item[field] = val; 
     }
 
-    if (['value', 'equation', 'unit'].includes(field)) {
+    // FIX: Added 'name' to the array. Renaming a variable now correctly updates the math tree.
+    if (['value', 'equation', 'unit', 'name'].includes(field)) {
         evaluateEquations();
         refresh();
     }
     
-    // SYSTEMATIC FIX: Force history save on every variable change
     if (typeof saveHistory === 'function') saveHistory();
 }
 
@@ -4164,6 +4232,7 @@ function syncVarToDOM(id, val) {
                             : currentVal;
         v.value = newVarVal;
         evaluateEquations();
+        refresh(); // FIX: Force the 3D SVG canvas to redraw after the math changes
     }
 }
 
@@ -7113,9 +7182,10 @@ function renderSpreadsheet() {
         
         tr.innerHTML = `
             <td style="padding: 8px; position: relative; box-sizing: border-box; cursor: pointer;" 
-                onclick="handleSelectComponent('${p.id}'); toggleSpreadsheet();">
+                onclick="handleSelectComponent('${p.id}');">
                 <input type="text" value="${safeName}" 
                     onchange="updateSpreadsheetValue('${p.id}', 'name', this.value, this)" 
+                    onclick="event.stopPropagation();" 
                     style="width: ${getIsMirrored(p) ? 'calc(100% - 20px)' : '100%'}; padding: 4px; margin: 0; box-sizing: border-box; cursor: pointer;">
                 ${getIsMirrored(p) ? '<span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); pointer-events: none; font-size: 1.1em;">⧓</span>' : ''}
             </td>
@@ -7983,16 +8053,14 @@ function handleCopyComponent(id, event) {
     if (event) event.stopPropagation();
     const newId = duplicateComponent(id);
     if (newId) {
-        App.state.selectedComponentId = newId;
-        refresh();
+        handleSelectComponent(newId);
         if (typeof saveHistory === 'function') saveHistory();
     }
 }
 
 function handleAddComponent() {
     const newId = createComponent();
-    App.state.selectedComponentId = newId;
-    refresh();
+    handleSelectComponent(newId);
     if (typeof saveHistory === 'function') saveHistory();
 }
 
@@ -8002,7 +8070,7 @@ function startDrag(e, id) {
     
     App.state.drag.dragging = true; 
     App.state.drag.dragComponentId = id; 
-    App.state.selectedComponentId = id;
+    handleSelectComponent(id);
     
     const svg = document.getElementById('visualizer');
     const p = getSVGPoint(svg, e.clientX, e.clientY);
@@ -8016,7 +8084,6 @@ function startDrag(e, id) {
         App.state.drag.componentStartY = safeParse(active.y); 
         App.state.drag.componentStartZ = safeParse(active.z);
     }
-    refresh();
 }
 
 function startVertexDrag(e, compId, idx) {
@@ -9310,6 +9377,43 @@ function bindPropertyEvents() {
         });
     });
 
+	const propMassVal = document.getElementById('prop-mass-val');
+    if (propMassVal) {
+        propMassVal.addEventListener('input', (e) => {
+            const p = getActive();
+            if (!p || p.lockedMass) return;
+            
+            // Route manual input through the system's target pipeline
+            // This systematically handles unit scaling, mass profiles, and mirrored multiplier logic
+            applyTargetValue(`${p.id}:prop-mass-val-${App.state.activeMassProfile}`, parseFloat(e.target.value) || 0);
+            
+            // Push changes to the total mass, CG, and spreadsheet UI
+            refresh();
+        });
+        
+        // Only log to history when the user commits the value (prevents undo-stack flooding)
+        propMassVal.addEventListener('change', () => {
+            if (typeof saveHistory === 'function') saveHistory();
+        });
+    }
+
+    const propRho = document.getElementById('prop-rho');
+    if (propRho) {
+        propRho.addEventListener('input', (e) => {
+            const p = getActive();
+            if (!p || p.lockedRho) return;
+            
+            const densityConversionFactor = getMassScalar() / Math.pow(getDimScalar(), 3);
+            p.rho = (parseFloat(e.target.value) || 0) / densityConversionFactor;
+            
+            refresh();
+        });
+        
+        propRho.addEventListener('change', () => {
+            if (typeof saveHistory === 'function') saveHistory();
+        });
+    }
+
     ['name', 'color'].forEach(prop => {
         const el = document.getElementById(`prop-${prop}`);
         if (!el) return;
@@ -9355,6 +9459,8 @@ function bindPropertyEvents() {
             });
         }
     });
+	
+	
 }
 
 function bindDragEvents() {
