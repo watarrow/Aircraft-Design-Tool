@@ -231,7 +231,7 @@
         text-transform: uppercase;
     }
 
-#project-title {
+	#project-title {
         background: var(--bg-black);
         border: 1px solid var(--accent-yellow);
         color: var(--accent-yellow);
@@ -929,8 +929,8 @@
     <!-- Left Sidebar: Component List -->
     <div class="sidebar" id="sidebar">
         <div style="display: flex; flex-direction: column; height: 100%;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <h2>Parts</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+                <h2 style="margin: 0; min-width: 150px; flex-grow: 1;">Parts & Configurations</h2>
                 <div style="display: flex; gap: 4px;">
                     <button class="btn-sm" id="btn-toggle-table" style="padding: 2px 6px; font-size: 0.7em;">Table</button>
                     <button class="btn-sm" id="btn-add-config" style="padding: 2px 6px; font-size: 0.7em;" title="Add Empty Config">+ Config</button>
@@ -1819,6 +1819,10 @@ Drag (CD): 0.0098</title></circle></svg>
             </div>
 
             <div id="prop-motor-settings" style="display: none; border-left: 2px solid var(--accent-yellow); padding-left: 8px; margin-bottom: 6px;">
+                <div class="input-group-inline" style="margin-bottom: 6px;">
+                    <input type="checkbox" id="prop-show-prop-disk">
+                    <label for="prop-show-prop-disk" style="margin-bottom:0; cursor:pointer; color: var(--text-main);">Show Prop Disk</label>
+                </div>
                 <div class="input-group-inline" style="margin-bottom: 8px;">
                     <input type="checkbox" id="prop-thrust-auto" checked="checked">
                     <label for="prop-thrust-auto" style="margin-bottom:0; cursor:pointer; color: var(--accent-yellow);">Calculate from Specs</label>
@@ -2335,11 +2339,12 @@ const App = {
 #
 ##############################################################*/
 
-function createComponent() {
+function createComponent(parentId = null) {
     const id = 'comp-' + Date.now();
     const newComp = { 
         id, 
-        name: "New Component", 
+        parentId, 
+        name: parentId ? "Instance" : "New Component", 
         type: 'body', 
         x: 0, y: -5, z: -5, sx: 10, sy: 10, sz: 10, 
         sections: [
@@ -2353,16 +2358,22 @@ function createComponent() {
         lockedX: false, lockedY: false, lockedZ: false, 
         anchorX: 'min', anchorY: 'center', anchorZ: 'center', 
         showLabel: false, isHollow: false, wallT: 0.2, isMirrored: false, isSymmetrical: false,
-        rotX: 0, rotY: 0, rotZ: 0, lockedMass: false, lockedRho: false 
+        rotX: 0, rotY: 0, rotZ: 0, lockedMass: false, lockedRho: false,
+        isSuppressed: false 
     };
     
     const activeCfg = getActiveConfig();
-    if (activeCfg) {
-        activeCfg.components.push(newComp);
-        App.state.components = activeCfg.components; // Repair reference
-    } else {
-        App.state.components.push(newComp);
+    const isBaseConfig = App.state.configurations.indexOf(activeCfg) === 0;
+
+    // If added inside a Variant, push to Base but auto-suppress globally EXCEPT for this Variant
+    if (!isBaseConfig) {
+        newComp.isSuppressed = true; 
+        if (!activeCfg.overrides) activeCfg.overrides = {};
+        if (!activeCfg.overrides[id]) activeCfg.overrides[id] = {};
+        activeCfg.overrides[id]['isSuppressed'] = false;
     }
+
+    App.state.configurations[0].components.push(newComp);
     return id;
 }
 
@@ -3427,19 +3438,29 @@ function createDefaultWing() {
 }
 
 function deleteComponent(id) {
+    const activeCfg = getActiveConfig();
+    const isBaseConfig = App.state.configurations.indexOf(activeCfg) === 0;
+
+    // If in a Linked Variant, suppress it instead of permanently deleting
+    if (!isBaseConfig) {
+        const comp = activeCfg.components.find(c => c.id === id);
+        if (comp) {
+            setProp(comp, 'isSuppressed', true);
+            if (App.state.selectedComponentId === id) App.state.selectedComponentId = 'main-wing';
+            return;
+        }
+    }
+
+    // Base Config: Nuke it everywhere
     App.state.globalComponents = App.state.globalComponents.filter(c => c.id !== id);
-    
     App.state.configurations.forEach(cfg => {
         cfg.components = cfg.components.filter(c => c.id !== id);
+        if (cfg.overrides && cfg.overrides[id]) delete cfg.overrides[id];
     });
     
-    // Re-sync pointer to active config
-    const activeCfg = getActiveConfig();
     if (activeCfg) App.state.components = activeCfg.components;
     
-    if (App.state.selectedComponentId === id) {
-        App.state.selectedComponentId = 'main-wing';
-    }
+    if (App.state.selectedComponentId === id) App.state.selectedComponentId = 'main-wing';
     if (App.ui.viewParams.focusedComponentId === id) {
         App.ui.viewParams.isFocused = false;
         App.ui.viewParams.focusedComponentId = null;
@@ -3447,19 +3468,33 @@ function deleteComponent(id) {
 }
 
 function duplicateComponent(id) {
-    const gIdx = App.state.globalComponents.findIndex(c => c.id === id);
-    const cIdx = App.state.components.findIndex(c => c.id === id);
+    const baseArray = App.state.configurations[0].components;
+    const originIndex = baseArray.findIndex(c => c.id === id);
+    if (originIndex === -1) return null;
     
-    let origin, targetArray, insertIndex;
-    if (gIdx !== -1) { origin = App.state.globalComponents[gIdx]; targetArray = App.state.globalComponents; insertIndex = gIdx; }
-    else if (cIdx !== -1) { origin = App.state.components[cIdx]; targetArray = App.state.components; insertIndex = cIdx; }
-    else return null;
-    
+    const origin = baseArray[originIndex];
     const clone = JSON.parse(JSON.stringify(origin));
-    clone.id = 'comp-' + Date.now();
+    clone.id = 'comp-' + Date.now() + Math.floor(Math.random() * 1000);
     clone.name = origin.name + " (Copy)";
     
-    targetArray.splice(insertIndex + 1, 0, clone);
+    const activeCfg = getActiveConfig();
+    const isBaseConfig = App.state.configurations.indexOf(activeCfg) === 0;
+
+    // If we are in a Variant, suppress the clone globally, but reveal it here
+    if (!isBaseConfig) {
+        clone.isSuppressed = true; 
+        if (!activeCfg.overrides) activeCfg.overrides = {};
+        if (!activeCfg.overrides[clone.id]) activeCfg.overrides[clone.id] = {};
+        
+        // Copy any active overrides from the original part to the new clone
+        if (activeCfg.overrides[id]) {
+            Object.assign(activeCfg.overrides[clone.id], JSON.parse(JSON.stringify(activeCfg.overrides[id])));
+        }
+        // Ensure it is visible in the current variant
+        activeCfg.overrides[clone.id]['isSuppressed'] = false; 
+    }
+
+    baseArray.splice(originIndex + 1, 0, clone);
     return clone.id;
 }
 
@@ -3468,10 +3503,58 @@ function getActiveConfig() {
     return App.state.configurations.find(cfg => cfg.isActive) || App.state.configurations[0];
 }
 
-// Master Helper: Merges globals and active config parts for the math engine
+// Data Hydrator (Merges Base Parts + Instances + Delta Overrides)
+function hydrateComponents() {
+    const baseCfg = App.state.configurations[0];
+    const activeCfg = getActiveConfig();
+    
+    if (activeCfg === baseCfg) {
+        App.state.components = baseCfg.components; 
+        App.state.wingData = baseCfg.wing;
+        return;
+    }
+
+    // 1. Fast Hydrate Wing (Shallow copy)
+    if (activeCfg.wing === baseCfg.wing || activeCfg.wing.id === baseCfg.wing.id) {
+        App.state.wingData = { ...baseCfg.wing };
+        if (activeCfg.overrides && activeCfg.overrides[App.state.wingData.id]) {
+            Object.assign(App.state.wingData, activeCfg.overrides[App.state.wingData.id]);
+        }
+    } else {
+        App.state.wingData = activeCfg.wing;
+    }
+    
+    // 2. Fast Hydrate Components
+    App.state.components = baseCfg.components.map(baseComp => {
+        const hydrated = { ...baseComp }; 
+        
+        // Rapid clone the internal geometry array
+        if (hydrated.sections) hydrated.sections = hydrated.sections.map(s => ({...s}));
+
+        if (hydrated.parentId) {
+            const parent = baseCfg.components.find(p => p.id === hydrated.parentId);
+            if (parent) {
+                const inherited = ['sx', 'sy', 'sz', 'rho', 'type', 'isHollow', 'wallT', 'budgetMass', 'measuredMass', 'predictedMass', 'thrustAuto', 'thrust', 'propDia', 'propPitch', 'motorKV', 'battCells'];
+                inherited.forEach(p => { if (parent[p] !== undefined) hydrated[p] = parent[p]; });
+                if (parent.sections) hydrated.sections = parent.sections.map(s => ({...s}));
+            }
+        }
+        
+        if (activeCfg.overrides && activeCfg.overrides[hydrated.id]) {
+            const overrides = activeCfg.overrides[hydrated.id];
+            for (let key in overrides) {
+                if (key === 'sections') hydrated[key] = overrides[key].map(s => ({...s}));
+                else hydrated[key] = overrides[key];
+            }
+        }
+        return hydrated;
+    });
+}
+
+// Master Helper for the Math Engine
 function getAllActiveParts() {
-    const activeConfig = getActiveConfig();
-    return [...App.state.globalComponents, ...activeConfig.components];
+    // Read from the newly hydrated array and filter out suppressed parts
+    return [...App.state.globalComponents, ...App.state.components].filter(c => !c.isSuppressed);
 }
 
 function activateConfigModel(cfgId) {
@@ -3605,6 +3688,8 @@ function performLoopCut(id) {
         dy: (s1.dy + s2.dy) / 2,
         dz: (s1.dz + s2.dz) / 2
     });
+	
+	setProp(active, 'sections', active.sections); // <-- ROUTE TO DELTA
     
     // Assuming recalculateMassOrDensity is moving to Section 8 later
     if (typeof recalculateMassOrDensity === 'function') {
@@ -3647,24 +3732,6 @@ function reorderComponents(draggedId, targetId) {
     tgtArr.splice(tgtIdx, 0, movedItem);
 }
 
-function handleAddConfig() {
-    const activeCfg = getActiveConfig();
-    const newWing = JSON.parse(JSON.stringify(activeCfg.wing));
-    newWing.id = 'wing-' + Date.now() + Math.floor(Math.random() * 1000);
-    
-    const newConfig = {
-        id: 'config-' + Date.now(),
-        name: 'New Configuration',
-        isActive: false,
-        isExpanded: true,
-        wing: newWing,
-        components: [] // Completely empty parts bin
-    };
-    App.state.configurations.push(newConfig);
-    refresh();
-    saveHistory();
-}
-
 function deleteEdgeLoop(id, vertexIdx) {
     const active = App.state.components.find(c => c.id === id);
     if (!active || !active.sections || active.sections.length <= 2) return; 
@@ -3674,6 +3741,8 @@ function deleteEdgeLoop(id, vertexIdx) {
 
     let oldMass = getEffectiveMassGrams(active);
     active.sections.splice(secIdx, 1);
+	
+	setProp(active, 'sections', active.sections); // <-- ROUTE TO DELTA
     
     if (typeof recalculateMassOrDensity === 'function') recalculateMassOrDensity(active, oldMass);
     
@@ -3778,6 +3847,138 @@ function renameMassProfileModel(oldProfile, safeNewName) {
 # UTILITIES
 #
 ##############################################################*/
+
+// Universal Property Resolver
+function getProp(comp, prop) {
+    if (!comp) return undefined;
+
+    // 1. Configuration Override Check
+    const activeCfg = getActiveConfig();
+    const isBaseConfig = App.state.configurations.indexOf(activeCfg) === 0;
+    
+    if (!isBaseConfig && activeCfg.overrides && activeCfg.overrides[comp.id] && activeCfg.overrides[comp.id][prop] !== undefined) {
+        return activeCfg.overrides[comp.id][prop];
+    }
+
+    // 2. Instance Inheritance Check
+    if (comp.parentId) {
+        const inheritedProps = ['sx', 'sy', 'sz', 'rho', 'type', 'isHollow', 'wallT', 'budgetMass', 'measuredMass', 'predictedMass', 'thrustAuto', 'thrust', 'propDia', 'propPitch', 'motorKV', 'battCells'];
+        if (inheritedProps.includes(prop)) {
+            const parent = App.state.configurations[0].components.find(c => c.id === comp.parentId);
+            if (parent) return getProp(parent, prop); 
+        }
+    }
+
+    // 3. Fallback to Base State
+    return comp[prop];
+}
+
+// Universal Property Setter
+function setProp(comp, prop, val) {
+    if (!comp) return;
+    const activeCfg = getActiveConfig();
+    const isBaseConfig = App.state.configurations.indexOf(activeCfg) === 0;
+
+    const inheritedProps = ['sx', 'sy', 'sz', 'rho', 'type', 'isHollow', 'wallT', 'budgetMass', 'measuredMass', 'predictedMass', 'thrustAuto', 'thrust', 'propDia', 'propPitch', 'motorKV', 'battCells'];
+    if (comp.parentId && inheritedProps.includes(prop)) return; 
+
+    // CRITICAL: Always update live working memory immediately
+    comp[prop] = val; 
+
+    if (!isBaseConfig) {
+        const baseCfg = App.state.configurations[0];
+        let baseVal;
+        if (comp.id === 'main-wing' || comp.id === baseCfg.wing.id) {
+            baseVal = baseCfg.wing[prop];
+        } else {
+            const baseComp = baseCfg.components.find(c => c.id === comp.id);
+            baseVal = baseComp ? baseComp[prop] : undefined;
+        }
+
+        let isDifferent = false;
+        if (prop === 'sections') {
+            isDifferent = true; // Assume explicit section saves are always overrides
+        } else {
+            if (typeof val === 'number' && typeof baseVal === 'number') {
+                isDifferent = Math.abs(val - baseVal) > 0.000001;
+            } else {
+                isDifferent = val !== baseVal;
+            }
+        }
+
+        if (!activeCfg.overrides) activeCfg.overrides = {};
+        if (!activeCfg.overrides[comp.id]) activeCfg.overrides[comp.id] = {};
+        
+        if (isDifferent) {
+            // Rapid array cloning for geometry logging
+            activeCfg.overrides[comp.id][prop] = (prop === 'sections') ? val.map(s => ({...s})) : val;
+        } else {
+            if (activeCfg.overrides[comp.id][prop] !== undefined) {
+                delete activeCfg.overrides[comp.id][prop];
+            }
+        }
+    }
+}
+
+// Clear an Override (Triggered by UI)
+function clearOverride(compId, prop) {
+    const activeCfg = getActiveConfig();
+    if (activeCfg.overrides && activeCfg.overrides[compId]) {
+        delete activeCfg.overrides[compId][prop];
+    }
+    refresh();
+    if (typeof saveHistory === 'function') saveHistory();
+}
+
+// Sync instances with their parents
+function syncInstances() {
+    const baseParts = App.state.configurations[0].components;
+    baseParts.forEach(comp => {
+        if (comp.parentId) {
+            const parent = baseParts.find(p => p.id === comp.parentId);
+            if (parent) {
+                const inherited = ['sx', 'sy', 'sz', 'rho', 'type', 'isHollow', 'wallT', 'budgetMass', 'measuredMass', 'predictedMass', 'thrustAuto', 'thrust', 'propDia', 'propPitch', 'motorKV', 'battCells'];
+                inherited.forEach(prop => {
+                    if (parent[prop] !== undefined) comp[prop] = parent[prop];
+                });
+                if (parent.sections) {
+                    comp.sections = JSON.parse(JSON.stringify(parent.sections));
+                }
+            }
+        }
+    });
+}
+
+// Universal Property Resolver (Handles Configurations & Instances)
+function getProp(comp, prop) {
+    if (!comp) return undefined;
+
+    // 1. Configuration Override Check
+    // If we aren't in the Base config, check if the current config has an override for this part
+    const activeCfg = getActiveConfig();
+    const isBaseConfig = App.state.configurations.indexOf(activeCfg) === 0;
+    
+    if (!isBaseConfig && activeCfg.overrides && activeCfg.overrides[comp.id]) {
+        if (activeCfg.overrides[comp.id][prop] !== undefined) {
+            return activeCfg.overrides[comp.id][prop];
+        }
+    }
+
+    // 2. Instance Inheritance Check
+    // If this is an instance, it inherits physical dimensions and mass from its parent.
+    // It maintains its own position (x, y, z), rotation, and mirroring.
+    if (comp.parentId) {
+        const inheritedProps = ['sx', 'sy', 'sz', 'rho', 'type', 'isHollow', 'wallT', 'budgetMass', 'measuredMass', 'predictedMass'];
+        if (inheritedProps.includes(prop)) {
+            const allParts = App.state.configurations[0].components; // Always read parent from Base
+            const parent = allParts.find(c => c.id === comp.parentId);
+            if (parent) return getProp(parent, prop); 
+        }
+    }
+
+    // 3. Fallback to Base State
+    return comp[prop];
+}
 
 function getAgilityClassification(val, axis) {
     if (axis === 'roll') {
@@ -4243,7 +4444,6 @@ function applyTargetValue(targetCombo, val) {
     if (!inputId) {
         const el = document.getElementById(compId);
         setUIData(compId, val, el && el.tagName === 'INPUT' ? 4 : 2);
-
         if (compId.startsWith('var-input-')) {
             const varId = parseInt(compId.replace('var-input-', ''));
             const vObj = App.state.sysVariables.find(v => v.id === varId);
@@ -4273,17 +4473,18 @@ function applyTargetValue(targetCombo, val) {
             if (getIsMirrored(comp, 'budget')) targetMassGrams /= 2;
             const volume = comp === App.state.wingData ? getWingVolumeCm3('budget') : getComponentVolumeCm3(comp, 'budget');
             if (volume > 0) {
-                comp.rho = targetMassGrams / volume;
+                setProp(comp, 'rho', targetMassGrams / volume);
+                
                 if (compId === App.state.selectedComponentId && App.state.activeMassProfile === 'budget') {
                     const rhoInput = comp === App.state.wingData ? document.getElementById('wing-rho') : document.getElementById('prop-rho');
                     if (rhoInput && document.activeElement !== rhoInput) {
                         const conversionFactor = getMassScalar() / Math.pow(getDimScalar(), 3);
-                        rhoInput.value = (comp.rho * conversionFactor).toFixed(5);
+                        rhoInput.value = (getProp(comp, 'rho') * conversionFactor).toFixed(5);
                     }
                 }
             }
         } else {
-            comp[`${targetProfile}Mass`] = targetMassGrams;
+            setProp(comp, `${targetProfile}Mass`, targetMassGrams);
         }
 
         if (targetProfile === App.state.activeMassProfile && compId === App.state.selectedComponentId) {
@@ -4298,7 +4499,13 @@ function applyTargetValue(targetCombo, val) {
         'prop-sx': 'sx', 'prop-sy': 'sy', 'prop-sz': 'sz',
         'prop-rotX': 'rotX', 'prop-rotY': 'rotY', 'prop-rotZ': 'rotZ',
         'wing-b': 'b', 'wing-cr': 'cr', 'wing-ct': 'ct',
-        'wing-area': 'area', 'wing-ar': 'ar', 'wing-sweep': 'sweep', 'wing-dihedral': 'dihedral'
+        'wing-area': 'area', 'wing-ar': 'ar', 'wing-sweep': 'sweep', 'wing-dihedral': 'dihedral',
+        //Motor specific properties
+        'prop-thrust': 'thrust', 
+        'prop-dia': 'propDia', 
+        'prop-pitch': 'propPitch', 
+        'prop-kv': 'motorKV', 
+        'prop-cells': 'battCells'
     };
 
     const objKey = propMap[inputId];
@@ -4313,35 +4520,37 @@ function applyTargetValue(targetCombo, val) {
     if (comp === App.state.wingData) {
         resolveWingCascade(objKey, rawVal);
     } else {
-        let oldMass = getEffectiveMassGrams(comp); // Capture mass before mutating volume
+        let oldMass = getEffectiveMassGrams(comp); 
 
         if (['sx', 'sy', 'sz'].includes(objKey)) {
-            let currentDispSize = safeParse(comp[objKey]);
+            let currentDispSize = safeParse(getProp(comp, objKey));
             if (comp.sections && comp.sections.length > 0) {
                 let minVal = Infinity, maxVal = -Infinity;
+                const pSx = getProp(comp, 'sx'), pSy = getProp(comp, 'sy'), pSz = getProp(comp, 'sz');
                 comp.sections.forEach(sec => {
-                    if (objKey === 'sx') { minVal = Math.min(minVal, sec.x * comp.sx); maxVal = Math.max(maxVal, sec.x * comp.sx); }
-                    else if (objKey === 'sy') { const hy = (sec.w * comp.sy)/2; minVal = Math.min(minVal, sec.dy * comp.sy - hy); maxVal = Math.max(maxVal, sec.dy * comp.sy + hy); }
-                    else if (objKey === 'sz') { const hz = (sec.h * comp.sz)/2; minVal = Math.min(minVal, sec.dz * comp.sz - hz); maxVal = Math.max(maxVal, sec.dz * comp.sz + hz); }
+                    if (objKey === 'sx') { minVal = Math.min(minVal, sec.x * pSx); maxVal = Math.max(maxVal, sec.x * pSx); }
+                    else if (objKey === 'sy') { const hy = (sec.w * pSy)/2; minVal = Math.min(minVal, sec.dy * pSy - hy); maxVal = Math.max(maxVal, sec.dy * pSy + hy); }
+                    else if (objKey === 'sz') { const hz = (sec.h * pSz)/2; minVal = Math.min(minVal, sec.dz * pSz - hz); maxVal = Math.max(maxVal, sec.dz * pSz + hz); }
                 });
                 currentDispSize = maxVal - minVal;
             }
             if (currentDispSize > 0 && rawVal > 0) {
                 const scale = rawVal / currentDispSize;
-                comp[objKey] *= scale;
+                setProp(comp, objKey, getProp(comp, objKey) * scale);
+                
                 const axis = objKey.substring(1); 
-                if (['x', 'y', 'z'].includes(axis) && comp[`locked${axis.toUpperCase()}`]) {
+                if (['x', 'y', 'z'].includes(axis) && getProp(comp, `locked${axis.toUpperCase()}`)) {
                     const delta = rawVal - currentDispSize;
-                    comp[axis] = safeParse(comp[axis]) - (delta / 2);
+                    setProp(comp, axis, safeParse(getProp(comp, axis)) - (delta / 2));
                 }
             }
         } else if (['x', 'y', 'z'].includes(objKey)) {
-            comp[objKey] = getInternalMinCoord(rawVal, comp[`s${objKey}`] || 0);
+            setProp(comp, objKey, getInternalMinCoord(rawVal, getProp(comp, `s${objKey}`) || 0));
         } else {
-            comp[objKey] = rawVal;
+            setProp(comp, objKey, rawVal);
         }
         
-        if (typeof recalculateMassOrDensity === 'function') recalculateMassOrDensity(comp, oldMass);
+        recalculateMassOrDensity(comp, oldMass);
     }
 
     if (compId === App.state.selectedComponentId) {
@@ -4683,9 +4892,10 @@ function resolveWingCascade(changedProp, newVal) {
         }
     }
 
-    wing.b = b; wing.cr = cr; wing.ct = ct;
+	setProp(wing, 'b', b); 
+    setProp(wing, 'cr', cr); 
+    setProp(wing, 'ct', ct);
 
-    // BULLETPROOF TWO-WAY BINDING: Force updates and flag if equations need processing
     let varsChanged = false;
     const pushToVar = (p, val) => {
         let inputId = p === 'mass' ? 'wing-mass-display' : 'wing-' + p;
@@ -4702,11 +4912,8 @@ function resolveWingCascade(changedProp, newVal) {
         });
     };
 
-    pushToVar('b', wing.b);
-    pushToVar('cr', wing.cr);
-    pushToVar('ct', wing.ct);
+    pushToVar('b', wing.b); pushToVar('cr', wing.cr); pushToVar('ct', wing.ct);
 
-    // SYSTEMATIC FIX: Ping the equation engine immediately during manual use
     if (varsChanged && App.state.graphSweep && !App.state.graphSweep.isSimulating) {
         if (typeof evaluateEquations === 'function') evaluateEquations();
     }
@@ -4715,13 +4922,13 @@ function resolveWingCascade(changedProp, newVal) {
     const effectivelyLockedMass = isL('mass');
 
     if (changedProp === 'rho') {
-        wing.rho = newVal;
+        setProp(wing, 'rho', newVal);
     } else if (App.state.activeMassProfile === 'budget') {
         if (changedProp === 'mass') {
-            if (!isL('rho') && newVol > 0) wing.rho = newVal / newVol;
+            if (!isL('rho') && newVol > 0) setProp(wing, 'rho', newVal / newVol);
         } else {
             if (effectivelyLockedMass && newVol > 0 && !isL('rho')) {
-                wing.rho = targetMass / newVol;
+                setProp(wing, 'rho', targetMass / newVol);
                 const rhoInput = document.getElementById('wing-rho');
                 if (rhoInput && document.activeElement !== rhoInput) {
                     const conversionFactor = getMassScalar() / Math.pow(getDimScalar(), 3);
@@ -4731,7 +4938,7 @@ function resolveWingCascade(changedProp, newVal) {
         }
     } else {
         if (changedProp === 'mass') {
-            wing[`${App.state.activeMassProfile}Mass`] = newVal;
+            setProp(wing, `${App.state.activeMassProfile}Mass`, newVal);
         }
     }
 }
@@ -4762,7 +4969,9 @@ function recalculateMassOrDensity(p, targetMassGrams = null) {
             if (volume > 0) {
                 let massToUse = targetMassGrams !== null ? targetMassGrams : getEffectiveMassGrams(p);
                 if (getIsMirrored(p, 'budget')) massToUse /= 2;
-                p.rho = massToUse / volume;
+                
+                if (p.id === 'main-wing' || p === App.state.wingData) p.rho = massToUse / volume;
+                else setProp(p, 'rho', massToUse / volume); // <-- Route via Delta
             }
         }
     }
@@ -4783,11 +4992,15 @@ function calculateAircraft() {
     const tRootPerc = wingData.nacaRoot ? parseInt(wingData.nacaRoot.substring(2)) / 100 : 0.12;
     const tTipPerc = wingData.nacaTip ? parseInt(wingData.nacaTip.substring(2)) / 100 : 0.12;
     
-    const s = b / 2, lambda = cr > 0 ? ct / cr : 0;
-    const mac = cr * (2/3) * ((1 + lambda + lambda**2) / (1 + (lambda || 1)));
-    const y_mac = (s / 3) * ((1 + 2 * lambda) / (1 + (lambda || 1)));
+    const s = b / 2;
+    // Protect against division by zero without breaking lambda = 0 (Delta wings)
+    const lambda = cr > 0 ? ct / cr : 0;
+    const safeLambda = (1 + lambda) === 0 ? 0.0001 : lambda; 
+
+    const mac = cr * (2/3) * ((1 + lambda + lambda**2) / (1 + safeLambda));
+    const y_mac = (s / 3) * ((1 + 2 * lambda) / (1 + safeLambda));
     const x_mac = s > 0 ? (sweep / s) * y_mac : 0; 
-    const rec_cg_33 = x_mac + (0.33 * mac); 
+    const rec_cg_33 = x_mac + (0.33 * mac);
     
     const wingMass = getEffectiveMassGrams(wingData);
     const wingCGX = (cr + ct) > 0 ? (sweep / 3) * ((cr + 2 * ct) / (cr + ct)) + (1 / 3) * ((cr**2 + cr * ct + ct**2) / (cr + ct)) : 0;
@@ -4943,7 +5156,11 @@ function calculateAircraft() {
     else if (cfg === 'flying-wing') tailEff = 0.0;
     else if (cfg === 'custom') tailEff = safeParse(wingData.tailEff) !== undefined ? safeParse(wingData.tailEff) : 0.6;
 
-    const NP = x_ac_wing + (Vh * mac * tailEff);
+    
+    const NP = (wingAreaCm2 + hstab_area * tailEff) > 0 
+        ? ((x_ac_wing * wingAreaCm2) + (hstab_ac_x * hstab_area * tailEff)) / (wingAreaCm2 + hstab_area * tailEff) 
+        : x_ac_wing;
+
     const SM = mac > 0 ? ((NP - globalCGX) / mac) * 100 : 0;
     const rootBendingNm = (((totalMass / 1000) * 9.81) / 2) * ((b / 100) / 4);
 
@@ -5179,13 +5396,21 @@ function calculateAircraft() {
         });
     }
 	
-	// Copy dynamic status colors to the pill layout
+	// Copy dynamic status colors AND text to the pill layout
     const colorSyncIds = ['top-twr', 'top-sm', 'top-sm-guide', 'top-vh', 'top-vh-guide', 'top-vv', 'top-vv-guide'];
     colorSyncIds.forEach(id => {
         const source = document.getElementById(id);
         const targets = document.querySelectorAll(`[data-sync="${id}"]`);
         if (source && targets.length > 0) {
-            targets.forEach(t => t.style.color = source.style.color);
+            targets.forEach(t => {
+                t.style.color = source.style.color;
+                
+                // Manually sync the inner text for the guide elements 
+                // (since they are updated directly instead of through setUIData)
+                if (id.includes('-guide')) {
+                    t.innerText = source.innerText;
+                }
+            });
         }
     });
 
@@ -5818,16 +6043,6 @@ function drawDynamicStreamlines(nacaCode, aoaDeg, isStalled) {
 #
 ##############################################################*/
 
-function renderTopView(){}
-
-function renderSideView(){}
-
-function renderFrontView(){}
-
-function renderLabels(){}
-
-function renderGrid(){}
-
 function renderAircraft() {
     if (App.state.graphSweep.isSimulating) return; // Bypass heavy 3D rendering during a sweep
 
@@ -6104,6 +6319,65 @@ function renderAircraft() {
             line.setAttribute('stroke', '#e73ce1');
             line.setAttribute('stroke-width', '2');
             line.setAttribute('stroke-dasharray', '6,4');
+			
+			//Draw Propeller Disks ---
+            if (getProp(c, 'showPropDisk')) {
+                const radius = (getProp(c, 'propDia') || 5) * 2.54 / 2; // inches to cm radius
+                const sx = safeParse(getProp(c, 'sx')), sy = safeParse(getProp(c, 'sy')), sz = safeParse(getProp(c, 'sz'));
+                
+                [false, true].forEach(mirState => {
+                    if (mirState && !getIsMirrored(c)) return;
+
+                    const cx = safeParse(getProp(c, 'x')) + sx/2;
+                    const cy = mirState ? -(safeParse(getProp(c, 'y')) + sy/2) : safeParse(getProp(c, 'y')) + sy/2;
+                    const cz = safeParse(getProp(c, 'z')) + sz/2;
+
+                    let rX = (safeParse(getProp(c, 'rotX')) * Math.PI) / 180;
+                    let rY = (safeParse(getProp(c, 'rotY')) * Math.PI) / 180;
+                    let rZ = (safeParse(getProp(c, 'rotZ')) * Math.PI) / 180;
+                    if (mirState) { rX = -rX; rZ = -rZ; }
+
+                    const pts2D = [];
+                    // Generate 32 points for a smooth circle mapped onto the 3D plane
+                    for(let i=0; i<32; i++) {
+                        const a = (i/32) * Math.PI * 2;
+                        
+                        // Local prop coordinates: front face is -sx/2. Circle exists in YZ plane.
+                        let x1 = -sx/2;
+                        let y1 = radius * Math.cos(a);
+                        let z1 = radius * Math.sin(a);
+                        
+                        // Apply 3D Rotation Matrix
+                        let y2 = y1 * Math.cos(rX) - z1 * Math.sin(rX);
+                        let z2 = y1 * Math.sin(rX) + z1 * Math.cos(rX);
+
+                        let x2 = x1 * Math.cos(rY) + z2 * Math.sin(rY);
+                        let z3 = -x1 * Math.sin(rY) + z2 * Math.cos(rY);
+
+                        let x3 = x2 * Math.cos(rZ) - y2 * Math.sin(rZ);
+                        let y3 = x2 * Math.sin(rZ) + y2 * Math.cos(rZ);
+
+                        // Translate to world position
+                        const wx = x3 + cx;
+                        const wy = y3 + cy;
+                        const wz = z3 + cz;
+
+                        // Project based on camera view
+                        if (currentView === 'top') pts2D.push(`${wx},${wy}`);
+                        else if (currentView === 'side') pts2D.push(`${wx},${-wz}`);
+                        else if (currentView === 'front') pts2D.push(`${wy},${-wz}`);
+                    }
+
+                    // Render as a faint glass disk
+                    const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                    poly.setAttribute('points', pts2D.join(' '));
+                    poly.setAttribute('fill', 'rgba(255, 255, 255, 0.05)');
+                    poly.setAttribute('stroke', 'rgba(255, 255, 255, 0.4)');
+                    poly.setAttribute('stroke-width', '0.5');
+                    poly.setAttribute('pointer-events', 'none');
+                    compLayer.appendChild(poly);
+                });
+            }
             
             if (currentView === 'side') {
                 line.setAttribute('x1', bx); line.setAttribute('y1', -bz); line.setAttribute('x2', ex); line.setAttribute('y2', -ez);
@@ -6358,6 +6632,12 @@ function renderVisualSnapFeedback(layer, viewportMinX, viewportMaxX, viewportMin
 ##############################################################*/
 
 function renderVariablesTab() {
+	
+	const activeEl = document.activeElement;
+    if (activeEl && activeEl.tagName === 'INPUT' && activeEl.closest('#variables-overlay')) {
+        return; 
+    }
+	
     const varList = document.getElementById('var-def-list');
     if (varList) {
         varList.innerHTML = ''; 
@@ -6449,25 +6729,79 @@ function renderComponentList() {
     if (!list) return;
     list.innerHTML = '';
 
-    const renderItem = (c, isWing, isGlobal) => {
+	// Added 'cfg' context parameter
+    const renderItem = (c, isWing, isGlobal, cfg) => {
         const isSelected = (c.id === App.state.selectedComponentId);
-        // Assumes isEffectivelyVisible is defined in Section 8 or 5
-        const isVis = typeof isEffectivelyVisible === 'function' ? isEffectivelyVisible(c.id, c.isHidden) : !c.isHidden;
-        let mass = getEffectiveMassGrams(c) * getMassScalar();
-        if (!isWing && getIsMirrored(c)) mass *= 2;
+        const isBaseConfig = App.state.configurations.indexOf(cfg) === 0;
+        
+        // Resolve state locally for the exact configuration being drawn
+        let isSuppressed = !!c.isSuppressed;
+        let isHiddenOverride = !!c.isHidden;
+        let hasOverride = false;
+        
+        // NEW: Check if natively suppressed in the Base configuration (Auto-Suppressed)
+        const isAutoSuppressed = !!c.isSuppressed;
 
-        const name = isWing ? "Main Wing Panel" : c.name + (getIsMirrored(c) ? ' ⧓' : '');
+        if (!isBaseConfig && cfg.overrides && cfg.overrides[c.id]) {
+            if (cfg.overrides[c.id].isSuppressed !== undefined) isSuppressed = cfg.overrides[c.id].isSuppressed;
+            if (cfg.overrides[c.id].isHidden !== undefined) isHiddenOverride = cfg.overrides[c.id].isHidden;
+            
+            const overrideKeys = Object.keys(cfg.overrides[c.id]).filter(k => k !== 'isHidden' && k !== 'isSuppressed');
+            hasOverride = overrideKeys.length > 0;
+        }
+
+        // Fetch accurate dynamic mass if drawing the active config
+        let displayComp = c;
+        if (cfg.isActive && !isGlobal && !isWing) {
+            displayComp = App.state.components.find(x => x.id === c.id) || c;
+        }
+        
+        let mass = getEffectiveMassGrams(displayComp) * getMassScalar();
+        if (!isWing && getIsMirrored(displayComp)) mass *= 2;
+
+        const isVis = typeof isEffectivelyVisible === 'function' ? isEffectivelyVisible(c.id, isHiddenOverride) : !isHiddenOverride;
+        const isInstance = !!c.parentId;
+
+        let statusIcon = '';
+        if (hasOverride) {
+            statusIcon = `<span style="color:var(--accent-yellow); font-weight:bold; margin-right:4px;" title="Has Overrides">Δ</span>`;
+        } else if (isInstance && isBaseConfig) {
+            statusIcon = `<span style="color:var(--text-dim); margin-right:4px;" title="Instance">🔗</span>`;
+        } else if (!isBaseConfig && !isWing) {
+            statusIcon = `<span style="color:var(--border-grey); opacity: 0.5; margin-right:4px;" title="Linked to Base">🔗</span>`;
+        }
+
+        // NEW: Apply text decorations based on suppression states
+        const fontWeight = isAutoSuppressed ? 'bold' : 'normal';
+        const textDecoration = isSuppressed ? 'line-through' : 'none';
+        const name = statusIcon + (isWing ? "Main Wing Panel" : c.name + (getIsMirrored(displayComp) ? ' ⧓' : ''));
+
+        // NEW: Group all action icons on the right side
+        let rightIcons = '';
+        
+        // 1. Eye (Visibility) Icon
+        rightIcons += `<span class="outliner-icon" onclick="handleToggleVisibility('${c.id}', event)" style="opacity: ${isVis && !isSuppressed ? '1' : '0.2'}; margin-left: 4px;" title="Toggle Visibility">👁️</span>`;
+        
+        if (!isWing) {
+            // 2. Suppress Toggle (Permanent)
+            rightIcons += `<span class="outliner-icon" onclick="handleToggleSuppress('${c.id}', event)" style="opacity: ${isSuppressed ? '1' : '0.2'}; color: ${isSuppressed ? '#e74c3c' : 'inherit'}; margin-left: 2px;" title="Toggle Suppression">🚫</span>`;
+            // 3. Instance
+            rightIcons += `<span class="outliner-icon" onclick="handleCreateInstance('${c.id}', event)" title="Create Instance" style="margin-left: 2px;">🔲</span>`;
+            // 4. Duplicate
+            rightIcons += `<span class="outliner-icon" onclick="handleCopyComponent('${c.id}', event)" title="Duplicate" style="margin-left: 2px;">📋</span>`;
+            // 5. Delete (Smart)
+            const xTitle = isBaseConfig ? "Delete Globally" : "Suppress in Variant";
+            rightIcons += `<span class="outliner-icon" onclick="handleDeleteComponent('${c.id}', event)" style="color:#e74c3c; margin-left: 2px;" title="${xTitle}">✖</span>`;
+        }
 
         return `
         <div class="outliner-item ${isSelected ? 'selected' : ''}" 
              onclick="handleSelectComponent('${c.id}', true)" 
              draggable="${!isWing}" data-id="${c.id}">
             ${!isWing ? `<span class="drag-handle" title="Drag to reorder">⋮</span>` : `<span style="width:12px;display:inline-block;"></span>`}
-            <span class="outliner-icon" onclick="handleToggleVisibility('${c.id}', event)" style="opacity: ${isVis ? '1' : '0.2'}">👁️</span>
-            <span class="outliner-label" style="opacity: ${isVis ? '1' : '0.5'}">${name}</span>
-            <span style="font-size:0.8em; color:var(--text-dim); margin-right:4px;">${mass.toFixed(2)}${App.state.unitScales.mass}</span>
-            ${!isWing ? `<span class="outliner-icon" onclick="handleCopyComponent('${c.id}', event)">📋</span>` : ''}
-            ${!isWing ? `<span class="outliner-icon" onclick="handleDeleteComponent('${c.id}', event)" style="color:#e74c3c;">✖</span>` : ''}
+            <span class="outliner-label" style="opacity: ${isVis && !isSuppressed ? '1' : '0.4'}; text-decoration: ${textDecoration}; font-weight: ${fontWeight}; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${name}</span>
+            <span style="font-size:0.8em; color:var(--text-dim); margin-right:4px; opacity: ${isSuppressed ? '0.4' : '1'}; flex-shrink: 0; margin-left: auto;">${mass.toFixed(2)}${App.state.unitScales.mass}</span>
+            ${rightIcons}
         </div>`;
     };
 
@@ -6488,7 +6822,7 @@ function renderComponentList() {
 
         App.state.globalComponents.forEach(c => {
             const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = renderItem(c, false, true);
+            tempDiv.innerHTML = renderItem(c, false, true, App.state.configurations[0]);
             const item = tempDiv.firstElementChild;
 
             // Assumes drag handlers are bound in Section 13
@@ -6503,10 +6837,6 @@ function renderComponentList() {
             list.appendChild(item);
         });
     }
-
-    const confHeader = document.createElement('div');
-    confHeader.innerHTML = `<span style="font-size: 0.7em; color: var(--text-dim); font-weight: bold; text-transform: uppercase; padding-left: 4px; display: inline-block; margin-top: 8px;">Configurations</span>`;
-    list.appendChild(confHeader);
 
     if (App.state.configurations) {
         App.state.configurations.forEach(cfg => {
@@ -6541,12 +6871,12 @@ function renderComponentList() {
                 groupDiv.className = 'outliner-group';
 
                 const wingDiv = document.createElement('div');
-                wingDiv.innerHTML = renderItem(cfg.wing, true, false);
+                wingDiv.innerHTML = renderItem(cfg.wing, true, false, cfg);
                 groupDiv.appendChild(wingDiv.firstElementChild);
 
                 cfg.components.forEach(c => {
                     const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = renderItem(c, false, false);
+                    tempDiv.innerHTML = renderItem(c, false, false, cfg);
                     const item = tempDiv.firstElementChild;
 
                     if (typeof handleDragStart === 'function') {
@@ -6574,7 +6904,6 @@ function renderInspector() {
 
     if (!standardForm || !wingForm) return;
 
-    // Intercept render if settings are active
     if (App.ui.showSettings) {
         standardForm.style.display = 'none';
         wingForm.style.display = 'none';
@@ -6583,28 +6912,61 @@ function renderInspector() {
         return; 
     }
 
-    // Otherwise, ensure settings are hidden and header is restored
     if (settingsForm) settingsForm.style.display = 'none';
     if (header) header.innerText = 'Properties Panel';
 
     const dScale = getDimScalar();
     const mScale = getMassScalar();
 
-    // SYSTEMATIC FIX: Protect the user's active typing cursor from being overwritten by the render loop
     const safeUpdate = (id, val) => {
         const el = document.getElementById(id);
-        // Only update the value if the user is NOT currently focused on this exact input box
         if (el && document.activeElement !== el) el.value = val;
     };
 
-    if (App.state.selectedComponentId === 'main-wing') {
+    const activeCfg = getActiveConfig();
+    const isBaseConfig = App.state.configurations.indexOf(activeCfg) === 0;
+
+    // HOISTED STYLE HELPER - NOW SUPPORTS WING!
+    const styleField = (inputId, propName, isPhysical, component) => {
+        const el = document.getElementById(inputId);
+        if (!el || !component) return;
+        
+        let label = el.closest('.input-group, .input-row-3col > div, .input-group-inline')?.querySelector('label');
+        
+        const isLockedInstance = !!component.parentId && isPhysical;
+        const isOverridden = !isBaseConfig && activeCfg.overrides && activeCfg.overrides[component.id] && activeCfg.overrides[component.id][propName] !== undefined;
+
+        if (label) label.innerHTML = label.innerHTML.replace(/ <span class="state-icon".*<\/span>/, '');
+
+        if (isLockedInstance) {
+            el.disabled = true;
+            el.style.opacity = '0.3';
+            el.style.borderStyle = 'dashed';
+            el.title = "Linked to Parent Instance";
+            if(label) label.innerHTML += ` <span class="state-icon" style="color:var(--border-grey);" title="Inherited from Parent">🔗</span>`;
+        } else if (isOverridden) {
+            el.disabled = false;
+            el.style.opacity = '1';
+            el.style.borderColor = 'var(--accent-yellow)';
+            el.title = "Overridden in this Configuration. Click Δ to restore inheritance.";
+            if(label) label.innerHTML += ` <span class="state-icon" style="color:var(--accent-yellow); cursor:pointer;" onclick="clearOverride('${component.id}', '${propName}')" title="Click to clear override">Δ</span>`;
+        } else {
+            el.style.opacity = '1';
+            el.style.borderColor = 'var(--border-grey)';
+            el.style.borderStyle = 'solid';
+            el.title = "";
+            if (!isBaseConfig && label) label.innerHTML += ` <span class="state-icon" style="color:var(--border-grey); opacity:0.5;" title="Inherited from Base Configuration">🔗</span>`;
+        }
+    };
+
+    if (App.state.selectedComponentId === 'main-wing' || (App.state.wingData && App.state.selectedComponentId === App.state.wingData.id)) {
         standardForm.style.display = 'none'; 
         wingForm.style.display = 'block';
         
         const wingData = App.state.wingData;
         if (!wingData) return;
         
-        // 1. Core Properties & Toggles
+        // Core Properties
         safeUpdate('wing-name', wingData.name || '');
         safeUpdate('wing-color', wingData.color || '#ffffff');
 
@@ -6639,21 +7001,12 @@ function renderInspector() {
                 if (wingData.syncAirfoil) selector.value = 'root';
             }
         }
-        
         if (typeof updateAirfoilPreview === 'function') updateAirfoilPreview(false);
 
-        // 2. Lock Icons & Input States
-        const L_b = !!wingData.lockedb;
-        const L_area = !!wingData.lockedarea;
-        const L_ar = !!wingData.lockedar;
-        const L_cr = !!wingData.lockedcr;
-        const L_ct = !!wingData.lockedct;
-        const L_mass = !!wingData.lockedmass;
-        const L_rho = !!wingData.lockedrho;
-        
+        // Lock Engine Math
+        const L_b = !!wingData.lockedb, L_area = !!wingData.lockedarea, L_ar = !!wingData.lockedar, L_cr = !!wingData.lockedcr, L_ct = !!wingData.lockedct, L_mass = !!wingData.lockedmass, L_rho = !!wingData.lockedrho;
         const isVolFixed = L_mass && L_rho;
         const chordsLinked = !!wingData.linkChords;
-        
         const avgChordFixed = (L_b && L_ar) || (L_b && L_area) || (L_area && L_ar);
         const chordsFixed = L_cr && L_ct;
         
@@ -6665,15 +7018,10 @@ function renderInspector() {
         const dis_ar = L_ar || (L_b && L_area) || (chordsFixed && (L_b || L_area)) || isVolFixed;
         const dis_cr = L_cr || (L_ct && avgChordFixed && !chordsLinked) || (chordsLinked && avgChordFixed) || isVolFixed;
         const dis_ct = L_ct || (L_cr && avgChordFixed && !chordsLinked) || (chordsLinked && avgChordFixed) || isVolFixed;
-        
         const isGeomFixed = dis_b && dis_cr && dis_ct;
 
         const disableStates = {
-            b: dis_b,
-            area: dis_area,
-            ar: dis_ar,
-            cr: dis_cr,
-            ct: dis_ct,
+            b: dis_b, area: dis_area, ar: dis_ar, cr: dis_cr, ct: dis_ct,
             mass: L_mass || (isGeomFixed && L_rho),
             rho: L_rho || (isGeomFixed && L_mass)
         };
@@ -6681,7 +7029,6 @@ function renderInspector() {
         ['b', 'cr', 'ct', 'area', 'ar', 'mass', 'rho'].forEach(prop => {
             const icon = document.getElementById(`lock-wing-${prop}`);
             const input = document.getElementById(`wing-${prop === 'mass' ? 'mass-display' : prop}`);
-            
             if (icon) icon.classList.toggle('locked', !!wingData['locked' + prop]);
             if (input) {
                 const shouldDisable = disableStates[prop];
@@ -6692,12 +7039,10 @@ function renderInspector() {
             }
         });
    
-        // 3. Geometric Calculations
         const b = safeParse(wingData.b), cr = safeParse(wingData.cr), ct = safeParse(wingData.ct);
         const area = ((cr + ct) / 2) * b;
         const ar = area > 0 ? (b * b) / area : 0;
 
-        // 5. Update Dimension & Mass Fields
         [
             ['area', area * Math.pow(dScale, 2), 2], ['ar', ar, 2],
             ['b', b * dScale, 2], ['cr', cr * dScale, 2], ['ct', ct * dScale, 2],
@@ -6710,7 +7055,6 @@ function renderInspector() {
         const densityConversionFactor = mScale / Math.pow(dScale, 3);
         safeUpdate('wing-rho', ((wingData.rho || 0) * densityConversionFactor).toFixed(5));
 
-        // 6. CD0 Parasitic Drag Dropdown Logic
         const currentCd0 = wingData.cd0 !== undefined ? wingData.cd0 : 0.025;
         const cd0Preset = document.getElementById('wing-cd0-preset');
         const cd0Custom = document.getElementById('wing-cd0-custom');
@@ -6725,6 +7069,17 @@ function renderInspector() {
                 safeUpdate('wing-cd0-custom', currentCd0);
             }
         }
+
+        // --- NEW: Apply delta styling to the wing! ---
+        ['name', 'color', 'tailConfig', 'tailEff', 'isHollow', 'wallT', 'syncAirfoil', 'cd0-preset', 'cd0-custom', 'b', 'cr', 'ct', 'area', 'ar', 'sweep', 'dihedral', 'pivot', 'rho'].forEach(prop => {
+            const inputId = prop === 'name' ? 'wing-name' : prop === 'isHollow' ? 'wing-is-hollow' : prop === 'wallT' ? 'wing-wall-t' : prop === 'syncAirfoil' ? 'wing-sync-airfoil' : prop === 'tailConfig' ? 'wing-tailConfig' : prop === 'tailEff' ? 'wing-tailEff' : `wing-${prop}`;
+            const objProp = prop.replace('-preset','').replace('-custom','');
+            styleField(inputId, objProp, true, wingData);
+        });
+        styleField('naca-input', 'nacaRoot', true, wingData);
+        styleField('airfoil-aoa', 'aoa', true, wingData);
+        styleField('wing-link-chords', 'linkChords', false, wingData);
+        styleField('wing-mass-display', App.state.activeMassProfile + 'Mass', true, wingData);
         
     } else {
         wingForm.style.display = 'none'; 
@@ -6733,31 +7088,51 @@ function renderInspector() {
         const activePart = App.state.components.find(c => c.id === App.state.selectedComponentId);
         if (!activePart) return;
 
-        safeUpdate('prop-name', activePart.name || '');
-        safeUpdate('prop-type', activePart.type || 'body');
+        const isInstance = !!activePart.parentId;
+
+        safeUpdate('prop-name', activePart.name || ''); 
+        safeUpdate('prop-type', getProp(activePart, 'type') || 'body');
+        styleField('prop-name', 'name', false, activePart);
+        styleField('prop-type', 'type', true, activePart);
 
         const motorSettings = document.getElementById('prop-motor-settings');
-        if (activePart.type === 'motor') {
+        
+        if (getProp(activePart, 'type') === 'motor') {
             if (motorSettings) motorSettings.style.display = 'block';
             
-            const isAuto = !!activePart.thrustAuto;
+            // --- Prop Disk Sync ---
+            const showPropDiskEl = document.getElementById('prop-show-prop-disk');
+            if (showPropDiskEl && document.activeElement !== showPropDiskEl) showPropDiskEl.checked = !!getProp(activePart, 'showPropDisk');
+            styleField('prop-show-prop-disk', 'showPropDisk', false, activePart);
+            
+            const isAuto = !!getProp(activePart, 'thrustAuto');
             const thrustAutoEl = document.getElementById('prop-thrust-auto');
             if (thrustAutoEl && document.activeElement !== thrustAutoEl) thrustAutoEl.checked = isAuto;
+            styleField('prop-thrust-auto', 'thrustAuto', true, activePart);
             
             const motorManualEl = document.getElementById('prop-motor-manual');
             const motorAutoEl = document.getElementById('prop-motor-auto');
             if (motorManualEl) motorManualEl.style.display = isAuto ? 'none' : 'block';
             if (motorAutoEl) motorAutoEl.style.display = isAuto ? 'flex' : 'none';
 
-            safeUpdate('prop-thrust', activePart.thrust || 0);
-            safeUpdate('prop-dia', activePart.propDia !== undefined ? activePart.propDia : 5);
-            safeUpdate('prop-pitch', activePart.propPitch !== undefined ? activePart.propPitch : 3);
-            safeUpdate('prop-kv', activePart.motorKV !== undefined ? activePart.motorKV : 2300);
-            safeUpdate('prop-cells', activePart.battCells !== undefined ? activePart.battCells : 3);
+            safeUpdate('prop-thrust', getProp(activePart, 'thrust') || 0);
+            styleField('prop-thrust', 'thrust', true, activePart);
+            
+            safeUpdate('prop-dia', getProp(activePart, 'propDia') !== undefined ? getProp(activePart, 'propDia') : 5);
+            styleField('prop-dia', 'propDia', true, activePart);
+            
+            safeUpdate('prop-pitch', getProp(activePart, 'propPitch') !== undefined ? getProp(activePart, 'propPitch') : 3);
+            styleField('prop-pitch', 'propPitch', true, activePart);
+            
+            safeUpdate('prop-kv', getProp(activePart, 'motorKV') !== undefined ? getProp(activePart, 'motorKV') : 2300);
+            styleField('prop-kv', 'motorKV', true, activePart);
+            
+            safeUpdate('prop-cells', getProp(activePart, 'battCells') !== undefined ? getProp(activePart, 'battCells') : 3);
+            styleField('prop-cells', 'battCells', true, activePart);
 
             if (isAuto) {
-                const rpm = (activePart.motorKV || 2300) * (activePart.battCells || 3) * 3.7;
-                const thrustGrams = Math.pow(rpm / 1000, 2) * Math.pow(activePart.propDia || 5, 3) * (activePart.propPitch || 3) * 0.0018;
+                const rpm = (getProp(activePart, 'motorKV') || 2300) * (getProp(activePart, 'battCells') || 3) * 3.7;
+                const thrustGrams = Math.pow(rpm / 1000, 2) * Math.pow(getProp(activePart, 'propDia') || 5, 3) * (getProp(activePart, 'propPitch') || 3) * 0.0018;
                 const calcThrustDisplay = document.getElementById('prop-calc-thrust-display');
                 if (calcThrustDisplay) calcThrustDisplay.innerText = (thrustGrams * mScale).toFixed(1);
             }
@@ -6766,122 +7141,157 @@ function renderInspector() {
         }
 
         const showLabelEl = document.getElementById('prop-show-label');
-        if (showLabelEl && document.activeElement !== showLabelEl) showLabelEl.checked = !!activePart.showLabel;
+        if (showLabelEl && document.activeElement !== showLabelEl) showLabelEl.checked = !!getProp(activePart, 'showLabel');
+        styleField('prop-show-label', 'showLabel', false, activePart); 
         
         const isMirroredEl = document.getElementById('prop-is-mirrored');
         if (isMirroredEl && document.activeElement !== isMirroredEl) isMirroredEl.checked = getIsMirrored(activePart);
+        styleField('prop-is-mirrored', 'isMirrored', false, activePart);
         
         const isSymEl = document.getElementById('prop-is-symmetrical');
-        if (isSymEl && document.activeElement !== isSymEl) isSymEl.checked = !!activePart.isSymmetrical; 
+        if (isSymEl && document.activeElement !== isSymEl) isSymEl.checked = !!getProp(activePart, 'isSymmetrical'); 
+        styleField('prop-is-symmetrical', 'isSymmetrical', false, activePart);
         
         const isHollowEl = document.getElementById('prop-is-hollow');
         if (isHollowEl && document.activeElement !== isHollowEl) isHollowEl.checked = getIsHollow(activePart);
+        styleField('prop-is-hollow', 'isHollow', true, activePart);
         
         const propWallT = document.getElementById('prop-wall-t');
         if (propWallT) {
-            propWallT.disabled = !getIsHollow(activePart);
-            safeUpdate('prop-wall-t', ((activePart.wallT || 0.2) * dScale).toFixed(3));
+            safeUpdate('prop-wall-t', ((getProp(activePart, 'wallT') || 0.2) * dScale).toFixed(3));
+            styleField('prop-wall-t', 'wallT', true, activePart);
+            
+            const wallTOverridden = !isBaseConfig && activeCfg.overrides && activeCfg.overrides[activePart.id] && activeCfg.overrides[activePart.id]['wallT'] !== undefined;
+            if (!wallTOverridden) propWallT.disabled = !getIsHollow(activePart) || isInstance;
         }
 
-        const rawX = activePart.x === undefined ? 0 : getDisplayCoord(activePart.x, activePart.sx || 0);
-        const rawY = activePart.y === undefined ? 0 : getDisplayCoord(activePart.y, activePart.sy || 0);
-        const rawZ = activePart.z === undefined ? 0 : getDisplayCoord(activePart.z, activePart.sz || 0);
+        const rawX = getProp(activePart, 'x') === undefined ? 0 : getDisplayCoord(getProp(activePart, 'x'), getProp(activePart, 'sx') || 0);
+        const rawY = getProp(activePart, 'y') === undefined ? 0 : getDisplayCoord(getProp(activePart, 'y'), getProp(activePart, 'sy') || 0);
+        const rawZ = getProp(activePart, 'z') === undefined ? 0 : getDisplayCoord(getProp(activePart, 'z'), getProp(activePart, 'sz') || 0);
 
         [
-            ['x', rawX * dScale, 2], ['y', rawY * dScale, 2], ['z', rawZ * dScale, 2],
-            ['rotX', activePart.rotX || 0, null], ['rotY', activePart.rotY || 0, null], ['rotZ', activePart.rotZ || 0, null]
-        ].forEach(([id, val, prec]) => safeUpdate(`prop-${id}`, prec ? val.toFixed(prec) : val));
+            ['x', rawX * dScale, 2, false], ['y', rawY * dScale, 2, false], ['z', rawZ * dScale, 2, false],
+            ['rotX', getProp(activePart, 'rotX') || 0, null, false], ['rotY', getProp(activePart, 'rotY') || 0, null, false], ['rotZ', getProp(activePart, 'rotZ') || 0, null, false]
+        ].forEach(([id, val, prec, isPhys]) => {
+            safeUpdate(`prop-${id}`, prec ? val.toFixed(prec) : val);
+            styleField(`prop-${id}`, id, isPhys, activePart);
+        });
 
-        let maxXSpan = activePart.sx || 0;
-        let maxYSpan = activePart.sy || 0;
-        let maxZSpan = activePart.sz || 0;
+        let maxXSpan = getProp(activePart, 'sx') || 0;
+        let maxYSpan = getProp(activePart, 'sy') || 0;
+        let maxZSpan = getProp(activePart, 'sz') || 0;
 
         if (activePart.sections && activePart.sections.length > 0) {
-            let minY = Infinity, maxY = -Infinity;
-            let minZ = Infinity, maxZ = -Infinity;
-            let minX = Infinity, maxX = -Infinity;
+            let minY = Infinity, maxY = -Infinity, minZ = Infinity, maxZ = -Infinity, minX = Infinity, maxX = -Infinity;
             
             activePart.sections.forEach(sec => {
-                const sx = safeParse(activePart.sx), sy = safeParse(activePart.sy), sz = safeParse(activePart.sz);
-                const hy = (sec.w * sy) / 2;
-                const hz = (sec.h * sz) / 2;
-                const dy = sec.dy * sy;
-                const dz = sec.dz * sz;
+                const sx = safeParse(getProp(activePart, 'sx')), sy = safeParse(getProp(activePart, 'sy')), sz = safeParse(getProp(activePart, 'sz'));
+                const hy = (sec.w * sy) / 2, hz = (sec.h * sz) / 2, dy = sec.dy * sy, dz = sec.dz * sz;
                 
-                minY = Math.min(minY, dy - hy);
-                maxY = Math.max(maxY, dy + hy);
-                minZ = Math.min(minZ, dz - hz);
-                maxZ = Math.max(maxZ, dz + hz);
+                minY = Math.min(minY, dy - hy); maxY = Math.max(maxY, dy + hy);
+                minZ = Math.min(minZ, dz - hz); maxZ = Math.max(maxZ, dz + hz);
                 
                 const actualX = sec.x * sx;
-                minX = Math.min(minX, actualX);
-                maxX = Math.max(maxX, actualX);
+                minX = Math.min(minX, actualX); maxX = Math.max(maxX, actualX);
             });
             
-            maxYSpan = maxY - minY;
-            maxZSpan = maxZ - minZ;
-            maxXSpan = maxX - minX;
+            maxYSpan = maxY - minY; maxZSpan = maxZ - minZ; maxXSpan = maxX - minX;
         }
 
         [
-            ['sx', maxXSpan * dScale, 2], ['sy', maxYSpan * dScale, 2], ['sz', maxZSpan * dScale, 2],
-            ['mass-val', getEffectiveMassGrams(activePart) * mScale, 2]
-        ].forEach(([id, val, prec]) => safeUpdate(`prop-${id}`, val.toFixed(prec)));
+            ['sx', maxXSpan * dScale, 2, true], ['sy', maxYSpan * dScale, 2, true], ['sz', maxZSpan * dScale, 2, true],
+            ['mass-val', getEffectiveMassGrams(activePart) * mScale, 2, true]
+        ].forEach(([id, val, prec, isPhys]) => {
+            safeUpdate(`prop-${id}`, val.toFixed(prec));
+            styleField(`prop-${id}`, id === 'mass-val' ? (App.state.activeMassProfile + 'Mass') : id, isPhys, activePart);
+        });
         
         const densityConversionFactor = mScale / Math.pow(dScale, 3);
-        safeUpdate('prop-rho', activePart.rho ? (activePart.rho * densityConversionFactor).toFixed(5) : '');
-        safeUpdate('prop-color', activePart.color || '#f1c40f');
+        const rhoVal = getProp(activePart, 'rho');
+        safeUpdate('prop-rho', rhoVal ? (rhoVal * densityConversionFactor).toFixed(5) : '');
+        styleField('prop-rho', 'rho', true, activePart);
+        
+        safeUpdate('prop-color', getProp(activePart, 'color') || '#f1c40f');
+        styleField('prop-color', 'color', false, activePart);
 
-        ['x', 'y', 'z'].forEach(axis => updateLockUI(axis, activePart[`locked${axis.toUpperCase()}`]));
+        ['x', 'y', 'z'].forEach(axis => updateLockUI(axis, getProp(activePart, `locked${axis.toUpperCase()}`)));
+        updateLockUI('mass', getProp(activePart, 'lockedMass'));
+        updateLockUI('rho', getProp(activePart, 'lockedRho'));
 
-        const isDimFixed = activePart.lockedMass && activePart.lockedRho;
+        const isDimFixed = getProp(activePart, 'lockedMass') && getProp(activePart, 'lockedRho');
         ['sx', 'sy', 'sz'].forEach(axis => {
             const el = document.getElementById(`prop-${axis}`);
-            if (el) {
+            if (el && !isInstance) { 
                 el.dataset.mechLocked = isDimFixed ? 'true' : 'false';
                 el.disabled = isDimFixed;
                 el.style.opacity = isDimFixed ? '0.5' : '1';
-                el.style.cursor = isDimFixed ? 'not-allowed' : '';
             }
         });
 
-        const propMassVal = document.getElementById('prop-mass-val');
-        if (propMassVal) {
-            propMassVal.dataset.mechLocked = activePart.lockedMass ? 'true' : 'false';
-            propMassVal.disabled = !!activePart.lockedMass;
-            propMassVal.style.opacity = activePart.lockedMass ? '0.5' : '1';
-            propMassVal.style.cursor = activePart.lockedMass ? 'not-allowed' : '';
-        }
-
-        const iconMass = document.getElementById('lock-mass');
-        if (iconMass) iconMass.classList.toggle('locked', !!activePart.lockedMass);
-
-        const propRho = document.getElementById('prop-rho');
-        if (propRho) {
-            propRho.dataset.mechLocked = activePart.lockedRho ? 'true' : 'false';
-            propRho.disabled = !!activePart.lockedRho;
-            propRho.style.opacity = activePart.lockedRho ? '0.5' : '1';
-            propRho.style.cursor = activePart.lockedRho ? 'not-allowed' : '';
-        }
-
-        const iconRho = document.getElementById('lock-rho');
-        if (iconRho) iconRho.classList.toggle('locked', !!activePart.lockedRho);
-		
-		const btnDelete = document.getElementById('prop-btn-delete');
+        const btnDelete = document.getElementById('prop-btn-delete');
         if (btnDelete) btnDelete.onclick = () => handleDeleteComponent(activePart.id);
-    }           
+    }          
     
     applyInputStyles();
+	
+	// 1. Reset all locks to interactive by default (clears old states if an equation was deleted)
+    document.querySelectorAll('[id^="lock-"]').forEach(icon => {
+        icon.style.pointerEvents = 'auto';
+        if (icon.title === "Value is controlled by an Equation") {
+            icon.style.opacity = '1';
+            icon.title = "";
+        }
+    });
+
+    // 2. Find any equations targeting the currently selected component
+    const activeId = App.state.selectedComponentId;
+    App.state.sysEquations.forEach(eq => {
+        if (!eq.targets) return;
+        
+        eq.targets.forEach(t => {
+            const parts = t.id.split(':');
+            if (parts.length === 2 && parts[0] === activeId) {
+                let inputId = parts[1];
+                
+                // Strip mass profiles off the ID to find the base input
+                if (inputId.startsWith('prop-mass-val-')) inputId = 'prop-mass-val';
+                if (inputId.startsWith('wing-mass-display-')) inputId = 'wing-mass-display';
+
+                // Map the input ID to its corresponding Lock Icon ID
+                let lockId = null;
+                if (inputId === 'prop-mass-val') lockId = 'lock-mass';
+                else if (inputId === 'prop-rho') lockId = 'lock-rho';
+                else if (['prop-x', 'prop-y', 'prop-z'].includes(inputId)) lockId = inputId.replace('prop-', 'lock-');
+                else if (inputId === 'wing-mass-display') lockId = 'lock-wing-mass';
+                else if (inputId.startsWith('wing-')) lockId = inputId.replace('wing-', 'lock-wing-');
+
+                // If a lock icon exists for this driven property, dim and disable it
+                if (lockId) {
+                    const lockIcon = document.getElementById(lockId);
+                    if (lockIcon) {
+                        lockIcon.style.opacity = '0.3';
+                        lockIcon.style.pointerEvents = 'none';
+                        lockIcon.title = "Value is controlled by an Equation";
+                    }
+                }
+            }
+        });
+    });
 }
 
 function updateLockUI(axis, isLocked) {
     const icon = document.getElementById(`lock-${axis}`);
     if (icon) icon.classList.toggle('locked', isLocked);
     
-    const propInput = document.getElementById(`prop-${axis}`);
+    // Handle the naming mismatch for the mass input
+    const inputId = axis === 'mass' ? 'prop-mass-val' : `prop-${axis}`;
+    const propInput = document.getElementById(inputId);
+    
     if (propInput) {
         propInput.dataset.mechLocked = isLocked ? 'true' : 'false';
         propInput.disabled = isLocked;
+        // Explicitly lower the opacity so it visually matches the grayed-out dimensions
+        propInput.style.opacity = isLocked ? '0.5' : '1'; 
     }
 }
 
@@ -7083,7 +7493,7 @@ function renderSpreadsheet() {
 
     tbody.innerHTML = '';
     
-    const allParts = [App.state.wingData, ...App.state.components];
+    const allParts = [App.state.wingData, ...getAllActiveParts().filter(p => p.id !== 'main-wing' && (!App.state.wingData || p.id !== App.state.wingData.id))];
     const mScale = getMassScalar();
     const { colA: spreadColA, colB: spreadColB } = App.state.spreadsheet;
     const { currentSortField, currentSortDir, colWidths } = App.ui.spreadsheet;
@@ -7354,11 +7764,11 @@ function handleOriginShift() {
         bestD = sum_vol > 0 ? {x: sum_x/sum_vol, y: sum_y/sum_vol, z: sum_z/sum_vol} : {x: 0, y: 0, z: 0};
     }
 
-    // Shift Pivot
+    // Shift Pivot (Route via Delta)
     let worldShift = rotatePt(bestD);
-    c.x = safeParse(c.x) + worldShift.x;
-    c.y = safeParse(c.y) + worldShift.y;
-    c.z = safeParse(c.z) + worldShift.z;
+    setProp(c, 'x', safeParse(c.x) + worldShift.x);
+    setProp(c, 'y', safeParse(c.y) + worldShift.y);
+    setProp(c, 'z', safeParse(c.z) + worldShift.z);
 
     // Counter-shift geometry to keep it visually frozen
     c.sections.forEach(sec => {
@@ -7366,6 +7776,7 @@ function handleOriginShift() {
         if (sy > 0) sec.dy -= bestD.y / sy;
         if (sz > 0) sec.dz -= bestD.z / sz;
     });
+    setProp(c, 'sections', c.sections); // <--- Save inner vertices to Delta
 
     refresh();
     saveHistory();
@@ -7462,18 +7873,6 @@ function handleDeleteConfig(cfgId, event) {
         refresh();
         saveHistory();
     }
-}
-
-function handleDuplicateConfig(cfgId, event) {
-    if (event) event.stopPropagation();
-    const sourceCfg = App.state.configurations.find(c => c.id === cfgId);
-    if (!sourceCfg) return;
-
-    const shouldInherit = confirm(`Duplicate '${sourceCfg.name}'?\n\nOK: Inherit variables and equations.\nCancel: Detach from all variables and equations.`);
-    
-    duplicateConfigModel(cfgId, shouldInherit);
-    refresh();
-    saveHistory();
 }
 
 function handleAddYAxisBox() {
@@ -7974,14 +8373,13 @@ function toggleGraphView() {
 }
 
 function toggleWingLock(prop) {
-    const isNowLocked = !App.state.wingData['locked' + prop];
-    App.state.wingData['locked' + prop] = isNowLocked;
+    const isNowLocked = !getProp(App.state.wingData, 'locked' + prop);
+    setProp(App.state.wingData, 'locked' + prop, isNowLocked);
     
     if (App.state.wingData.linkChords && (prop === 'cr' || prop === 'ct')) {
-        App.state.wingData.lockedcr = isNowLocked;
-        App.state.wingData.lockedct = isNowLocked;
+        setProp(App.state.wingData, 'lockedcr', isNowLocked);
+        setProp(App.state.wingData, 'lockedct', isNowLocked);
     }
-    
     refresh();
     if (typeof saveHistory === 'function') saveHistory();
 }
@@ -7995,7 +8393,7 @@ function toggleLock(axis) {
     if (!activePart) return;
     
     const key = `locked${axis.toUpperCase()}`;
-    activePart[key] = !activePart[key];
+    setProp(activePart, key, !getProp(activePart, key));
     
     refresh();
     if (typeof saveHistory === 'function') saveHistory();
@@ -8005,8 +8403,8 @@ function toggleExtendedLock(type) {
     const activePart = App.state.components.find(c => c.id === App.state.selectedComponentId);
     if (!activePart) return;
     
-    if (type === 'mass') activePart.lockedMass = !activePart.lockedMass;
-    if (type === 'rho') activePart.lockedRho = !activePart.lockedRho;
+    const key = type === 'mass' ? 'lockedMass' : 'lockedRho';
+    setProp(activePart, key, !getProp(activePart, key));
     
     refresh();
     if (typeof saveHistory === 'function') saveHistory();
@@ -8035,8 +8433,12 @@ function handleToggleVisibility(id, event) {
     if (id === App.state.wingData.id || id === 'main-wing') {
         App.state.wingData.isHidden = !App.state.wingData.isHidden;
     } else {
-        const c = getAllActiveParts().find(comp => comp.id === id);
-        if (c) c.isHidden = !c.isHidden;
+        // Find the base component and route the visibility toggle through the Delta engine
+        const c = App.state.components.find(comp => comp.id === id);
+        if (c) {
+            const currentHiddenState = !!getProp(c, 'isHidden');
+            setProp(c, 'isHidden', !currentHiddenState);
+        }
     }
     refresh();
     if (typeof saveHistory === 'function') saveHistory();
@@ -8047,6 +8449,17 @@ function handleDeleteComponent(id, event) {
     deleteComponent(id);
     refresh();
     if (typeof saveHistory === 'function') saveHistory();
+}
+
+function handleToggleSuppress(id, event) {
+    if (event) event.stopPropagation();
+
+    const activePart = App.state.components.find(x => x.id === id);
+    if (activePart) {
+        setProp(activePart, 'isSuppressed', !activePart.isSuppressed);
+        refresh();
+        if (typeof saveHistory === 'function') saveHistory();
+    }
 }
 
 function handleCopyComponent(id, event) {
@@ -8276,6 +8689,8 @@ function doDrag(e) {
         sec.dy = ((y_max + y_min) / 2) / sy;
         sec.dz = ((z_max + z_min) / 2) / sz;
 
+        setProp(active, 'sections', active.sections); // <--- Route to Delta
+        
         recalculateMassOrDensity(active, oldMass); 
         refresh();
         return;
@@ -8339,14 +8754,14 @@ function doDrag(e) {
     }
 
     if (App.state.currentView === 'top') {
-        if (!active.lockedX) active.x = targetX;
-        if (!active.lockedY) active.y = targetY;
+        if (!active.lockedX) setProp(active, 'x', targetX); // <--- Route to Delta
+        if (!active.lockedY) setProp(active, 'y', targetY); // <--- Route to Delta
     } else if (App.state.currentView === 'side') {
-        if (!active.lockedX) active.x = targetX;
-        if (!active.lockedZ) active.z = targetZ;
+        if (!active.lockedX) setProp(active, 'x', targetX); // <--- Route to Delta
+        if (!active.lockedZ) setProp(active, 'z', targetZ); // <--- Route to Delta
     } else if (App.state.currentView === 'front') {
-        if (!active.lockedY) active.y = targetY;
-        if (!active.lockedZ) active.z = targetZ;
+        if (!active.lockedY) setProp(active, 'y', targetY); // <--- Route to Delta
+        if (!active.lockedZ) setProp(active, 'z', targetZ); // <--- Route to Delta
     }
     refresh();
 }
@@ -8422,7 +8837,7 @@ function updateSpreadsheetDynamic(id, profile, value, inputElement) {
             App.state.wingData[key] = val / mScale;
         } else {
             const comp = getAllActiveParts().find(c => c.id === id);
-            if (comp) comp[key] = val / mScale;
+            if (comp) setProp(comp, key, val / mScale); // <-- Route via Delta
         }
     }
     
@@ -8480,7 +8895,7 @@ function updateSpreadsheetValue(id, field, value, inputElement) {
 }
 
 function exportSpreadsheetCSV() {
-    const allParts = [App.state.wingData, ...App.state.components];
+    const allParts = [App.state.wingData, ...getAllActiveParts().filter(p => p.id !== 'main-wing' && (!App.state.wingData || p.id !== App.state.wingData.id))];
     const mScale = getMassScalar();
     let csvContent = `Part Name,Budget Mass (${App.state.unitScales.mass}),Measured Mass (${App.state.unitScales.mass}),Delta (${App.state.unitScales.mass}),Notes\n`;
 
@@ -8535,6 +8950,145 @@ function updateComponentProperty(prop, value) {
         if (typeof saveHistory === 'function') saveHistory();
     }
 }
+
+function handleCreateInstance(parentId, event) {
+    if (event) event.stopPropagation();
+    if (!parentId || parentId === 'main-wing') return alert("Cannot instance the main wing.");
+    
+    const parent = App.state.configurations[0].components.find(c => c.id === parentId);
+    if (!parent) return;
+
+    // Create the instance pointer
+    const instanceId = createComponent(parentId);
+    const instance = App.state.configurations[0].components.find(c => c.id === instanceId);
+    
+    // NEW: Inherit physical dimensions, mass traits, and sections immediately
+    const inheritedProps = ['sx', 'sy', 'sz', 'rho', 'type', 'isHollow', 'wallT', 'budgetMass', 'measuredMass', 'predictedMass', 'thrustAuto', 'thrust', 'propDia', 'propPitch', 'motorKV', 'battCells'];
+    inheritedProps.forEach(prop => {
+        if (parent[prop] !== undefined) instance[prop] = parent[prop];
+    });
+    if (parent.sections) {
+        // Deep copy the sections array so modifying the parent doesn't accidentally mutate the instance reference
+        instance.sections = JSON.parse(JSON.stringify(parent.sections));
+    }
+
+    // Inherit the parent's name and position slightly offset so it's visible
+    instance.name = parent.name + " (Instance)";
+    instance.color = parent.color;
+    instance.x = safeParse(parent.x) + 2; 
+    instance.y = safeParse(parent.y) + 2;
+    instance.z = safeParse(parent.z);
+    instance.rotX = safeParse(parent.rotX);
+    instance.rotY = safeParse(parent.rotY);
+    instance.rotZ = safeParse(parent.rotZ);
+    instance.isMirrored = parent.isMirrored;
+
+    handleSelectComponent(instanceId);
+    if (typeof saveHistory === 'function') saveHistory();
+}
+
+function handleAddConfig(e) {
+    if (e) e.stopPropagation();
+    showConfigMenu(e, getActiveConfig().id);
+}
+
+function handleDuplicateConfig(cfgId, event) {
+    if (event) event.stopPropagation();
+    showConfigMenu(event, cfgId);
+}
+
+function showConfigMenu(event, sourceCfgId) {
+    // Remove any existing menu so they don't stack
+    const existing = document.getElementById('config-context-menu');
+    if (existing) existing.remove();
+
+    const sourceCfg = App.state.configurations.find(c => c.id === sourceCfgId) || getActiveConfig();
+
+    // Create the floating context menu
+    const menu = document.createElement('div');
+    menu.id = 'config-context-menu';
+    menu.style.cssText = `
+        position: absolute;
+        top: ${event.clientY + 10}px;
+        left: ${event.clientX}px;
+        background: var(--panel-grey);
+        border: 1px solid var(--accent-yellow);
+        border-radius: 6px;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        z-index: 1000;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+    `;
+
+    const btnStyle = "background: transparent; color: var(--text-main); border: none; text-align: left; padding: 8px 12px; cursor: pointer; font-size: 0.85em; border-radius: 4px; transition: background 0.1s;";
+
+    // Helper to generate the 3 stylized buttons
+    const createBtn = (icon, title, desc, type) => {
+        const btn = document.createElement('button');
+        btn.style.cssText = btnStyle;
+        btn.innerHTML = `<span style="font-size:1.2em; margin-right:6px; vertical-align:middle;">${icon}</span> <b>${title}</b><br><span style="font-size:0.8em; color:var(--text-dim); display:block; margin-top:2px;">${desc}</span>`;
+        btn.onmouseover = () => btn.style.background = 'rgba(255, 204, 0, 0.15)';
+        btn.onmouseout = () => btn.style.background = 'transparent';
+        btn.onclick = () => {
+            executeConfigCreation(sourceCfg, type);
+            menu.remove();
+        };
+        return btn;
+    };
+
+    menu.appendChild(createBtn('🔗', 'New Linked Variant', 'Inherits parts from Base. Stores specific dimension/mass overrides.', 'linked'));
+    menu.appendChild(createBtn('📋', 'Unique Duplicate', 'Creates a deep copy. Changes here never affect other configs.', 'unique'));
+    menu.appendChild(createBtn('📄', 'New Blank Config', 'Starts with an empty parts list.', 'blank'));
+    
+    document.body.appendChild(menu);
+
+    // Click outside to close listener
+    setTimeout(() => {
+        const closeMenu = (e) => {
+            if (!menu.contains(e.target)) {
+                menu.remove();
+                document.removeEventListener('click', closeMenu);
+            }
+        };
+        document.addEventListener('click', closeMenu);
+    }, 0);
+}
+
+function executeConfigCreation(sourceCfg, type) {
+    const clone = {
+        id: 'config-' + Date.now(),
+        name: sourceCfg.name + (type === 'blank' ? " (Blank)" : " (Variant)"),
+        isActive: false,
+        isExpanded: true,
+        wing: null,
+        components: [],
+        overrides: {}
+    };
+
+    if (type === 'linked') {
+        // LINK to Base
+        clone.wing = App.state.configurations[0].wing; 
+        clone.components = App.state.configurations[0].components; 
+        if (sourceCfg.overrides) clone.overrides = JSON.parse(JSON.stringify(sourceCfg.overrides));
+    } else if (type === 'unique') {
+        // UNIQUE Deep Copy
+        clone.wing = JSON.parse(JSON.stringify(sourceCfg.wing));
+        clone.wing.id = 'wing-' + Date.now() + Math.floor(Math.random() * 1000);
+        clone.components = JSON.parse(JSON.stringify(sourceCfg.components));
+        clone.components.forEach(c => { c.id = 'comp-' + Date.now() + Math.floor(Math.random() * 10000); });
+    } else {
+        // BLANK Config
+        clone.wing = JSON.parse(JSON.stringify(sourceCfg.wing));
+        clone.wing.id = 'wing-' + Date.now() + Math.floor(Math.random() * 1000);
+    }
+
+    App.state.configurations.push(clone);
+    refresh();
+    if (typeof saveHistory === 'function') saveHistory();
+}
+
 
 /*##############################################################
 #
@@ -8854,8 +9408,8 @@ function exportHTML() {
 ##############################################################*/
 
 function refresh() {
-    // If running a sweep, ONLY run the invisible math engine. No visuals.
     if (App.state.graphSweep && App.state.graphSweep.isSimulating) {
+        hydrateComponents(); 
         calculateAircraft();
         return; 
     }
@@ -8864,6 +9418,10 @@ function refresh() {
     App.cache.renderPending = true;
     
     requestAnimationFrame(() => {
+        // NEW: Skip the heavy configuration rebuild if the user is actively dragging!
+        if (!App.state.drag.dragging && App.state.drag.draggingVertexIndex === -1) {
+            hydrateComponents(); 
+        }
         calculateAircraft();
         renderEverything();
         App.cache.renderPending = false;
@@ -9021,21 +9579,16 @@ function bindWingEvents() {
         const el = document.getElementById(id === 'mass' ? 'wing-mass-display' : 'wing-' + id);
         if (!el) return;
         el.addEventListener('input', (e) => {
-            if (App.state.wingData['locked' + id] && App.state.activeMassProfile === 'budget') return;
-
+            if (getProp(App.state.wingData, 'locked' + id) && App.state.activeMassProfile === 'budget') return;
             let inputVal = safeParse(e.target.value);
             if (['b', 'cr', 'ct'].includes(id)) inputVal /= getDimScalar();
             if (id === 'area') inputVal /= Math.pow(getDimScalar(), 2);
             if (id === 'rho') inputVal /= (getMassScalar() / Math.pow(getDimScalar(), 3));
             if (id === 'mass') inputVal /= getMassScalar(); 
-
             resolveWingCascade(id, inputVal);
             refresh();
         });
-        
-        el.addEventListener('change', () => {
-            if (typeof saveHistory === 'function') saveHistory();
-        });
+        el.addEventListener('change', () => { if (typeof saveHistory === 'function') saveHistory(); });
     });
 
     ['sweep','dihedral','pivot','color'].forEach(id => {
@@ -9043,82 +9596,63 @@ function bindWingEvents() {
         if (!el) return;
         el.addEventListener('input', (e) => {
             const scalar = (id === 'dihedral' || id === 'color') ? 1 : getDimScalar();
-            App.state.wingData[id] = id === 'color' ? e.target.value : safeParse(e.target.value) / scalar; 
+            setProp(App.state.wingData, id, id === 'color' ? e.target.value : safeParse(e.target.value) / scalar); 
             refresh();
         });
-        
-        el.addEventListener('change', () => {
+        el.addEventListener('change', () => { if (typeof saveHistory === 'function') saveHistory(); });
+    });
+    
+    const airfoilSyncBox = document.getElementById('wing-sync-airfoil');
+    if (airfoilSyncBox) {
+        airfoilSyncBox.addEventListener('change', (e) => {
+            const w = App.state.wingData;
+            if (!w) return;
+            setProp(w, 'syncAirfoil', e.target.checked);
+            if (e.target.checked) setProp(w, 'nacaTip', getProp(w, 'nacaRoot'));
+            refresh();
             if (typeof saveHistory === 'function') saveHistory();
         });
-    });
-	
-	const airfoilSyncBox = document.getElementById('wing-sync-airfoil');
-		if (airfoilSyncBox) {
-			airfoilSyncBox.addEventListener('change', (e) => {
-				const w = App.state.wingData;
-				if (!w) return;
-				w.syncAirfoil = e.target.checked;
-				if (e.target.checked) {
-					w.nacaTip = w.nacaRoot;
-				}
-				refresh();
-				if (typeof saveHistory === 'function') saveHistory();
-			});
-		}
-		
-		const nacaInputEl = document.getElementById('naca-input');
-	if (nacaInputEl) {
-		nacaInputEl.addEventListener('input', () => updateAirfoilPreview(true));
-	}
+    }
+        
+    const nacaInputEl = document.getElementById('naca-input');
+    if (nacaInputEl) nacaInputEl.addEventListener('input', () => updateAirfoilPreview(true));
 
-	const airfoilSelectorEl = document.getElementById('airfoil-selector');
-	if (airfoilSelectorEl) {
-		airfoilSelectorEl.addEventListener('change', () => updateAirfoilPreview(false));
-	}
+    const airfoilSelectorEl = document.getElementById('airfoil-selector');
+    if (airfoilSelectorEl) airfoilSelectorEl.addEventListener('change', () => updateAirfoilPreview(false));
 
-	const airfoilAoAEl = document.getElementById('airfoil-aoa');
-	if (airfoilAoAEl) {
-		airfoilAoAEl.addEventListener('input', (e) => {
-			if (App.state.wingData) {
-				App.state.wingData.aoa = parseFloat(e.target.value) || 0;
-				
-				const previewPath = document.getElementById('airfoil-preview-path');
-				if (previewPath) {
-					previewPath.setAttribute('transform', `rotate(${App.state.wingData.aoa}, 0.25, 0)`);
-				}
-				refresh();
-			}
-		});
-		airfoilAoAEl.addEventListener('change', () => {
-			if (typeof saveHistory === 'function') saveHistory();
-		});
-	}
-	
-	const cd0Preset = document.getElementById('wing-cd0-preset');
-	const cd0Custom = document.getElementById('wing-cd0-custom');
-
-	if (cd0Preset && cd0Custom) {
-		cd0Preset.addEventListener('change', (e) => {
-			if (e.target.value === 'custom') {
-				cd0Custom.style.display = 'block';
-				cd0Custom.focus();
-			} else {
-				cd0Custom.style.display = 'none';
-				App.state.wingData.cd0 = parseFloat(e.target.value);
-				refresh();
-				if (typeof saveHistory === 'function') saveHistory();
-			}
-		});
-
-		cd0Custom.addEventListener('input', (e) => {
-			App.state.wingData.cd0 = safeParse(e.target.value) || 0.001;
-			refresh();
-		});
-		
-		cd0Custom.addEventListener('change', () => {
-			if (typeof saveHistory === 'function') saveHistory();
-		});
-	}
+    const airfoilAoAEl = document.getElementById('airfoil-aoa');
+    if (airfoilAoAEl) {
+        airfoilAoAEl.addEventListener('input', (e) => {
+            if (App.state.wingData) {
+                setProp(App.state.wingData, 'aoa', parseFloat(e.target.value) || 0);
+                const previewPath = document.getElementById('airfoil-preview-path');
+                if (previewPath) previewPath.setAttribute('transform', `rotate(${App.state.wingData.aoa}, 0.25, 0)`);
+                refresh();
+            }
+        });
+        airfoilAoAEl.addEventListener('change', () => { if (typeof saveHistory === 'function') saveHistory(); });
+    }
+    
+    const cd0Preset = document.getElementById('wing-cd0-preset');
+    const cd0Custom = document.getElementById('wing-cd0-custom');
+    if (cd0Preset && cd0Custom) {
+        cd0Preset.addEventListener('change', (e) => {
+            if (e.target.value === 'custom') {
+                cd0Custom.style.display = 'block';
+                cd0Custom.focus();
+            } else {
+                cd0Custom.style.display = 'none';
+                setProp(App.state.wingData, 'cd0', parseFloat(e.target.value));
+                refresh();
+                if (typeof saveHistory === 'function') saveHistory();
+            }
+        });
+        cd0Custom.addEventListener('input', (e) => {
+            setProp(App.state.wingData, 'cd0', safeParse(e.target.value) || 0.001);
+            refresh();
+        });
+        cd0Custom.addEventListener('change', () => { if (typeof saveHistory === 'function') saveHistory(); });
+    }
 }
 
 function bindPropertyEvents() {
@@ -9140,7 +9674,7 @@ function bindPropertyEvents() {
     document.getElementById('prop-type')?.addEventListener('change', (e) => {
         const p = getActive();
         if (p) {
-            p.type = e.target.value;
+            setProp(p, 'type', e.target.value);
             refresh();
             if (typeof saveHistory === 'function') saveHistory();
         }
@@ -9149,7 +9683,7 @@ function bindPropertyEvents() {
     document.getElementById('prop-show-label')?.addEventListener('change', (e) => {
         const p = getActive();
         if (p) {
-            p.showLabel = e.target.checked;
+            setProp(p, 'showLabel', e.target.checked);
             refresh();
             if (typeof saveHistory === 'function') saveHistory();
         }
@@ -9160,26 +9694,28 @@ function bindPropertyEvents() {
         if (!p) return;
         
         const isNowMirrored = e.target.checked;
-        if (isNowMirrored) p.isSymmetrical = false;
+        if (isNowMirrored) setProp(p, 'isSymmetrical', false);
 
-        let oldMass = getEffectiveMassGrams(p); // Capture mass before mutating
-
+        let oldMass = getEffectiveMassGrams(p);
         const wasMirrored = getIsMirrored(p);
+
         if (isNowMirrored !== wasMirrored) {
             if (App.state.activeMassProfile === 'budget') {
-                p.isMirrored = isNowMirrored;
+                setProp(p, 'isMirrored', isNowMirrored);
                 App.state.massProfiles.forEach(prof => {
-                    if (prof === 'budget' || p[`${prof}IsMirrored`] !== undefined) return;
+                    if (prof === 'budget' || getProp(p, `${prof}IsMirrored`) !== undefined) return;
                     const key = `${prof}Mass`;
-                    if (p[key] !== undefined && p[key] !== "") {
-                        p[key] = isNowMirrored ? p[key] * 2 : p[key] / 2;
+                    const currentMass = getProp(p, key);
+                    if (currentMass !== undefined && currentMass !== "") {
+                        setProp(p, key, isNowMirrored ? currentMass * 2 : currentMass / 2);
                     }
                 });
             } else {
-                p[`${App.state.activeMassProfile}IsMirrored`] = isNowMirrored;
+                setProp(p, `${App.state.activeMassProfile}IsMirrored`, isNowMirrored);
                 const key = `${App.state.activeMassProfile}Mass`;
-                if (p[key] !== undefined && p[key] !== "") {
-                    p[key] = isNowMirrored ? p[key] * 2 : p[key] / 2;
+                const currentMass = getProp(p, key);
+                if (currentMass !== undefined && currentMass !== "") {
+                    setProp(p, key, isNowMirrored ? currentMass * 2 : currentMass / 2);
                 }
             }
         }
@@ -9195,12 +9731,12 @@ function bindPropertyEvents() {
         
         const isNowSymmetrical = e.target.checked;
         if (isNowSymmetrical) {
-            p.isMirrored = false;
-            p[`${App.state.activeMassProfile}IsMirrored`] = false;
+            setProp(p, 'isMirrored', false);
+            setProp(p, `${App.state.activeMassProfile}IsMirrored`, false);
         }
         
-        p.isSymmetrical = isNowSymmetrical;
-        if (p.isSymmetrical) p.dy = 0; 
+        setProp(p, 'isSymmetrical', isNowSymmetrical);
+        if (isNowSymmetrical) setProp(p, 'dy', 0); 
         
         refresh();
         if (typeof saveHistory === 'function') saveHistory();
@@ -9211,10 +9747,10 @@ function bindPropertyEvents() {
         if (!p) return;
         
         let oldMass = getEffectiveMassGrams(p); 
-        
         const isNowHollow = e.target.checked;
-        if (App.state.activeMassProfile === 'budget') p.isHollow = isNowHollow;
-        else p[`${App.state.activeMassProfile}IsHollow`] = isNowHollow;
+        
+        if (App.state.activeMassProfile === 'budget') setProp(p, 'isHollow', isNowHollow);
+        else setProp(p, `${App.state.activeMassProfile}IsHollow`, isNowHollow);
         
         recalculateMassOrDensity(p, oldMass);
         refresh();
@@ -9225,7 +9761,7 @@ function bindPropertyEvents() {
         const p = getActive();
         if (!p) return;
         let oldMass = getEffectiveMassGrams(p); 
-        p.wallT = safeParse(e.target.value) / getDimScalar();
+        setProp(p, 'wallT', safeParse(e.target.value) / getDimScalar());
         recalculateMassOrDensity(p, oldMass);
         refresh();
     });
@@ -9299,9 +9835,9 @@ function bindPropertyEvents() {
         const el = document.getElementById(`prop-${axis}`);
         if (!el) return;
         el.addEventListener('input', (e) => {
-            const p = App.state.components.find(c => c.id === App.state.selectedComponentId);
+            const p = getActive();
             if (p) {
-                p[axis] = safeParse(e.target.value);
+                setProp(p, axis, safeParse(e.target.value));
                 refresh();
             }
         });
@@ -9314,10 +9850,10 @@ function bindPropertyEvents() {
         const el = document.getElementById(`prop-${axis}`);
         if (!el) return;
         el.addEventListener('input', (e) => {
-            const p = App.state.components.find(c => c.id === App.state.selectedComponentId);
+            const p = getActive();
             if (p) {
                 const inputCm = safeParse(e.target.value) / getDimScalar();
-                p[axis] = getInternalMinCoord(inputCm, p[`s${axis}`] || 0);
+                setProp(p, axis, getInternalMinCoord(inputCm, getProp(p, `s${axis}`) || 0));
                 refresh();
             }
         });
@@ -9330,26 +9866,28 @@ function bindPropertyEvents() {
         const el = document.getElementById(`prop-${field}`);
         if (!el) return;
         el.addEventListener('input', (e) => {
-            const p = App.state.components.find(c => c.id === App.state.selectedComponentId);
-            if (!p || (p.lockedMass && p.lockedRho)) return;
+            const p = getActive();
+            if (!p || (getProp(p, 'lockedMass') && getProp(p, 'lockedRho'))) return;
             
             let oldMass = getEffectiveMassGrams(p);
             
-            let currentDispSize = safeParse(p[field]);
+            let currentDispSize = safeParse(getProp(p, field));
             if (p.sections && p.sections.length > 0) {
                 let minVal = Infinity, maxVal = -Infinity;
+                const pSx = getProp(p, 'sx'), pSy = getProp(p, 'sy'), pSz = getProp(p, 'sz');
+                
                 p.sections.forEach(sec => {
                     if (field === 'sx') {
-                        minVal = Math.min(minVal, sec.x * p.sx);
-                        maxVal = Math.max(maxVal, sec.x * p.sx);
+                        minVal = Math.min(minVal, sec.x * pSx);
+                        maxVal = Math.max(maxVal, sec.x * pSx);
                     } else if (field === 'sy') {
-                        const hy = (sec.w * p.sy) / 2;
-                        minVal = Math.min(minVal, sec.dy * p.sy - hy);
-                        maxVal = Math.max(maxVal, sec.dy * p.sy + hy);
+                        const hy = (sec.w * pSy) / 2;
+                        minVal = Math.min(minVal, sec.dy * pSy - hy);
+                        maxVal = Math.max(maxVal, sec.dy * pSy + hy);
                     } else if (field === 'sz') {
-                        const hz = (sec.h * p.sz) / 2;
-                        minVal = Math.min(minVal, sec.dz * p.sz - hz);
-                        maxVal = Math.max(maxVal, sec.dz * p.sz + hz);
+                        const hz = (sec.h * pSz) / 2;
+                        minVal = Math.min(minVal, sec.dz * pSz - hz);
+                        maxVal = Math.max(maxVal, sec.dz * pSz + hz);
                     }
                 });
                 currentDispSize = maxVal - minVal;
@@ -9359,17 +9897,17 @@ function bindPropertyEvents() {
             if (currentDispSize <= 0 || newSize <= 0) return;
             const scale = newSize / currentDispSize;
 
-            if (field === 'sx') p.sx *= scale;
-            else if (field === 'sy') p.sy *= scale;
-            else if (field === 'sz') p.sz *= scale;
+            setProp(p, field, getProp(p, field) * scale);
 
             const axis = field.substring(1); 
-            if (['x', 'y', 'z'].includes(axis) && p[`locked${axis.toUpperCase()}`]) {
+            if (['x', 'y', 'z'].includes(axis) && getProp(p, `locked${axis.toUpperCase()}`)) {
                 const delta = newSize - currentDispSize;
-                p[axis] = safeParse(p[axis]) - (delta / 2);
+                setProp(p, axis, safeParse(getProp(p, axis)) - (delta / 2));
             }
             
-            if (typeof recalculateMassOrDensity === 'function') recalculateMassOrDensity(p, oldMass);
+            // Note: recalculateMassOrDensity currently mutates directly. 
+            // This is acceptable because the math engine will use the new mass until the next save.
+            recalculateMassOrDensity(p, oldMass);
             refresh();
         });
         el.addEventListener('change', () => {
@@ -9377,21 +9915,16 @@ function bindPropertyEvents() {
         });
     });
 
-	const propMassVal = document.getElementById('prop-mass-val');
+    const propMassVal = document.getElementById('prop-mass-val');
     if (propMassVal) {
         propMassVal.addEventListener('input', (e) => {
             const p = getActive();
-            if (!p || p.lockedMass) return;
+            if (!p || getProp(p, 'lockedMass')) return;
             
-            // Route manual input through the system's target pipeline
-            // This systematically handles unit scaling, mass profiles, and mirrored multiplier logic
             applyTargetValue(`${p.id}:prop-mass-val-${App.state.activeMassProfile}`, parseFloat(e.target.value) || 0);
-            
-            // Push changes to the total mass, CG, and spreadsheet UI
             refresh();
         });
         
-        // Only log to history when the user commits the value (prevents undo-stack flooding)
         propMassVal.addEventListener('change', () => {
             if (typeof saveHistory === 'function') saveHistory();
         });
@@ -9401,10 +9934,10 @@ function bindPropertyEvents() {
     if (propRho) {
         propRho.addEventListener('input', (e) => {
             const p = getActive();
-            if (!p || p.lockedRho) return;
+            if (!p || getProp(p, 'lockedRho')) return;
             
             const densityConversionFactor = getMassScalar() / Math.pow(getDimScalar(), 3);
-            p.rho = (parseFloat(e.target.value) || 0) / densityConversionFactor;
+            setProp(p, 'rho', (parseFloat(e.target.value) || 0) / densityConversionFactor);
             
             refresh();
         });
@@ -9418,9 +9951,9 @@ function bindPropertyEvents() {
         const el = document.getElementById(`prop-${prop}`);
         if (!el) return;
         el.addEventListener('input', (e) => {
-            const p = App.state.components.find(c => c.id === App.state.selectedComponentId);
+            const p = getActive();
             if (p) {
-                p[prop] = e.target.value;
+                setProp(p, prop, e.target.value);
                 refresh();
             }
         });
@@ -9432,9 +9965,21 @@ function bindPropertyEvents() {
     const thrustCheckbox = document.getElementById('prop-thrust-auto');
     if (thrustCheckbox) {
         thrustCheckbox.addEventListener('change', (e) => {
-            const p = App.state.components.find(c => c.id === App.state.selectedComponentId);
+            const p = getActive();
             if (p) {
-                p.thrustAuto = e.target.checked;
+                setProp(p, 'thrustAuto', e.target.checked);
+                refresh();
+                if (typeof saveHistory === 'function') saveHistory();
+            }
+        });
+    }
+	
+	const showPropDiskCheckbox = document.getElementById('prop-show-prop-disk');
+    if (showPropDiskCheckbox) {
+        showPropDiskCheckbox.addEventListener('change', (e) => {
+            const p = getActive();
+            if (p) {
+                setProp(p, 'showPropDisk', e.target.checked);
                 refresh();
                 if (typeof saveHistory === 'function') saveHistory();
             }
@@ -9448,9 +9993,9 @@ function bindPropertyEvents() {
         const el = document.getElementById(elId);
         if (el) {
             el.addEventListener('input', (e) => {
-                const p = App.state.components.find(c => c.id === App.state.selectedComponentId);
+                const p = getActive();
                 if (p) {
-                    p[objKey] = e.target.value === '' ? '' : safeParse(e.target.value);
+                    setProp(p, objKey, e.target.value === '' ? '' : safeParse(e.target.value));
                     refresh();
                 }
             });
@@ -9459,8 +10004,6 @@ function bindPropertyEvents() {
             });
         }
     });
-	
-	
 }
 
 function bindDragEvents() {
@@ -9615,7 +10158,7 @@ function bindStaticUI() {
     document.getElementById('btn-toggle-table')?.addEventListener('click', toggleSpreadsheet);
     document.getElementById('btn-add-comp')?.addEventListener('click', handleAddComponent);
 	document.getElementById('btn-add-config')?.addEventListener('click', handleAddConfig);
-    
+	
     // Graph Sweep Overlay
     document.getElementById('pg-btn-x')?.addEventListener('click', () => { if(typeof startEyedropper === 'function') startEyedropper('x'); });
     document.getElementById('pg-btn-refresh')?.addEventListener('click', generateSweep);
