@@ -316,16 +316,57 @@
     input[type="checkbox"] { width: auto; cursor: pointer; }
     input[type="range"] { background: none; border: none; padding: 0; cursor: pointer; }
 
-    /* Drag scrub cursor for numeric inputs */
-    input[type="number"]:not(:disabled) {
-        cursor: ew-resize;
+    /* SolidWorks-Style Driving Dimension Lines */
+    .dim-line {
+        stroke: var(--accent-yellow);
+        stroke-width: 1.2px;
+        vector-effect: non-scaling-stroke;
     }
-    input[type="number"]:not(:disabled):focus {
-        cursor: text;
+    .dim-witness {
+        stroke: var(--accent-yellow);
+        stroke-width: 1px;
+        opacity: 0.75;
+        stroke-dasharray: 2,2;
+        vector-effect: non-scaling-stroke;
     }
-    body.is-scrubbing, body.is-scrubbing * {
-        cursor: ew-resize !important;
-        user-select: none !important;
+    .dim-badge {
+        cursor: pointer;
+        transition: transform 0.1s ease;
+    }
+    .dim-badge:hover text {
+        filter: drop-shadow(0 0 3px var(--accent-yellow));
+    }
+    .dim-badge text {
+        user-select: none;
+    }
+    .dim-snap-vertex {
+        fill: var(--accent-yellow);
+        stroke: #ffffff;
+        stroke-width: 1.5px;
+        vector-effect: non-scaling-stroke;
+        filter: drop-shadow(0 0 4px var(--accent-yellow));
+        pointer-events: none;
+    }
+    .dim-snap-edge {
+        stroke: var(--accent-yellow);
+        stroke-width: 3.5px;
+        stroke-linecap: round;
+        vector-effect: non-scaling-stroke;
+        filter: drop-shadow(0 0 5px var(--accent-yellow));
+        pointer-events: none;
+    }
+    .dim-selected-feature {
+        stroke: var(--accent-yellow);
+        stroke-width: 3.5px;
+        stroke-dasharray: 4,3;
+        stroke-linecap: round;
+        vector-effect: non-scaling-stroke;
+        filter: drop-shadow(0 0 6px var(--accent-yellow));
+        pointer-events: none;
+    }
+    .dim-snap-badge {
+        pointer-events: none;
+        user-select: none;
     }
 	
     input:disabled, select:disabled { 
@@ -1105,8 +1146,8 @@ Reference Airframes:
             <button class="view-btn" id="view-btn-front">Front View</button>
             <button class="view-btn" id="view-btn-graph">Graph Sweep</button>
             <button class="view-btn" id="view-btn-vars">Variables</button>
-            
-            <div id="mass-preset-controls" style="gap: 6px; align-items: center;"><span style="font-size: 0.7em; color: var(--text-dim); text-transform: uppercase; font-weight: bold; flex-shrink: 0;">Mass Set:</span><button class="view-btn active" id="btn-profile-budget" title="Budget">Budget</button><button class="view-btn" id="btn-profile-measured" title="Measured">Measured</button><button class="view-btn" id="btn-profile-predicted" title="Predicted">Predicted</button><button class="view-btn" title="Add Custom Profile" style="margin: 0px; padding: 4px 8px; font-weight: bold; color: rgb(46, 204, 113); flex-shrink: 0;">+</button><button class="view-btn" title="Delete Active Profile" style="margin: 0px; padding: 4px 8px; font-weight: bold; color: rgb(231, 76, 60); flex-shrink: 0;">-</button></div>
+            <div style="width: 1px; height: 16px; background: var(--border-grey); margin: 0 4px;"></div>
+            <div id="mass-preset-controls" style="gap: 6px; align-items: center;"><span style="font-size: 0.7em; color: var(--text-dim); text-transform: uppercase; font-weight: bold; flex-shrink: 0;">Mass Set:</span><button class="view-btn active" id="btn-profile-budget" title="Budget">Budget</button><button class="view-btn" id="btn-profile-measured" title="Measured">Measured</button><button class="view-btn" id="btn-profile-predicted" title="Predicted">Predicted</button><button class="view-btn" id="tool-btn-dim" onclick="toggleDimensionTool()" title="Smart Driving Dimension (D)" style="display: inline-flex; align-items: center; gap: 4px;">Dimension</button><button class="view-btn" title="Add Custom Profile" style="margin: 0px; padding: 4px 8px; font-weight: bold; color: rgb(46, 204, 113); flex-shrink: 0;">+</button><button class="view-btn" title="Delete Active Profile" style="margin: 0px; padding: 4px 8px; font-weight: bold; color: rgb(231, 76, 60); flex-shrink: 0;">-</button></div>
         </div>
         
         <div id="canvas-container">
@@ -1256,6 +1297,7 @@ Reference Airframes:
                 <g id="components-layer"><g class="interactive-shape"><g opacity="0.4"><polygon points="51.041419322958085,-19 65.04219426346768,-19 65.04219426346768,19 51.041419322958085,19" fill="#7f8c8d" stroke="#7f8c8d" stroke-width="0.5"></polygon></g><path d="M 51.041419322958085 -19 L 65.04219426346768 -19 M 65.04219426346768 -19 L 65.04219426346768 19 M 65.04219426346768 19 L 51.041419322958085 19 M 51.041419322958085 19 L 51.041419322958085 -19 " fill="none" stroke="#7f8c8d" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="51.041806793212885,-0.3 64.04180679321288,-0.3 64.04180679321288,0.3 51.041806793212885,0.3" fill="#ffffff" stroke="#ffffff" stroke-width="0.5"></polygon></g><path d="M 51.041806793212885 -0.3 L 64.04180679321288 -0.3 M 64.04180679321288 -0.3 L 64.04180679321288 0.3 M 64.04180679321288 0.3 L 51.041806793212885 0.3 M 51.041806793212885 0.3 L 51.041806793212885 -0.3 " fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="51.041806793212885,-1.95 61.041806793212885,-1.95 61.041806793212885,1.95 51.041806793212885,1.95" fill="#00ff00" stroke="#00ff00" stroke-width="0.5"></polygon></g><path d="M 51.041806793212885 -1.95 L 61.041806793212885 -1.95 M 61.041806793212885 -1.95 L 61.041806793212885 1.95 M 61.041806793212885 1.95 L 51.041806793212885 1.95 M 51.041806793212885 1.95 L 51.041806793212885 -1.95 " fill="none" stroke="#00ff00" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="55.838481426239014,3 57.838481426239014,3 57.838481426239014,4 55.838481426239014,4" fill="#0000ff" stroke="#0000ff" stroke-width="0.5"></polygon></g><path d="M 55.838481426239014 3 L 57.838481426239014 3 M 57.838481426239014 3 L 57.838481426239014 4 M 57.838481426239014 4 L 55.838481426239014 4 M 55.838481426239014 4 L 55.838481426239014 3 " fill="none" stroke="#0000ff" stroke-width="1" stroke-linecap="round"></path></g><text x="56.838481426239014" y="3.5" class="part-label" style="font-size: 1.7954800759606253px;">Elevator Servo</text><g class="interactive-shape"><g opacity="0.4"><polygon points="55.838481426239014,-4 57.838481426239014,-4 57.838481426239014,-3 55.838481426239014,-3" fill="#0000ff" stroke="#0000ff" stroke-width="0.5"></polygon></g><path d="M 55.838481426239014 -4 L 57.838481426239014 -4 M 57.838481426239014 -4 L 57.838481426239014 -3 M 57.838481426239014 -3 L 55.838481426239014 -3 M 55.838481426239014 -3 L 55.838481426239014 -4 " fill="none" stroke="#0000ff" stroke-width="1" stroke-linecap="round"></path></g><text x="56.838481426239014" y="-3.5" class="part-label" style="font-size: 1.7954800759606253px;">Rudder Servo</text><g class="interactive-shape"><g opacity="0.4"><polygon points="11.642518043518066,-31 13.642518043518066,-31 13.642518043518066,-30 11.642518043518066,-30" fill="#0517fa" stroke="#0517fa" stroke-width="0.5"></polygon></g><path d="M 11.642518043518066 -31 L 13.642518043518066 -31 M 13.642518043518066 -31 L 13.642518043518066 -30 M 13.642518043518066 -30 L 11.642518043518066 -30 M 11.642518043518066 -30 L 11.642518043518066 -31 " fill="none" stroke="#0517fa" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.2"><polygon points="11.642518043518066,30 13.642518043518066,30 13.642518043518066,31 11.642518043518066,31" fill="#0517fa" stroke="#0517fa" stroke-width="0.5"></polygon></g><path d="M 11.642518043518066 30 L 13.642518043518066 30 M 13.642518043518066 30 L 13.642518043518066 31 M 13.642518043518066 31 L 11.642518043518066 31 M 11.642518043518066 31 L 11.642518043518066 30 " fill="none" stroke="#0517fa" stroke-width="1" stroke-linecap="round" stroke-dasharray="2,2"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="-9,-23.5 -7,-23.5 -7,-22.5 -9,-22.5" fill="#f1c40f" stroke="#f1c40f" stroke-width="0.5"></polygon></g><path d="M -9 -23.5 L -7 -23.5 M -7 -23.5 L -7 -22.5 M -7 -22.5 L -9 -22.5 M -9 -22.5 L -9 -23.5 " fill="none" stroke="#f1c40f" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.2"><polygon points="-9,22.5 -7,22.5 -7,23.5 -9,23.5" fill="#f1c40f" stroke="#f1c40f" stroke-width="0.5"></polygon></g><path d="M -9 22.5 L -7 22.5 M -7 22.5 L -7 23.5 M -7 23.5 L -9 23.5 M -9 23.5 L -9 22.5 " fill="none" stroke="#f1c40f" stroke-width="1" stroke-linecap="round" stroke-dasharray="2,2"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="-15.5,-4 -6.32621693611145,-4 -6.32621693611145,4 -15.5,4" fill="#6b6b6b" stroke="#6b6b6b" stroke-width="0.5"></polygon><polygon points="-6.32621693611145,-4 16.5,-4 16.5,4 -6.32621693611145,4" fill="#6b6b6b" stroke="#6b6b6b" stroke-width="0.5"></polygon></g><path d="M -15.5 -4 L -6.32621693611145 -4 M -6.32621693611145 4 L -15.5 4 M -15.5 4 L -15.5 -4 M -6.32621693611145 -4 L 16.5 -4 M 16.5 -4 L 16.5 4 M 16.5 4 L -6.32621693611145 4 " fill="none" stroke="#6b6b6b" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="16.5,-4 28.238925652457965,-3.2323166966438293 28.238925652457965,3.2323166966438293 16.5,4" fill="#95a5a6" stroke="#95a5a6" stroke-width="0.5"></polygon><polygon points="28.238925652457965,-3.2323166966438293 65.00731602659562,-0.7580794572830198 65.00731602659562,0.7580794572830198 28.238925652457965,3.2323166966438293" fill="#95a5a6" stroke="#95a5a6" stroke-width="0.5"></polygon></g><path d="M 16.5 -4 L 28.238925652457965 -3.2323166966438293 M 28.238925652457965 3.2323166966438293 L 16.5 4 M 16.5 4 L 16.5 -4 M 28.238925652457965 -3.2323166966438293 L 65.00731602659562 -0.7580794572830198 M 65.00731602659562 -0.7580794572830198 L 65.00731602659562 0.7580794572830198 M 65.00731602659562 0.7580794572830198 L 28.238925652457965 3.2323166966438293 " fill="none" stroke="#95a5a6" stroke-width="1" stroke-linecap="round"></path></g><text x="36.58208055968453" y="0" class="part-label" style="font-size: 1.7954800759606253px;">Rear Fuse</text><g class="interactive-shape"><g opacity="0.4"><polygon points="-9,-26.5 -7,-26.5 -7,-23.5 -9,-23.5" fill="#e817be" stroke="#e817be" stroke-width="0.5"></polygon></g><path d="M -9 -26.5 L -7 -26.5 M -7 -26.5 L -7 -23.5 M -7 -23.5 L -9 -23.5 M -9 -23.5 L -9 -26.5 " fill="none" stroke="#e817be" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.2"><polygon points="-9,23.5 -7,23.5 -7,26.5 -9,26.5" fill="#e817be" stroke="#e817be" stroke-width="0.5"></polygon></g><path d="M -9 23.5 L -7 23.5 M -7 23.5 L -7 26.5 M -7 26.5 L -9 26.5 M -9 26.5 L -9 23.5 " fill="none" stroke="#e817be" stroke-width="1" stroke-linecap="round" stroke-dasharray="2,2"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="-11.427639770507813,-2 -3.427639770507813,-2 -3.427639770507813,2 -11.427639770507813,2" fill="#ff0000" stroke="#ff0000" stroke-width="0.5"></polygon></g><path d="M -11.427639770507813 -2 L -3.427639770507813 -2 M -3.427639770507813 -2 L -3.427639770507813 2 M -3.427639770507813 2 L -11.427639770507813 2 M -11.427639770507813 2 L -11.427639770507813 -2 " fill="none" stroke="#ff0000" stroke-width="1" stroke-linecap="round"></path></g><text x="-7.427639770507813" y="0" class="part-label" style="font-size: 1.7954800759606253px;">Battery</text><g class="interactive-shape"><g opacity="0.4"><polygon points="36.56433868408203,-1.5 39.56433868408203,-1.5 39.56433868408203,1.5 36.56433868408203,1.5" fill="#e817be" stroke="#e817be" stroke-width="0.5"></polygon></g><path d="M 36.56433868408203 -1.5 L 39.56433868408203 -1.5 M 39.56433868408203 -1.5 L 39.56433868408203 1.5 M 39.56433868408203 1.5 L 36.56433868408203 1.5 M 36.56433868408203 1.5 L 36.56433868408203 -1.5 " fill="none" stroke="#e817be" stroke-width="1" stroke-linecap="round"></path></g><text x="38.06433868408203" y="0" class="part-label" style="font-size: 1.7954800759606253px;">Tail Motor and ESC</text><g class="interactive-shape"><g opacity="0.4"><polygon points="-7,-26.5 13.5,-26.5 13.5,-23.5 -7,-23.5" fill="#00ff00" stroke="#00ff00" stroke-width="0.5"></polygon></g><path d="M -7 -26.5 L 13.5 -26.5 M 13.5 -26.5 L 13.5 -23.5 M 13.5 -23.5 L -7 -23.5 M -7 -23.5 L -7 -26.5 " fill="none" stroke="#00ff00" stroke-width="1" stroke-linecap="round"></path></g><text x="3.25" y="-25" class="part-label" style="font-size: 1.7954800759606253px;">Motor Mounts</text><g class="interactive-shape"><g opacity="0.2"><polygon points="-7,23.5 13.5,23.5 13.5,26.5 -7,26.5" fill="#00ff00" stroke="#00ff00" stroke-width="0.5"></polygon></g><path d="M -7 23.5 L 13.5 23.5 M 13.5 23.5 L 13.5 26.5 M 13.5 26.5 L -7 26.5 M -7 26.5 L -7 23.5 " fill="none" stroke="#00ff00" stroke-width="1" stroke-linecap="round" stroke-dasharray="2,2"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="6,-60 7,-60 7,60 6,60" fill="#dfdfdf" stroke="#dfdfdf" stroke-width="0.5"></polygon></g><path d="M 6 -60 L 7 -60 M 7 -60 L 7 60 M 7 60 L 6 60 M 6 60 L 6 -60 " fill="none" stroke="#dfdfdf" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="12.8,-30 13.5,-30 13.5,30 12.8,30" fill="#dfdfdf" stroke="#dfdfdf" stroke-width="0.5"></polygon></g><path d="M 12.8 -30 L 13.5 -30 M 13.5 -30 L 13.5 30 M 13.5 30 L 12.8 30 M 12.8 30 L 12.8 -30 " fill="none" stroke="#dfdfdf" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="-1.0210990905761719,-3 4.978900909423828,-3 4.978900909423828,3 -1.0210990905761719,3" fill="#000000" stroke="#000000" stroke-width="0.5"></polygon></g><path d="M -1.0210990905761719 -3 L 4.978900909423828 -3 M 4.978900909423828 -3 L 4.978900909423828 3 M 4.978900909423828 3 L -1.0210990905761719 3 M -1.0210990905761719 3 L -1.0210990905761719 -3 " fill="none" stroke="#000000" stroke-width="1" stroke-linecap="round"></path></g><text x="1.9789009094238281" y="0" class="part-label" style="font-size: 1.7954800759606253px;">GPS</text><g class="interactive-shape"><g opacity="0.4"><polygon points="0,-5 10,-5 10,5 0,5" fill="#f1c40f" stroke="#f1c40f" stroke-width="0.5"></polygon></g><path d="M 0 -5 L 10 -5 M 10 -5 L 10 5 M 10 5 L 0 5 M 0 5 L 0 -5 " fill="none" stroke="#f1c40f" stroke-width="1" stroke-linecap="round"></path></g><g class="interactive-shape"><g opacity="0.4"><polygon points="10.04,-2.5 15.04,-2.5 15.04,2.5 10.04,2.5" fill="#f1c40f" stroke="#f1c40f" stroke-width="0.5"></polygon></g><path d="M 10.04 -2.5 L 15.04 -2.5 M 15.04 -2.5 L 15.04 2.5 M 15.04 2.5 L 10.04 2.5 M 10.04 2.5 L 10.04 -2.5 " fill="none" stroke="#f1c40f" stroke-width="1" stroke-linecap="round"></path></g><line stroke="#e73ce1" stroke-width="2" stroke-dasharray="6,4" x1="70.213708" y1="0" x2="-86.213708" y2="0"></line></g>
                 <g id="mac-layer" pointer-events="none"><line x1="0" y1="29.999999999999993" x2="22.499999999999975" y2="29.999999999999993" stroke="#2ecc71" stroke-width="0.2992466793267709"></line><line x1="7.424999999999992" y1="29.40150664134645" x2="7.424999999999992" y2="30.598493358653535" stroke="#2ecc71" stroke-width="0.2992466793267709"></line><line x1="0" y1="-29.999999999999993" x2="22.499999999999975" y2="-29.999999999999993" stroke="#2ecc71" stroke-width="0.2992466793267709"></line><line x1="7.424999999999992" y1="-30.598493358653535" x2="7.424999999999992" y2="-29.40150664134645" stroke="#2ecc71" stroke-width="0.2992466793267709"></line></g>
                 <g id="cg-layer" pointer-events="none"><g><circle cx="7.424999999999992" cy="0" r="0.8981288981288982" fill="#000" stroke="#fff" stroke-width="0.1496881496881497"></circle><path d="M 7.424999999999992 0 L 7.424999999999992 -0.8981288981288982 A 0.8981288981288982 0.8981288981288982 0 0 1 8.32312889812889 0 Z" fill="#2ecc71"></path><path d="M 7.424999999999992 0 L 7.424999999999992 0.8981288981288982 A 0.8981288981288982 0.8981288981288982 0 0 1 6.526871101871094 0 Z" fill="#2ecc71"></path><line x1="6.227494802494794" y1="0" x2="8.622505197505188" y2="0" stroke="#fff" stroke-width="0.1496881496881497"></line><line x1="7.424999999999992" y1="-1.1975051975051976" x2="7.424999999999992" y2="1.1975051975051976" stroke="#fff" stroke-width="0.1496881496881497"></line></g><g><circle cx="9.202752575396572" cy="0" r="0.8981288981288982" fill="#000" stroke="#fff" stroke-width="0.1496881496881497"></circle><path d="M 9.202752575396572 0 L 9.202752575396572 -0.8981288981288982 A 0.8981288981288982 0.8981288981288982 0 0 1 10.100881473525469 0 Z" fill="#f1c40f"></path><path d="M 9.202752575396572 0 L 9.202752575396572 0.8981288981288982 A 0.8981288981288982 0.8981288981288982 0 0 1 8.304623677267674 0 Z" fill="#f1c40f"></path><line x1="8.005247377891376" y1="0" x2="10.400257772901767" y2="0" stroke="#fff" stroke-width="0.1496881496881497"></line><line x1="9.202752575396572" y1="-1.1975051975051976" x2="9.202752575396572" y2="1.1975051975051976" stroke="#fff" stroke-width="0.1496881496881497"></line></g></g>
+                <g id="dimensions-layer"></g>
             </svg>
 
             <!-- CAD View Legends -->
@@ -1266,7 +1308,16 @@ Reference Airframes:
                 <div class="legend-item"><div class="legend-color" style="background: transparent; border-top: 2px dashed #e73ce1; height: 0; width: 15px;"></div> Thrust Vector</div>
             </div>
             
-			<div id="shortcuts-legend" style="position: absolute; bottom: 10px; right: 10px; background: var(--bg-black); padding: 8px; border-radius: 4px; font-size: 0.65em; border: 1px solid var(--border-grey); color: var(--text-dim); pointer-events: none; text-align: left; display: flex; flex-direction: column; gap: 4px; z-index: 10;"><div style="color: var(--accent-yellow); font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid var(--border-grey); padding-bottom: 2px;">Shortcuts</div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">H</kbd></span> <span>Hide Part</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">F</kbd></span> <span>Focus Part</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">I</kbd></span> <span>Isolate (Edit)</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">O</kbd></span> <span>Set Origin (Hover/CoM)</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+H</kbd></span> <span>Unhide All</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+Z</kbd></span> <span>Undo</span></div></div>
+			<div id="shortcuts-legend" style="position: absolute; bottom: 10px; right: 10px; background: var(--bg-black); padding: 8px; border-radius: 4px; font-size: 0.65em; border: 1px solid var(--border-grey); color: var(--text-dim); pointer-events: none; text-align: left; display: flex; flex-direction: column; gap: 4px; z-index: 10;"><div style="color: var(--accent-yellow); font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid var(--border-grey); padding-bottom: 2px;">Shortcuts</div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">H</kbd></span> <span>Hide Part</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">F</kbd></span> <span>Focus Part</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">I</kbd></span> <span>Isolate (Edit)</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">O</kbd></span> <span>Set Origin (Hover/CoM)</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">D</kbd></span> <span>Dimension</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+H</kbd></span> <span>Unhide All</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+Z</kbd></span> <span>Undo</span></div></div>
+
+            <!-- Dimension Modify Popover -->
+            <div id="dim-edit-popover" style="display: none; position: absolute; z-index: 1000; background: var(--panel-grey); border: 1px solid var(--accent-yellow); border-radius: 6px; padding: 6px 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); font-family: inherit; font-size: 0.85em; gap: 6px; align-items: center;">
+                <input type="number" id="dim-input-val" step="any" style="width: 75px; padding: 3px 6px; border: 1px solid var(--border-grey); border-radius: 4px; background: linear-gradient(180deg, rgba(0,0,0,calc(var(--grad-opacity) * 1.33)) 0%, rgba(255,255,255,calc(var(--grad-opacity) * 0.13)) 100%), var(--bg-black); color: var(--text-main); font-weight: bold; text-align: right;" />
+                <span id="dim-unit-label" style="color: var(--text-dim); font-size: 0.9em;">mm</span>
+                <button id="dim-btn-confirm" class="view-btn" style="padding: 3px 7px; color: #2ecc71; border-color: #2ecc71;" title="Apply (Enter)">✓</button>
+                <button id="dim-btn-delete" class="view-btn" style="padding: 3px 7px; color: #e74c3c; border-color: #e74c3c;" title="Delete">Del</button>
+                <button id="dim-btn-cancel" class="view-btn" style="padding: 3px 7px; color: var(--text-dim);" title="Close (Esc)">✕</button>
+            </div>
 
             <!-- Spreadsheet Overlay -->
             <div id="spreadsheet-overlay" style="display: none; position: absolute; inset: 0px; background: var(--bg-black); z-index: 30; box-sizing: border-box; flex-direction: column;">
@@ -2527,6 +2578,8 @@ const App = {
         isIsolated: false,
         isolatedSet: new Set(),
         isFocused: false,
+        dimTool: { active: false, step: 0, refA: null, refB: null, previewPos: null },
+        selectedDimensionId: null,
         
         // Default Variables
         sysVariables: [
@@ -4215,6 +4268,7 @@ function deleteComponent(id) {
     App.state.globalComponents = App.state.globalComponents.filter(c => c.id !== id);
     App.state.configurations.forEach(cfg => {
         cfg.components = cfg.components.filter(c => c.id !== id);
+        if (cfg.dimensions) cfg.dimensions = cfg.dimensions.filter(d => d.partA !== id && d.partB !== id && (!d.refA || d.refA.partId !== id) && (!d.refB || d.refB.partId !== id));
         if (cfg.overrides && cfg.overrides[id]) delete cfg.overrides[id];
     });
     
@@ -4328,6 +4382,7 @@ function activateConfigModel(cfgId) {
     // SYNC WORKING MEMORY TO THE NEW CONFIG
     App.state.wingData = active.wing;
     App.state.components = active.components;
+    if (typeof hydrateComponents === 'function') hydrateComponents();
 
     // Clear isolated/focused state to prevent phantom ID locks
     App.ui.viewParams.isIsolated = false;
@@ -4714,9 +4769,6 @@ function setProp(comp, prop, val) {
     const inheritedProps = ['sx', 'sy', 'sz', 'rho', 'type', 'isHollow', 'wallT', 'budgetMass', 'measuredMass', 'predictedMass', 'thrustAuto', 'thrust', 'propDia', 'propPitch', 'motorKV', 'battCells'];
     if (comp.parentId && inheritedProps.includes(prop)) return; 
 
-    // CRITICAL: Always update live working memory immediately
-    comp[prop] = val; 
-
     if (!isBaseConfig) {
         const baseCfg = App.state.configurations[0];
         let baseVal;
@@ -4750,6 +4802,9 @@ function setProp(comp, prop, val) {
             }
         }
     }
+
+    // CRITICAL: Always update live working memory immediately
+    comp[prop] = val;
 }
 
 // Clear an Override (Triggered by UI)
@@ -5661,15 +5716,34 @@ function generateNACA4(code, numPoints = 40) {
 
 function resolveWingCascade(changedProp, newVal) {
     const wing = App.state.wingData;
+    if (!wing) return;
     const oldVol = getWingVolumeCm3('budget');
     const targetMass = oldVol * (wing.rho || 0);
 
     newVal = Math.max(0, newVal);
 
-    let b = Math.max(0, wing.b), cr = Math.max(0, wing.cr), ct = Math.max(0, wing.ct);
+    // If typing 0 or negative in a dimensional property, do not collapse geometry
+    if (['b', 'cr', 'ct', 'area', 'ar'].includes(changedProp) && newVal <= 0) {
+        return;
+    }
+
+    let b = Math.max(0, safeParse(wing.b)), cr = Math.max(0, safeParse(wing.cr)), ct = Math.max(0, safeParse(wing.ct));
     let area = ((cr + ct) / 2) * b;
     let ar = area > 0 ? (b * b) / area : 0;
     
+    // Update fallback geometry whenever current wing has valid dimensions
+    if (ar > 0.01) wing.fallbackAR = ar;
+    if (cr > 0 && ct > 0) wing.fallbackTaper = ct / cr;
+    if (b > 0) wing.fallbackB = b;
+    if (cr > 0) wing.fallbackCr = cr;
+    if (ct > 0) wing.fallbackCt = ct;
+
+    const safeAR = ar > 0.01 ? ar : (wing.fallbackAR && wing.fallbackAR > 0.01 ? wing.fallbackAR : 6.0);
+    const safeTaper = (cr > 0 && ct > 0) ? (ct / cr) : (wing.fallbackTaper !== undefined ? wing.fallbackTaper : 1.0);
+    const safeB = b > 0 ? b : (wing.fallbackB && wing.fallbackB > 0 ? wing.fallbackB : 100.0);
+    const safeCr = cr > 0 ? cr : (wing.fallbackCr && wing.fallbackCr > 0 ? wing.fallbackCr : 20.0);
+    const safeCt = ct > 0 ? ct : (wing.fallbackCt && wing.fallbackCt > 0 ? wing.fallbackCt : 20.0);
+
     const isL = (p) => {
         if (wing['locked' + p]) return true; 
         
@@ -5691,52 +5765,67 @@ function resolveWingCascade(changedProp, newVal) {
 
     if (changedProp === 'b') b = Math.max(0, newVal);
     if (changedProp === 'cr') {
-        const mult = cr > 0 ? newVal / cr : 1;
+        const baseCr = cr > 0 ? cr : safeCr;
+        const mult = baseCr > 0 ? newVal / baseCr : 1;
         cr = Math.max(0, newVal);
-        if (chordsLinked) ct = Math.max(0, ct * mult);
+        if (chordsLinked) {
+            const baseCt = ct > 0 ? ct : (baseCr * safeTaper);
+            ct = Math.max(0, baseCt * mult);
+        }
     }
     if (changedProp === 'ct') {
-        const mult = ct > 0 ? newVal / ct : 1;
+        const baseCt = ct > 0 ? ct : safeCt;
+        const mult = baseCt > 0 ? newVal / baseCt : 1;
         ct = Math.max(0, newVal);
-        if (chordsLinked) cr = Math.max(0, cr * mult);
+        if (chordsLinked) {
+            const baseCr = cr > 0 ? cr : (baseCt / (safeTaper || 1));
+            cr = Math.max(0, baseCr * mult);
+        }
     }
     if (changedProp === 'area') area = Math.max(0, newVal);
     if (changedProp === 'ar') ar = Math.max(0, newVal);
 
     if (changedProp === 'area' || changedProp === 'ar') {
         if (isL('b')) {
-            if (changedProp === 'area') ar = area > 0 ? (b * b) / area : 0;
+            if (b <= 0) b = safeB;
+            if (changedProp === 'area') ar = area > 0 ? (b * b) / area : safeAR;
             if (changedProp === 'ar') area = ar > 0 ? (b * b) / ar : 0;
             
             let avgC = b > 0 ? area / b : 0;
             if (isL('cr')) ct = Math.max(0, 2 * avgC - cr);
             else if (isL('ct')) cr = Math.max(0, 2 * avgC - ct);
             else {
-                let ratio = wing.cr > 0 ? wing.ct / wing.cr : 1; 
+                let ratio = safeTaper; 
                 cr = (2 * avgC) / (1 + ratio);
                 ct = cr * ratio;
             }
         } else {
-            b = Math.sqrt(area * ar);
+            const activeAR = (changedProp === 'ar') ? ar : (ar > 0.01 ? ar : safeAR);
+            b = Math.sqrt(area * activeAR);
             let avgC = b > 0 ? area / b : 0;
             if (isL('cr')) ct = Math.max(0, 2 * avgC - cr);
             else if (isL('ct')) cr = Math.max(0, 2 * avgC - ct);
             else {
-                let ratio = wing.cr > 0 ? wing.ct / wing.cr : 1; 
+                let ratio = safeTaper; 
                 cr = (2 * avgC) / (1 + ratio);
                 ct = cr * ratio;
             }
         }
     } else if (changedProp === 'b') {
         if (isL('area') || isL('ar')) {
-            if (isL('area')) ar = area > 0 ? (b * b) / area : 0;
-            else area = ar > 0 ? (b * b) / ar : 0;
+            if (isL('area')) {
+                if (area <= 0) area = ((safeCr + safeCt) / 2) * safeB;
+                ar = (b > 0 && area > 0) ? (b * b) / area : safeAR;
+            } else {
+                const activeAR = ar > 0.01 ? ar : safeAR;
+                area = activeAR > 0 ? (b * b) / activeAR : 0;
+            }
             
             let avgC = b > 0 ? area / b : 0;
             if (isL('cr')) ct = Math.max(0, 2 * avgC - cr);
             else if (isL('ct')) cr = Math.max(0, 2 * avgC - ct);
             else {
-                let ratio = wing.cr > 0 ? wing.ct / wing.cr : 1;
+                let ratio = safeTaper;
                 cr = (2 * avgC) / (1 + ratio);
                 ct = cr * ratio;
             }
@@ -5744,9 +5833,9 @@ function resolveWingCascade(changedProp, newVal) {
     } else if (changedProp === 'cr' || changedProp === 'ct') {
         if (chordsLinked) {
             if (isL('area')) {
-                b = (cr + ct) > 0 ? (2 * area) / (cr + ct) : 0;
+                b = (cr + ct) > 0 ? (2 * area) / (cr + ct) : safeB;
             } else if (isL('ar')) {
-                b = ar * ((cr + ct) / 2);
+                b = safeAR * ((cr + ct) / 2);
             }
         } else {
             if (avgChordFixed) {
@@ -5755,21 +5844,29 @@ function resolveWingCascade(changedProp, newVal) {
                 else cr = Math.max(0, 2 * avgC - ct);
             } else if (isL('area')) {
                 if ((changedProp === 'cr' && isL('ct')) || (changedProp === 'ct' && isL('cr'))) {
-                    b = (cr + ct) > 0 ? (2 * area) / (cr + ct) : 0;
+                    b = (cr + ct) > 0 ? (2 * area) / (cr + ct) : safeB;
                 } else {
                     let avgC = b > 0 ? area / b : 0;
                     if (changedProp === 'cr') ct = Math.max(0, 2 * avgC - cr);
                     else cr = Math.max(0, 2 * avgC - ct);
                 }
             } else if (isL('ar')) {
-                b = ar * ((cr + ct) / 2);
+                b = safeAR * ((cr + ct) / 2);
             }
         }
     }
 
-	setProp(wing, 'b', Math.max(0, b)); 
+    setProp(wing, 'b', Math.max(0, b)); 
     setProp(wing, 'cr', Math.max(0, cr)); 
     setProp(wing, 'ct', Math.max(0, ct));
+
+    if (b > 0 && (cr + ct) > 0) {
+        wing.fallbackB = b;
+        wing.fallbackCr = cr;
+        wing.fallbackCt = ct;
+        wing.fallbackAR = (b * b) / (((cr + ct) / 2) * b);
+        if (cr > 0) wing.fallbackTaper = ct / cr;
+    }
 
     let varsChanged = false;
     const pushToVar = (p, val) => {
@@ -7068,7 +7165,14 @@ function renderAircraft() {
         p.setAttribute('stroke', '#888'); 
         p.setAttribute('stroke-width', '1');
         p.setAttribute('class', `interactive-shape ${isActive(wingData.id)}`);
-        p.onclick = (e) => { e.stopPropagation(); handleSelectComponent(wingData.id); };
+        p.onclick = (e) => {
+            e.stopPropagation();
+            if (App.state.dimTool && App.state.dimTool.active) {
+                handleDimToolClick(e, 'main-wing');
+                return;
+            }
+            handleSelectComponent(wingData.id);
+        };
         p.setAttribute('transform', `translate(${pX}, 0) scale(${Math.cos(currentAoA * Math.PI / 180)}, 1) translate(${-pX}, 0)`);
         if (isEffectivelyVisible(wingData.id, wingData.isHidden)) wingLayer.appendChild(p);
     } else if (currentView === 'side') {
@@ -7078,7 +7182,14 @@ function renderAircraft() {
         p.setAttribute('fill-opacity', '0.4'); // Added transparency
         p.setAttribute('stroke', '#888');
         p.setAttribute('class', `interactive-shape ${isActive(wingData.id)}`);
-        p.onclick = (e) => { e.stopPropagation(); handleSelectComponent(wingData.id); };
+        p.onclick = (e) => {
+            e.stopPropagation();
+            if (App.state.dimTool && App.state.dimTool.active) {
+                handleDimToolClick(e, 'main-wing');
+                return;
+            }
+            handleSelectComponent(wingData.id);
+        };
         p.setAttribute('transform', `rotate(${currentAoA}, ${pX}, 0)`); 
         if (isEffectivelyVisible(wingData.id, wingData.isHidden)) wingLayer.appendChild(p);
     } else {
@@ -7094,7 +7205,14 @@ function renderAircraft() {
         p.setAttribute('fill-opacity', '0.4'); // Added transparency
         p.setAttribute('stroke', '#888');
         p.setAttribute('class', `interactive-shape ${isActive(wingData.id)}`);
-        p.onclick = (e) => { e.stopPropagation(); handleSelectComponent(wingData.id); };
+        p.onclick = (e) => {
+            e.stopPropagation();
+            if (App.state.dimTool && App.state.dimTool.active) {
+                handleDimToolClick(e, 'main-wing');
+                return;
+            }
+            handleSelectComponent(wingData.id);
+        };
         if (isEffectivelyVisible(wingData.id, wingData.isHidden)) wingLayer.appendChild(p);
     }
 
@@ -7377,6 +7495,12 @@ function renderAircraft() {
             });
         });
     }
+
+    const dimLayer = document.getElementById('dimensions-layer');
+    if (dimLayer) {
+        dimLayer.innerHTML = '';
+        renderDimensionLines(dimLayer, currentView, screenRatio, absoluteScaledFont);
+    }
 }
 
 function renderShortcutsLegend() {
@@ -7406,6 +7530,7 @@ function renderShortcutsLegend() {
         }
     }
     
+    html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">D</kbd></span> <span>Dimension</span></div>`;
     html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+H</kbd></span> <span>Unhide All</span></div>`;
     html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+Z</kbd></span> <span>Undo</span></div>`;
 
@@ -7510,6 +7635,1505 @@ function renderVisualSnapFeedback(layer, viewportMinX, viewportMaxX, viewportMin
         }
         layer.appendChild(l);
     });
+}
+
+/* ==============================================================
+   DRIVING DIMENSION LINES (SolidWorks Style)
+   ============================================================== */
+
+function getActiveDimensions() {
+    const activeCfg = (typeof getActiveConfig === 'function' ? getActiveConfig() : null) || App.state.configurations[0];
+    if (!activeCfg) return [];
+    if (!activeCfg.dimensions) activeCfg.dimensions = [];
+    return activeCfg.dimensions;
+}
+
+function getVisualizerScreenRatio() {
+    const svg = document.getElementById('visualizer');
+    if (!svg) return 1;
+    try {
+        const screenMatrix = svg.getScreenCTM();
+        if (screenMatrix && screenMatrix.a) return 1 / screenMatrix.a;
+    } catch(err) {}
+    const vb = svg.viewBox.baseVal;
+    return vb && vb.width ? vb.width / (svg.clientWidth || 600) : 1;
+}
+
+function projectPointToSegment(p, a, b) {
+    const l2 = (b.u - a.u) ** 2 + (b.v - a.v) ** 2;
+    if (l2 === 0) return { distance: Math.hypot(p.u - a.u, p.v - a.v), point: a, t: 0 };
+    let t = ((p.u - a.u) * (b.u - a.u) + (p.v - a.v) * (b.v - a.v)) / l2;
+    t = Math.max(0, Math.min(1, t));
+    const proj = { u: a.u + t * (b.u - a.u), v: a.v + t * (b.v - a.v) };
+    return { distance: Math.hypot(p.u - proj.u, p.v - proj.v), point: proj, t: t };
+}
+
+function getPartCenterCoord(part, axis) {
+    if (!part) return 0;
+    if (part.id === 'main-wing' || part === App.state.wingData) {
+        return 0; // Reference origin LE
+    }
+    const val = safeParse(getProp(part, axis));
+    const size = safeParse(getProp(part, 's' + axis) || 0);
+    return getDisplayCoord(val, size);
+}
+
+function getPartSize(part, axis) {
+    if (!part) return 0;
+    if (part.id === 'main-wing' || part === App.state.wingData) {
+        if (axis === 'x') return safeParse(App.state.wingData.cr);
+        if (axis === 'y') return safeParse(App.state.wingData.b);
+        if (axis === 'z') return 0;
+        return 0;
+    }
+    return safeParse(getProp(part, 's' + axis) || 0);
+}
+
+function getPartCenter2D(part, currentView) {
+    if (!part) return { u: 0, v: 0 };
+    if (part.id === 'main-wing' || part === App.state.wingData) {
+        return { u: 0, v: 0 };
+    }
+    const cx = getPartCenterCoord(part, 'x');
+    const cy = getPartCenterCoord(part, 'y');
+    const cz = getPartCenterCoord(part, 'z');
+    if (currentView === 'top') return { u: cx, v: cy };
+    if (currentView === 'side') return { u: cx, v: -cz };
+    return { u: cy, v: -cz }; // front
+}
+
+function getSelectableFeatures(currentView) {
+    const features = { vertices: [], edges: [] };
+    const { wingData } = App.state;
+
+    // 1. MAIN WING FEATURES
+    if (wingData && isEffectivelyVisible('main-wing', wingData.isHidden)) {
+        const b = safeParse(wingData.b), cr = safeParse(wingData.cr), ct = safeParse(wingData.ct);
+        const sweep = safeParse(wingData.sweep), dihedral = safeParse(wingData.dihedral);
+        const s = b / 2;
+        const z_delta = s * Math.sin(dihedral * Math.PI / 180);
+        const pX = wingData.pivot || 0;
+        const aoaRad = (parseFloat(document.getElementById('airfoil-aoa')?.value) || 0) * Math.PI / 180;
+        const cosAoA = Math.cos(aoaRad);
+
+        if (currentView === 'top') {
+            const rootLE = { u: pX + (0 - pX) * cosAoA, v: 0 };
+            const rootTE = { u: pX + (cr - pX) * cosAoA, v: 0 };
+            const tipLeftLE = { u: pX + (sweep - pX) * cosAoA, v: -s };
+            const tipLeftTE = { u: pX + (sweep + ct - pX) * cosAoA, v: -s };
+            const tipRightLE = { u: pX + (sweep - pX) * cosAoA, v: s };
+            const tipRightTE = { u: pX + (sweep + ct - pX) * cosAoA, v: s };
+
+            features.vertices.push(
+                { partId: 'main-wing', featureType: 'vertex', featureId: 'root_le', label: 'Wing Root Leading Edge', pt: rootLE, orig3D: { x: 0, y: 0, z: 0 } },
+                { partId: 'main-wing', featureType: 'vertex', featureId: 'root_te', label: 'Wing Root Trailing Edge', pt: rootTE, orig3D: { x: cr, y: 0, z: 0 } },
+                { partId: 'main-wing', featureType: 'vertex', featureId: 'tip_left_le', label: 'Wing Left Tip LE', pt: tipLeftLE, orig3D: { x: sweep, y: -s, z: -z_delta } },
+                { partId: 'main-wing', featureType: 'vertex', featureId: 'tip_left_te', label: 'Wing Left Tip TE', pt: tipLeftTE, orig3D: { x: sweep + ct, y: -s, z: -z_delta } },
+                { partId: 'main-wing', featureType: 'vertex', featureId: 'tip_right_le', label: 'Wing Right Tip LE', pt: tipRightLE, orig3D: { x: sweep, y: s, z: -z_delta } },
+                { partId: 'main-wing', featureType: 'vertex', featureId: 'tip_right_te', label: 'Wing Right Tip TE', pt: tipRightTE, orig3D: { x: sweep + ct, y: s, z: -z_delta } }
+            );
+
+            features.edges.push(
+                { partId: 'main-wing', featureType: 'edge', featureId: 'leading_edge', label: 'Wing Leading Edge', seg: { p1: tipLeftLE, p2: tipRightLE }, midpoint: { u: (tipLeftLE.u + tipRightLE.u) / 2, v: 0 } },
+                { partId: 'main-wing', featureType: 'edge', featureId: 'trailing_edge', label: 'Wing Trailing Edge', seg: { p1: tipLeftTE, p2: tipRightTE }, midpoint: { u: (tipLeftTE.u + tipRightTE.u) / 2, v: 0 } },
+                { partId: 'main-wing', featureType: 'edge', featureId: 'tip_left', label: 'Wing Left Tip', seg: { p1: tipLeftLE, p2: tipLeftTE }, midpoint: { u: (tipLeftLE.u + tipLeftTE.u) / 2, v: -s } },
+                { partId: 'main-wing', featureType: 'edge', featureId: 'tip_right', label: 'Wing Right Tip', seg: { p1: tipRightLE, p2: tipRightTE }, midpoint: { u: (tipRightLE.u + tipRightTE.u) / 2, v: s } },
+                { partId: 'main-wing', featureType: 'edge', featureId: 'root_chord', label: 'Wing Root Chord', seg: { p1: rootLE, p2: rootTE }, midpoint: { u: (rootLE.u + rootTE.u) / 2, v: 0 } }
+            );
+        } else if (currentView === 'side') {
+            const rootLE = { u: 0, v: 0 };
+            const rootTE = { u: cr, v: 0 };
+            features.vertices.push(
+                { partId: 'main-wing', featureType: 'vertex', featureId: 'root_le', label: 'Wing Root Leading Edge', pt: rootLE, orig3D: { x: 0, y: 0, z: 0 } },
+                { partId: 'main-wing', featureType: 'vertex', featureId: 'root_te', label: 'Wing Root Trailing Edge', pt: rootTE, orig3D: { x: cr, y: 0, z: 0 } }
+            );
+            features.edges.push(
+                { partId: 'main-wing', featureType: 'edge', featureId: 'leading_edge', label: 'Wing Leading Edge', seg: { p1: { u: 0, v: -5 }, p2: { u: 0, v: 5 } }, midpoint: { u: 0, v: 0 } },
+                { partId: 'main-wing', featureType: 'edge', featureId: 'trailing_edge', label: 'Wing Trailing Edge', seg: { p1: { u: cr, v: -5 }, p2: { u: cr, v: 5 } }, midpoint: { u: cr, v: 0 } },
+                { partId: 'main-wing', featureType: 'edge', featureId: 'root_chord', label: 'Wing Root Chord', seg: { p1: rootLE, p2: rootTE }, midpoint: { u: cr / 2, v: 0 } }
+            );
+        } else { // front
+            const rootPt = { u: 0, v: 0 };
+            const tipLeft = { u: -s, v: -z_delta };
+            const tipRight = { u: s, v: -z_delta };
+            features.vertices.push(
+                { partId: 'main-wing', featureType: 'vertex', featureId: 'root_le', label: 'Wing Center', pt: rootPt, orig3D: { x: 0, y: 0, z: 0 } },
+                { partId: 'main-wing', featureType: 'vertex', featureId: 'tip_left_le', label: 'Wing Left Tip', pt: tipLeft, orig3D: { x: sweep, y: -s, z: -z_delta } },
+                { partId: 'main-wing', featureType: 'vertex', featureId: 'tip_right_le', label: 'Wing Right Tip', pt: tipRight, orig3D: { x: sweep, y: s, z: -z_delta } }
+            );
+            features.edges.push(
+                { partId: 'main-wing', featureType: 'edge', featureId: 'wing_span', seg: { p1: tipLeft, p2: tipRight }, label: 'Wing Span Line', midpoint: { u: 0, v: -z_delta / 2 } }
+            );
+        }
+    }
+
+    // 2. ACTIVE COMPONENTS FEATURES
+    getAllActiveParts().forEach(c => {
+        if (!c.sections || c.sections.length < 2) return;
+        if (App.ui.viewParams.isIsolated && !App.ui.viewParams.isolatedSet.has(c.id)) return;
+        if (!App.ui.viewParams.isIsolated && c.isHidden) return;
+
+        [false, true].forEach(mirState => {
+            if (mirState && !getIsMirrored(c)) return;
+
+            const vertices3D = getRotatedVertices(c, mirState);
+            const edgeMap = new Map();
+            const componentVertices2D = [];
+
+            for (let s = 0; s < c.sections.length - 1; s++) {
+                const segVerts = vertices3D.slice(s * 4, s * 4 + 8);
+                const points2D = segVerts.map((v, localIdx) => {
+                    let u = 0, vCoord = 0;
+                    if (currentView === 'top') { u = v.x; vCoord = v.y; }
+                    else if (currentView === 'side') { u = v.x; vCoord = -v.z; }
+                    else { u = v.y; vCoord = -v.z; }
+                    return { u, v: vCoord, orig3D: v, globalIdx: s * 4 + localIdx };
+                });
+
+                const hull = getConvexHull2D(points2D);
+                if (hull.length === 0) continue;
+
+                for (let i = 0; i < hull.length; i++) {
+                    const p1 = hull[i], p2 = hull[(i + 1) % hull.length];
+                    const k1 = `${p1.u.toFixed(4)},${p1.v.toFixed(4)}`;
+                    const k2 = `${p2.u.toFixed(4)},${p2.v.toFixed(4)}`;
+                    if (edgeMap.has(`${k2}|${k1}`)) edgeMap.delete(`${k2}|${k1}`);
+                    else edgeMap.set(`${k1}|${k2}`, { p1, p2 });
+                    componentVertices2D.push(p1);
+                }
+            }
+
+            let minU = Infinity, maxU = -Infinity, minV = Infinity, maxV = -Infinity;
+            componentVertices2D.forEach(pt => {
+                if (pt.u < minU) minU = pt.u;
+                if (pt.u > maxU) maxU = pt.u;
+                if (pt.v < minV) minV = pt.v;
+                if (pt.v > maxV) maxV = pt.v;
+            });
+
+            // Deduplicate vertices
+            const uniqueVerts = [];
+            componentVertices2D.forEach(pt => {
+                if (!uniqueVerts.some(uv => Math.hypot(uv.u - pt.u, uv.v - pt.v) < 0.05)) {
+                    let vLabel = `${c.name} Vertex`;
+                    let fid = `vert_${uniqueVerts.length}`;
+                    if (currentView === 'top') {
+                        if (Math.abs(pt.u - minU) < 0.1 && Math.abs(pt.v - minV) < 0.1) { vLabel = `${c.name} Front Left Vertex`; fid = 'front_left_vert'; }
+                        else if (Math.abs(pt.u - minU) < 0.1 && Math.abs(pt.v - maxV) < 0.1) { vLabel = `${c.name} Front Right Vertex`; fid = 'front_right_vert'; }
+                        else if (Math.abs(pt.u - maxU) < 0.1 && Math.abs(pt.v - minV) < 0.1) { vLabel = `${c.name} Rear Left Vertex`; fid = 'rear_left_vert'; }
+                        else if (Math.abs(pt.u - maxU) < 0.1 && Math.abs(pt.v - maxV) < 0.1) { vLabel = `${c.name} Rear Right Vertex`; fid = 'rear_right_vert'; }
+                    }
+                    uniqueVerts.push({
+                        partId: c.id,
+                        featureType: 'vertex',
+                        featureId: fid,
+                        label: vLabel,
+                        pt: { u: pt.u, v: pt.v },
+                        orig3D: pt.orig3D,
+                        vertexIdx: pt.globalIdx,
+                        mirrored: mirState
+                    });
+                }
+            });
+            features.vertices.push(...uniqueVerts);
+
+            let edgeIndex = 0;
+            edgeMap.forEach(edge => {
+                const midU = (edge.p1.u + edge.p2.u) / 2;
+                const midV = (edge.p1.v + edge.p2.v) / 2;
+                let edgeLabel = `${c.name} Edge`;
+                let fid = `edge_${edgeIndex++}`;
+
+                if (currentView === 'top' || currentView === 'side') {
+                    const isTransverse = Math.abs(edge.p1.u - edge.p2.u) < Math.abs(edge.p1.v - edge.p2.v) * 0.4 || Math.abs(edge.p1.u - edge.p2.u) < 0.1;
+                    if (isTransverse || Math.abs(midU - minU) < (maxU - minU) * 0.2) {
+                        if (Math.abs(midU - minU) <= Math.abs(midU - maxU)) {
+                            edgeLabel = `${c.name} Leading Edge`;
+                            fid = 'leading_edge';
+                        }
+                    }
+                    if (isTransverse || Math.abs(midU - maxU) < (maxU - minU) * 0.2) {
+                        if (Math.abs(midU - maxU) < Math.abs(midU - minU)) {
+                            edgeLabel = `${c.name} Trailing Edge`;
+                            fid = 'trailing_edge';
+                        }
+                    }
+                    if (currentView === 'top') {
+                        if (Math.abs(midV - minV) < 0.2) {
+                            edgeLabel = `${c.name} Left Tip`;
+                            fid = 'left_tip';
+                        } else if (Math.abs(midV - maxV) < 0.2) {
+                            edgeLabel = `${c.name} Right Tip`;
+                            fid = 'right_tip';
+                        }
+                    }
+                }
+
+                features.edges.push({
+                    partId: c.id,
+                    featureType: 'edge',
+                    featureId: fid,
+                    label: edgeLabel,
+                    seg: { p1: { u: edge.p1.u, v: edge.p1.v }, p2: { u: edge.p2.u, v: edge.p2.v } },
+                    midpoint: { u: midU, v: midV },
+                    vIdx1: edge.p1.globalIdx,
+                    vIdx2: edge.p2.globalIdx,
+                    mirrored: mirState
+                });
+            });
+        });
+    });
+
+    return features;
+}
+
+function findSnappedFeature(cadPt, currentView, screenRatio) {
+    if (!cadPt) return null;
+    const features = getSelectableFeatures(currentView);
+    const VERTEX_SNAP_RADIUS = 12 * screenRatio;
+    const EDGE_SNAP_RADIUS = 8 * screenRatio;
+
+    let closestVertex = null;
+    let minVertDist = VERTEX_SNAP_RADIUS;
+    for (const v of features.vertices) {
+        const d = Math.hypot(cadPt.u - v.pt.u, cadPt.v - v.pt.v);
+        if (d < minVertDist) {
+            minVertDist = d;
+            closestVertex = v;
+        }
+    }
+    if (closestVertex) {
+        return {
+            partId: closestVertex.partId,
+            featureType: 'vertex',
+            featureId: closestVertex.featureId,
+            label: closestVertex.label,
+            pt: closestVertex.pt,
+            orig3D: closestVertex.orig3D,
+            vertexIdx: closestVertex.vertexIdx,
+            mirrored: closestVertex.mirrored
+        };
+    }
+
+    let closestEdge = null;
+    let minEdgeDist = EDGE_SNAP_RADIUS;
+    let closestProjPt = null;
+    let closestT = 0.5;
+
+    for (const e of features.edges) {
+        const proj = projectPointToSegment(cadPt, e.seg.p1, e.seg.p2);
+        if (proj.distance < minEdgeDist) {
+            minEdgeDist = proj.distance;
+            closestEdge = e;
+            closestProjPt = proj.point;
+            closestT = (proj.t !== undefined) ? proj.t : 0.5;
+        }
+    }
+    if (closestEdge) {
+        return {
+            partId: closestEdge.partId,
+            featureType: 'edge',
+            featureId: closestEdge.featureId,
+            label: closestEdge.label,
+            seg: closestEdge.seg,
+            pt: closestProjPt || closestEdge.midpoint,
+            midpoint: closestEdge.midpoint,
+            vIdx1: closestEdge.vIdx1,
+            vIdx2: closestEdge.vIdx2,
+            edgeT: closestT,
+            mirrored: closestEdge.mirrored
+        };
+    }
+
+    return null;
+}
+
+function getFeatureCoord(ref, axis, currentView) {
+    if (!ref) return 0;
+    const partId = ref.partId;
+
+    if (partId === 'main-wing') {
+        const wing = App.state.wingData;
+        const b = safeParse(wing.b), cr = safeParse(wing.cr), ct = safeParse(wing.ct);
+        const sweep = safeParse(wing.sweep);
+        const s = b / 2;
+
+        if (axis === 'x') {
+            if (ref.featureId === 'leading_edge' || ref.featureId === 'root_le') return 0;
+            if (ref.featureId === 'trailing_edge' || ref.featureId === 'root_te') return cr;
+            if (ref.featureId === 'tip_left_le' || ref.featureId === 'tip_right_le') return sweep;
+            if (ref.featureId === 'tip_left_te' || ref.featureId === 'tip_right_te') return sweep + ct;
+            if (ref.featureId === 'tip_left' || ref.featureId === 'tip_right') return sweep + ct / 2;
+            if (ref.featureId === 'root_chord') return cr / 2;
+            if (ref.pt) return ref.pt.u;
+            return 0;
+        } else if (axis === 'y') {
+            if (ref.featureId === 'tip_left' || ref.featureId === 'tip_left_le' || ref.featureId === 'tip_left_te') return -s;
+            if (ref.featureId === 'tip_right' || ref.featureId === 'tip_right_le' || ref.featureId === 'tip_right_te') return s;
+            if (ref.featureId === 'root_chord' || ref.featureId === 'root_le' || ref.featureId === 'root_te') return 0;
+            if (ref.pt) return ref.pt.v;
+            return 0;
+        } else {
+            const dihedral = safeParse(wing.dihedral);
+            const z_delta = s * Math.sin(dihedral * Math.PI / 180);
+            if (ref.featureId === 'tip_left' || ref.featureId === 'tip_right' || (ref.featureId && ref.featureId.includes('tip'))) return -z_delta;
+            return 0;
+        }
+    }
+
+    const comp = App.state.components.find(c => c.id === partId);
+    if (!comp) return 0;
+
+    const sx = safeParse(comp.sx), sy = safeParse(comp.sy), sz = safeParse(comp.sz);
+    const cx = safeParse(comp.x);
+    const cy = safeParse(comp.y);
+    const cz = safeParse(comp.z);
+
+    if (ref.featureType === 'vertex') {
+        const verts3D = getRotatedVertices(comp, ref.mirrored);
+        if (ref.vertexIdx !== undefined && verts3D && verts3D[ref.vertexIdx]) {
+            return verts3D[ref.vertexIdx][axis];
+        }
+        if (axis === 'x') return (ref.featureId && ref.featureId.includes('rear')) ? cx + sx : cx;
+        if (axis === 'y') return (ref.featureId && ref.featureId.includes('right')) ? cy + sy : cy;
+        if (axis === 'z') return cz;
+    } else if (ref.featureType === 'edge') {
+        const verts3D = getRotatedVertices(comp, ref.mirrored);
+        if (ref.vIdx1 !== undefined && ref.vIdx2 !== undefined && verts3D && verts3D[ref.vIdx1] && verts3D[ref.vIdx2]) {
+            const v1 = verts3D[ref.vIdx1], v2 = verts3D[ref.vIdx2];
+            const t = (ref.edgeT !== undefined) ? ref.edgeT : 0.5;
+            return v1[axis] + t * (v2[axis] - v1[axis]);
+        }
+        if (axis === 'x') {
+            if (ref.featureId === 'leading_edge') return cx;
+            if (ref.featureId === 'trailing_edge') return cx + sx;
+            if (ref.featureId === 'left_tip' || ref.featureId === 'right_tip') return cx + sx / 2;
+        } else if (axis === 'y') {
+            if (ref.featureId === 'left_tip') return cy;
+            if (ref.featureId === 'right_tip') return cy + sy;
+            return cy + sy / 2;
+        } else if (axis === 'z') {
+            return cz + sz / 2;
+        }
+    }
+
+    return getPartCenterCoord(comp, axis);
+}
+
+function getFeature2D(ref, currentView) {
+    if (!ref) return { u: 0, v: 0 };
+    const partId = ref.partId;
+
+    if (partId === 'main-wing') {
+        const wing = App.state.wingData;
+        const b = safeParse(wing.b), cr = safeParse(wing.cr), ct = safeParse(wing.ct);
+        const sweep = safeParse(wing.sweep), dihedral = safeParse(wing.dihedral);
+        const s = b / 2;
+        const z_delta = s * Math.sin(dihedral * Math.PI / 180);
+
+        if (currentView === 'top') {
+            if (ref.featureId === 'root_le') return { u: 0, v: 0 };
+            if (ref.featureId === 'root_te') return { u: cr, v: 0 };
+            if (ref.featureId === 'tip_left_le') return { u: sweep, v: -s };
+            if (ref.featureId === 'tip_left_te') return { u: sweep + ct, v: -s };
+            if (ref.featureId === 'tip_right_le') return { u: sweep, v: s };
+            if (ref.featureId === 'tip_right_te') return { u: sweep + ct, v: s };
+            if (ref.featureId === 'tip_left') return { u: sweep + ct / 2, v: -s };
+            if (ref.featureId === 'tip_right') return { u: sweep + ct / 2, v: s };
+            if (ref.featureId === 'root_chord') return { u: cr / 2, v: 0 };
+            if (ref.featureId === 'leading_edge') return { u: 0, v: ref.pt ? ref.pt.v : 0 };
+            if (ref.featureId === 'trailing_edge') return { u: cr, v: ref.pt ? ref.pt.v : 0 };
+        } else if (currentView === 'side') {
+            if (ref.featureId === 'root_le' || ref.featureId === 'leading_edge') return { u: 0, v: 0 };
+            if (ref.featureId === 'root_te' || ref.featureId === 'trailing_edge') return { u: cr, v: 0 };
+            if (ref.featureId === 'root_chord') return { u: cr / 2, v: 0 };
+            if (ref.featureId && ref.featureId.includes('tip')) return { u: sweep, v: -z_delta };
+        } else { // front
+            if (ref.featureId === 'root_le' || ref.featureId === 'root_te' || ref.featureId === 'root_chord') return { u: 0, v: 0 };
+            if (ref.featureId === 'tip_left' || ref.featureId === 'tip_left_le' || ref.featureId === 'tip_left_te') return { u: -s, v: -z_delta };
+            if (ref.featureId === 'tip_right' || ref.featureId === 'tip_right_le' || ref.featureId === 'tip_right_te') return { u: s, v: -z_delta };
+            if (ref.featureId === 'wing_span') return { u: 0, v: -z_delta / 2 };
+        }
+        return getPartCenter2D(wing, currentView);
+    }
+
+    const comp = App.state.components.find(c => c.id === partId);
+    if (!comp) return { u: 0, v: 0 };
+
+    const cx = safeParse(comp.x), cy = safeParse(comp.y), cz = safeParse(comp.z);
+    const sx = safeParse(comp.sx), sy = safeParse(comp.sy), sz = safeParse(comp.sz);
+
+    if (ref.featureType === 'vertex') {
+        const verts3D = getRotatedVertices(comp, ref.mirrored);
+        if (ref.vertexIdx !== undefined && verts3D && verts3D[ref.vertexIdx]) {
+            const V = verts3D[ref.vertexIdx];
+            if (currentView === 'top') return { u: V.x, v: V.y };
+            if (currentView === 'side') return { u: V.x, v: -V.z };
+            return { u: V.y, v: -V.z }; // front
+        }
+        // Fallback for named vertices without index
+        let u = cx, v = cy;
+        if (ref.featureId && ref.featureId.includes('rear')) u = cx + sx;
+        if (ref.featureId && ref.featureId.includes('right')) v = cy + sy;
+        if (currentView === 'top') return { u, v };
+        if (currentView === 'side') return { u, v: -cz };
+        return { u: v, v: -cz };
+    }
+
+    if (ref.featureType === 'edge') {
+        const verts3D = getRotatedVertices(comp, ref.mirrored);
+        if (ref.vIdx1 !== undefined && ref.vIdx2 !== undefined && verts3D && verts3D[ref.vIdx1] && verts3D[ref.vIdx2]) {
+            const v1 = verts3D[ref.vIdx1], v2 = verts3D[ref.vIdx2];
+            const t = (ref.edgeT !== undefined) ? ref.edgeT : 0.5;
+            const P3D = {
+                x: v1.x + t * (v2.x - v1.x),
+                y: v1.y + t * (v2.y - v1.y),
+                z: v1.z + t * (v2.z - v1.z)
+            };
+            if (currentView === 'top') return { u: P3D.x, v: P3D.y };
+            if (currentView === 'side') return { u: P3D.x, v: -P3D.z };
+            return { u: P3D.y, v: -P3D.z }; // front
+        }
+
+        // Semantic edge fallback
+        if (currentView === 'top') {
+            if (ref.featureId === 'leading_edge') return { u: cx, v: cy + sy / 2 };
+            if (ref.featureId === 'trailing_edge') return { u: cx + sx, v: cy + sy / 2 };
+            if (ref.featureId === 'left_tip') return { u: cx + sx / 2, v: cy };
+            if (ref.featureId === 'right_tip') return { u: cx + sx / 2, v: cy + sy };
+        } else if (currentView === 'side') {
+            if (ref.featureId === 'leading_edge') return { u: cx, v: -(cz + sz / 2) };
+            if (ref.featureId === 'trailing_edge') return { u: cx + sx, v: -(cz + sz / 2) };
+            if (ref.featureId === 'left_tip' || ref.featureId === 'right_tip') return { u: cx + sx / 2, v: -(cz + sz / 2) };
+        } else { // front
+            if (ref.featureId === 'left_tip') return { u: cy, v: -(cz + sz / 2) };
+            if (ref.featureId === 'right_tip') return { u: cy + sy, v: -(cz + sz / 2) };
+            return { u: cy + sy / 2, v: -(cz + sz / 2) };
+        }
+    }
+
+    if (ref.pt && ref.initPartPos) {
+        const du = cx - ref.initPartPos.x;
+        const dv = (currentView === 'top') ? (cy - ref.initPartPos.y) : (- (cz - ref.initPartPos.z));
+        return { u: ref.pt.u + du, v: ref.pt.v + dv };
+    }
+
+    return getPartCenter2D(comp, currentView);
+}
+
+function toggleDimensionTool(forceState) {
+    const btn = document.getElementById('tool-btn-dim');
+    const svg = document.getElementById('visualizer');
+    const newState = (forceState !== undefined) ? forceState : !App.state.dimTool.active;
+    
+    App.state.dimTool.active = newState;
+    App.state.dimTool.step = 0;
+    App.state.dimTool.refA = null;
+    App.state.dimTool.refB = null;
+    App.state.dimTool.previewPos = null;
+    App.state.dimTool.hoverFeature = null;
+
+    if (btn) btn.classList.toggle('active', newState);
+    if (svg) svg.style.cursor = newState ? 'crosshair' : 'default';
+
+    if (!newState) {
+        closeDimensionModifyDialog();
+    }
+    renderAircraft();
+}
+
+function handleDimToolClick(e, fallbackPartId) {
+    if (e) {
+        e.stopPropagation();
+        if (e.preventDefault) e.preventDefault();
+    }
+    if (!App.state.dimTool || !App.state.dimTool.active) return;
+
+    const svg = document.getElementById('visualizer');
+    let cadPt = null;
+    if (svg && e && e.clientX !== undefined) {
+        const p = getSVGPoint(svg, e.clientX, e.clientY);
+        cadPt = { u: p.x, v: p.y };
+    }
+
+    const currentView = App.state.currentView;
+    const screenRatio = getVisualizerScreenRatio();
+    let clickedFeature = null;
+
+    if (cadPt) {
+        clickedFeature = findSnappedFeature(cadPt, currentView, screenRatio);
+    }
+
+    if (!clickedFeature && fallbackPartId) {
+        const part = (fallbackPartId === 'main-wing') ? App.state.wingData : App.state.components.find(c => c.id === fallbackPartId);
+        if (part) {
+            clickedFeature = {
+                partId: fallbackPartId,
+                featureType: 'center',
+                label: (part.name || 'Wing') + ' Center',
+                pt: getPartCenter2D(part, currentView)
+            };
+        }
+    }
+
+    if (App.state.dimTool.step === 0) {
+        if (!clickedFeature) return;
+        App.state.dimTool.refA = clickedFeature;
+        App.state.dimTool.step = 1;
+        renderAircraft();
+    } else if (App.state.dimTool.step === 1) {
+        if (!clickedFeature) return;
+        const refA = App.state.dimTool.refA;
+        if (refA.partId === clickedFeature.partId && refA.featureType === clickedFeature.featureType && refA.featureId === clickedFeature.featureId) {
+            return; // Cannot select identical feature twice
+        }
+        App.state.dimTool.refB = clickedFeature;
+        App.state.dimTool.step = 2;
+        App.state.dimTool.stepTransitionTime = Date.now();
+        if (cadPt) App.state.dimTool.previewPos = cadPt;
+        renderAircraft();
+    } else if (App.state.dimTool.step === 2) {
+        finalizeDimensionPlacement(e);
+    }
+}
+
+function handleDimToolMouseMove(e) {
+    if (!App.state.dimTool || !App.state.dimTool.active) return;
+    const svg = document.getElementById('visualizer');
+    if (!svg) return;
+    const p = getSVGPoint(svg, e.clientX, e.clientY);
+    const cadPt = { u: p.x, v: p.y };
+    const currentView = App.state.currentView;
+    const screenRatio = getVisualizerScreenRatio();
+
+    if (App.state.dimTool.step === 0 || App.state.dimTool.step === 1) {
+        const snapped = findSnappedFeature(cadPt, currentView, screenRatio);
+        App.state.dimTool.hoverFeature = snapped;
+        updateDimensionSnapOverlay(currentView, screenRatio);
+    } else if (App.state.dimTool.step === 2) {
+        App.state.dimTool.previewPos = cadPt;
+        renderAircraft();
+    }
+}
+
+function updateDimensionSnapOverlay(currentView, screenRatio, absoluteScaledFont) {
+    const snapGroup = document.getElementById('dim-snap-group');
+    if (!snapGroup) return;
+    snapGroup.innerHTML = '';
+
+    const fontSz = absoluteScaledFont || ((parseFloat(document.getElementById('settings-label-size')?.value) || 12) * screenRatio);
+
+    const refA = App.state.dimTool.refA;
+    if (refA) {
+        if (refA.featureType === 'vertex' && refA.pt) {
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute('class', 'dim-snap-vertex');
+            circle.setAttribute('cx', refA.pt.u);
+            circle.setAttribute('cy', refA.pt.v);
+            circle.setAttribute('r', 5 * screenRatio);
+            snapGroup.appendChild(circle);
+        } else if (refA.featureType === 'edge' && refA.seg) {
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute('class', 'dim-selected-feature');
+            line.setAttribute('x1', refA.seg.p1.u);
+            line.setAttribute('y1', refA.seg.p1.v);
+            line.setAttribute('x2', refA.seg.p2.u);
+            line.setAttribute('y2', refA.seg.p2.v);
+            snapGroup.appendChild(line);
+        }
+    }
+
+    const hover = App.state.dimTool.hoverFeature;
+    if (hover) {
+        if (hover.featureType === 'vertex' && hover.pt) {
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute('class', 'dim-snap-vertex');
+            circle.setAttribute('cx', hover.pt.u);
+            circle.setAttribute('cy', hover.pt.v);
+            circle.setAttribute('r', 6 * screenRatio);
+            snapGroup.appendChild(circle);
+
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute('class', 'dim-snap-badge');
+            text.setAttribute('x', hover.pt.u + 8 * screenRatio);
+            text.setAttribute('y', hover.pt.v - 8 * screenRatio);
+            text.setAttribute('fill', 'var(--accent-yellow)');
+            text.setAttribute('font-size', `${fontSz}px`);
+            text.setAttribute('font-weight', 'bold');
+            text.textContent = hover.label;
+            snapGroup.appendChild(text);
+        } else if (hover.featureType === 'edge' && hover.seg) {
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute('class', 'dim-snap-edge');
+            line.setAttribute('x1', hover.seg.p1.u);
+            line.setAttribute('y1', hover.seg.p1.v);
+            line.setAttribute('x2', hover.seg.p2.u);
+            line.setAttribute('y2', hover.seg.p2.v);
+            snapGroup.appendChild(line);
+
+            const midPt = hover.midpoint || { u: (hover.seg.p1.u + hover.seg.p2.u) / 2, v: (hover.seg.p1.v + hover.seg.p2.v) / 2 };
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute('class', 'dim-snap-badge');
+            text.setAttribute('x', midPt.u + 8 * screenRatio);
+            text.setAttribute('y', midPt.v - 8 * screenRatio);
+            text.setAttribute('fill', 'var(--accent-yellow)');
+            text.setAttribute('font-size', `${fontSz}px`);
+            text.setAttribute('font-weight', 'bold');
+            text.textContent = hover.label;
+            snapGroup.appendChild(text);
+        }
+    }
+}
+
+function finalizeDimensionPlacement(e) {
+    if (!App.state.dimTool || !App.state.dimTool.active || App.state.dimTool.step !== 2) return;
+    if (App.state.dimTool.stepTransitionTime && (Date.now() - App.state.dimTool.stepTransitionTime < 150)) return;
+
+    const svg = document.getElementById('visualizer');
+    let u = 0, v = 0;
+    if (svg && e && e.clientX !== undefined) {
+        const p = getSVGPoint(svg, e.clientX, e.clientY);
+        u = p.x;
+        v = p.y;
+    } else if (App.state.dimTool.previewPos) {
+        u = App.state.dimTool.previewPos.u;
+        v = App.state.dimTool.previewPos.v;
+    }
+
+    const refA = App.state.dimTool.refA;
+    const refB = App.state.dimTool.refB;
+    if (!refA || !refB) {
+        toggleDimensionTool(false);
+        return;
+    }
+
+    const currentView = App.state.currentView;
+    const ptA = getFeature2D(refA, currentView);
+    const ptB = getFeature2D(refB, currentView);
+
+    const midU = (ptA.u + ptB.u) / 2;
+    const midV = (ptA.v + ptB.v) / 2;
+    const distU = Math.abs(u - midU);
+    const distV = Math.abs(v - midV);
+
+    let orientation = 'horizontal';
+    if (Math.abs(ptB.u - ptA.u) < 0.001) {
+        orientation = 'vertical';
+    } else if (Math.abs(ptB.v - ptA.v) < 0.001) {
+        orientation = 'horizontal';
+    } else {
+        orientation = (distV > distU) ? 'horizontal' : 'vertical';
+    }
+
+    let axis = 'x';
+    if (currentView === 'top') {
+        axis = (orientation === 'horizontal') ? 'x' : 'y';
+    } else if (currentView === 'side') {
+        axis = (orientation === 'horizontal') ? 'x' : 'z';
+    } else { // front
+        axis = (orientation === 'horizontal') ? 'y' : 'z';
+    }
+
+    const offset = (orientation === 'horizontal') ? v : u;
+    const relOffset = (orientation === 'horizontal') ? (v - midV) : (u - midU);
+
+    const partA = (refA.partId === 'main-wing') ? App.state.wingData : App.state.components.find(c => c.id === refA.partId);
+    const partB = (refB.partId === 'main-wing') ? App.state.wingData : App.state.components.find(c => c.id === refB.partId);
+    if (partA && !refA.initPartPos) {
+        refA.initPartPos = { x: safeParse(partA.x || 0), y: safeParse(partA.y || 0), z: safeParse(partA.z || 0) };
+    }
+    if (partB && !refB.initPartPos) {
+        refB.initPartPos = { x: safeParse(partB.x || 0), y: safeParse(partB.y || 0), z: safeParse(partB.z || 0) };
+    }
+
+    const newDim = {
+        id: 'dim-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+        view: currentView,
+        orientation: orientation,
+        axis: axis,
+        partA: refA.partId,
+        partB: refB.partId,
+        refA: refA,
+        refB: refB,
+        offset: offset,
+        relOffset: relOffset
+    };
+
+    const dims = getActiveDimensions();
+    dims.push(newDim);
+
+    App.state.dimTool.step = 0;
+    App.state.dimTool.refA = null;
+    App.state.dimTool.refB = null;
+    App.state.dimTool.previewPos = null;
+    App.state.dimTool.hoverFeature = null;
+
+    renderAircraft();
+    if (typeof saveHistory === 'function') saveHistory();
+
+    openDimensionModifyDialog(newDim.id, e ? e.clientX : undefined, e ? e.clientY : undefined);
+}
+
+function getDimensionDistance(d) {
+    if (!d) return 0;
+    const refA = d.refA || { partId: d.partA, featureType: 'center' };
+    const refB = d.refB || { partId: d.partB, featureType: 'center' };
+    const cA = getFeatureCoord(refA, d.axis, d.view);
+    const cB = getFeatureCoord(refB, d.axis, d.view);
+    return Math.abs(cB - cA);
+}
+
+function isPartSizeDimensioned(partId, axis, excludeDimId) {
+    const dims = getActiveDimensions();
+    // 1. Explicit single-part dimension on this part & axis
+    const singleDim = dims.find(d => 
+        d.id !== excludeDimId && 
+        d.axis === axis && 
+        (d.refA ? d.refA.partId : d.partA) === partId && 
+        (d.refB ? d.refB.partId : d.partB) === partId
+    );
+    if (singleDim) return true;
+
+    // 2. Or two or more inter-part dimensions referencing this part & axis
+    const interDims = dims.filter(d => 
+        d.id !== excludeDimId && 
+        d.axis === axis && 
+        ((d.refA && d.refA.partId === partId) || (d.refB && d.refB.partId === partId))
+    );
+    if (interDims.length >= 2) return true;
+
+    return false;
+}
+
+function isPartLocationDimensioned(partId, axis, excludeDimId) {
+    if (partId === 'main-wing') return true;
+    const dims = getActiveDimensions();
+    const interDim = dims.find(d => 
+        d.id !== excludeDimId && 
+        d.axis === axis && 
+        ((d.refA && d.refA.partId === partId && d.refB && d.refB.partId !== partId) || 
+         (d.refB && d.refB.partId === partId && d.refA && d.refA.partId !== partId))
+    );
+    return !!interDim;
+}
+
+function getPartFixedRef(partId, axis, excludeDimId) {
+    const dims = getActiveDimensions();
+    for (let d of dims) {
+        if (d.id === excludeDimId || d.axis !== axis) continue;
+        if (d.refA && d.refA.partId === partId) return d.refA;
+        if (d.refB && d.refB.partId === partId) return d.refB;
+    }
+    return null;
+}
+
+function getDimensionConstraints(dims, excludeDimId) {
+    const constraints = {};
+
+    const getPartConstraints = (partId) => {
+        if (!constraints[partId]) {
+            constraints[partId] = {
+                location: { x: false, y: false, z: false },
+                size: { x: false, y: false, z: false },
+                fixedRef: { x: null, y: null, z: null }
+            };
+        }
+        return constraints[partId];
+    };
+
+    const wingConst = getPartConstraints('main-wing');
+    wingConst.location.x = true; wingConst.location.y = true; wingConst.location.z = true;
+    if (App.state.wingData) {
+        const wdConst = getPartConstraints(App.state.wingData.id);
+        wdConst.location.x = true; wdConst.location.y = true; wdConst.location.z = true;
+    }
+
+    if (!dims || !Array.isArray(dims)) return constraints;
+
+    dims.forEach(d => {
+        if (d.id === excludeDimId) return;
+
+        const axis = d.axis;
+        const partAId = d.refA ? d.refA.partId : d.partA;
+        const partBId = d.refB ? d.refB.partId : d.partB;
+
+        if (partAId === partBId) {
+            const c = getPartConstraints(partAId);
+            c.size[axis] = true;
+            return;
+        }
+
+        let targetId = partBId;
+        let anchorId = partAId;
+        let targetRef = d.refB || { partId: partBId, featureType: 'center' };
+        if (targetId === 'main-wing' || (App.state.wingData && targetId === App.state.wingData.id)) {
+            targetId = partAId;
+            anchorId = partBId;
+            targetRef = d.refA || { partId: partAId, featureType: 'center' };
+        }
+
+        const tConst = getPartConstraints(targetId);
+        if (!tConst.size[axis]) {
+            tConst.size[axis] = true;
+            tConst.fixedRef[axis] = targetRef;
+        } else if (!tConst.location[axis]) {
+            tConst.location[axis] = true;
+        }
+    });
+
+    return constraints;
+}
+
+function applyDrivingDimension(dim, newValCAD) {
+    if (!dim || typeof newValCAD !== 'number' || isNaN(newValCAD)) return false;
+
+    // 0. Invalid value check
+    if (newValCAD <= 0) {
+        alert("invalid value");
+        return false;
+    }
+
+    const activeDims = getActiveDimensions();
+
+    // Snapshot initial distances of all other active dimensions to guarantee Priority 1: other dimensions
+    const initialDistances = {};
+    activeDims.forEach(d => {
+        if (d.id !== dim.id) {
+            initialDistances[d.id] = getDimensionDistance(d);
+        }
+    });
+
+    const isAnyOtherDimViolated = () => {
+        for (let d of activeDims) {
+            if (d.id === dim.id) continue;
+            const initDist = initialDistances[d.id];
+            if (initDist === undefined) continue;
+            const curDist = getDimensionDistance(d);
+            const diff = Math.abs(curDist - initDist);
+            if (diff > 0.05) {
+                console.log(`[DIM VIOLATION]: Dim ${d.id} changed by ${diff} (init=${initDist}, cur=${curDist})`);
+                return true;
+            }
+        }
+        return false;
+    };
+
+    // 1. Single-Part Dimension (Feature A and Feature B are on the SAME part)
+    if (dim.refA && dim.refB && dim.refA.partId === dim.refB.partId) {
+        const partId = dim.refA.partId;
+
+        // Check if size is already dimensioned by another single-part dimension
+        const otherSingleDim = activeDims.find(d => 
+            d.id !== dim.id && 
+            d.axis === dim.axis && 
+            (d.refA ? d.refA.partId : d.partA) === partId && 
+            (d.refB ? d.refB.partId : d.partB) === partId
+        );
+        if (otherSingleDim) {
+            alert("overdefined");
+            return false;
+        }
+
+        if (partId === 'main-wing') {
+            const oldCr = App.state.wingData.cr;
+            const oldB = App.state.wingData.b;
+            if (dim.axis === 'x') App.state.wingData.cr = newValCAD;
+            else if (dim.axis === 'y') App.state.wingData.b = newValCAD;
+
+            if (isAnyOtherDimViolated()) {
+                App.state.wingData.cr = oldCr;
+                App.state.wingData.b = oldB;
+                alert("overdefined");
+                return false;
+            }
+            refresh();
+            if (typeof saveHistory === 'function') saveHistory();
+            return true;
+        }
+
+        const comp = App.state.components.find(c => c.id === partId);
+        if (!comp) return false;
+
+        const sizeProp = 's' + dim.axis;
+        const oldSize = safeParse(getProp(comp, sizeProp)) || 0;
+        const oldPos = safeParse(getProp(comp, dim.axis)) || 0;
+
+        let fixedCoord = null;
+        let u_fixed = 0.0;
+        const fixedRef = getPartFixedRef(partId, dim.axis, dim.id);
+        const isLocLocked = !!getProp(comp, `locked${dim.axis.toUpperCase()}`);
+
+        if (fixedRef) {
+            fixedCoord = getFeatureCoord(fixedRef, dim.axis, dim.view);
+            u_fixed = oldSize > 0.0001 ? (fixedCoord - oldPos) / oldSize : 0.0;
+        } else if (isLocLocked) {
+            fixedCoord = oldPos + oldSize / 2;
+            u_fixed = 0.5;
+        }
+
+        setProp(comp, sizeProp, newValCAD);
+        if (fixedCoord !== null) {
+            const newPos = fixedCoord - u_fixed * newValCAD;
+            setProp(comp, dim.axis, newPos);
+        }
+
+        if (isAnyOtherDimViolated()) {
+            setProp(comp, sizeProp, oldSize);
+            setProp(comp, dim.axis, oldPos);
+            alert("overdefined");
+            return false;
+        }
+
+        if (typeof recalculateMassOrDensity === 'function') recalculateMassOrDensity(comp);
+        refresh();
+        if (typeof saveHistory === 'function') saveHistory();
+        return true;
+    }
+
+    // 2. Inter-Part Dimension (Different parts)
+    const partAId = dim.refA ? dim.refA.partId : dim.partA;
+    const partBId = dim.refB ? dim.refB.partId : dim.partB;
+
+    let targetId = partBId;
+    let anchorId = partAId;
+    let targetRef = dim.refB || { partId: partBId, featureType: 'center' };
+    let anchorRef = dim.refA || { partId: partAId, featureType: 'center' };
+
+    if (targetId === 'main-wing' || (App.state.wingData && targetId === App.state.wingData.id)) {
+        targetId = partAId;
+        anchorId = partBId;
+        targetRef = dim.refA || { partId: partAId, featureType: 'center' };
+        anchorRef = dim.refB || { partId: partBId, featureType: 'center' };
+    }
+    if (targetId === 'main-wing') return false;
+
+    const targetPart = App.state.components.find(c => c.id === targetId);
+    const anchorPart = (anchorId === 'main-wing' || (App.state.wingData && anchorId === App.state.wingData.id)) 
+                       ? App.state.wingData 
+                       : App.state.components.find(c => c.id === anchorId);
+    if (!targetPart || !anchorPart) return false;
+
+    const currentAnchorCoord = getFeatureCoord(anchorRef, dim.axis, dim.view);
+    const currentTargetCoord = getFeatureCoord(targetRef, dim.axis, dim.view);
+
+    const sign = (currentTargetCoord >= currentAnchorCoord) ? 1 : -1;
+    const desiredTargetCoord = currentAnchorCoord + sign * newValCAD;
+    const delta = desiredTargetCoord - currentTargetCoord;
+
+    if (Math.abs(delta) < 0.001) {
+        return true;
+    }
+
+    // PRIORITY RESOLUTION:
+    // 1. other dimensions (must not be affected)
+    // 2. Sizes (unless dimensioned, in which case it is priority 1)
+    // 3. Locations
+
+    // --- STEP 1: Try Priority 2 - Size of targetPart ---
+    const isTargetSizeDim = isPartSizeDimensioned(targetId, dim.axis, dim.id);
+    const isTargetCenter = (targetRef.featureType === 'center');
+    
+    if (!isTargetSizeDim && !isTargetCenter) {
+        const sizeProp = 's' + dim.axis;
+        const oldSize = safeParse(getProp(targetPart, sizeProp)) || 0;
+        const oldPos = safeParse(getProp(targetPart, dim.axis)) || 0;
+
+        let fixedCoord;
+        let fixedRef = getPartFixedRef(targetId, dim.axis, dim.id);
+        const isTargetLocLocked = !!getProp(targetPart, `locked${dim.axis.toUpperCase()}`);
+
+        if (fixedRef) {
+            fixedCoord = getFeatureCoord(fixedRef, dim.axis, dim.view);
+        } else if (isTargetLocLocked) {
+            fixedCoord = oldPos + oldSize / 2;
+        } else {
+            fixedCoord = oldPos;
+        }
+
+        const u_fixed = oldSize > 0.0001 ? (fixedCoord - oldPos) / oldSize : 0.5;
+        const u_target = oldSize > 0.0001 ? (currentTargetCoord - oldPos) / oldSize : 0.5;
+        const delta_u = u_target - u_fixed;
+
+        if (Math.abs(delta_u) > 0.0001) {
+            const newSize = (desiredTargetCoord - fixedCoord) / delta_u;
+            if (newSize > 0) {
+                const newPos = fixedCoord - u_fixed * newSize;
+                setProp(targetPart, sizeProp, newSize);
+                setProp(targetPart, dim.axis, newPos);
+
+                if (!isAnyOtherDimViolated()) {
+                    if (typeof recalculateMassOrDensity === 'function') recalculateMassOrDensity(targetPart);
+                    refresh();
+                    if (typeof saveHistory === 'function') saveHistory();
+                    return true;
+                }
+                // Revert if other dimension violated
+                setProp(targetPart, sizeProp, oldSize);
+                setProp(targetPart, dim.axis, oldPos);
+            } else {
+                const isLocFree = !isTargetLocLocked && !isPartLocationDimensioned(targetId, dim.axis, dim.id);
+                if (!isLocFree) {
+                    alert("invalid value");
+                    return false;
+                }
+            }
+        }
+    }
+
+    // --- STEP 2: Try Priority 3 - Location of targetPart ---
+    const isTargetLocLocked = !!getProp(targetPart, `locked${dim.axis.toUpperCase()}`);
+    if (!isTargetLocLocked) {
+        const oldPos = safeParse(getProp(targetPart, dim.axis)) || 0;
+        setProp(targetPart, dim.axis, oldPos + delta);
+
+        if (!isAnyOtherDimViolated()) {
+            refresh();
+            if (typeof saveHistory === 'function') saveHistory();
+            return true;
+        }
+        // Revert if other dimension violated
+        setProp(targetPart, dim.axis, oldPos);
+    }
+
+    // --- STEP 3: If targetPart could not adapt, try anchorPart (if component) ---
+    if (anchorId !== 'main-wing' && (!App.state.wingData || anchorId !== App.state.wingData.id)) {
+        const desiredAnchorCoord = currentTargetCoord - sign * newValCAD;
+        const anchorDelta = desiredAnchorCoord - currentAnchorCoord;
+        const isAnchorCenter = (anchorRef.featureType === 'center');
+
+        // Try Size of anchorPart (Priority 2)
+        const isAnchorSizeDim = isPartSizeDimensioned(anchorId, dim.axis, dim.id);
+        if (!isAnchorSizeDim && !isAnchorCenter) {
+            const sizeProp = 's' + dim.axis;
+            const oldSize = safeParse(getProp(anchorPart, sizeProp)) || 0;
+            const oldPos = safeParse(getProp(anchorPart, dim.axis)) || 0;
+
+            let fixedCoord;
+            let fixedRef = getPartFixedRef(anchorId, dim.axis, dim.id);
+            const isAnchorLocLocked = !!getProp(anchorPart, `locked${dim.axis.toUpperCase()}`);
+
+            if (fixedRef) {
+                fixedCoord = getFeatureCoord(fixedRef, dim.axis, dim.view);
+            } else if (isAnchorLocLocked) {
+                fixedCoord = oldPos + oldSize / 2;
+            } else {
+                fixedCoord = oldPos;
+            }
+
+            const u_fixed = oldSize > 0.0001 ? (fixedCoord - oldPos) / oldSize : 0.5;
+            const u_anchor = oldSize > 0.0001 ? (currentAnchorCoord - oldPos) / oldSize : 0.5;
+            const delta_u = u_anchor - u_fixed;
+
+            if (Math.abs(delta_u) > 0.0001) {
+                const newSize = (desiredAnchorCoord - fixedCoord) / delta_u;
+                if (newSize > 0) {
+                    const newPos = fixedCoord - u_fixed * newSize;
+                    setProp(anchorPart, sizeProp, newSize);
+                    setProp(anchorPart, dim.axis, newPos);
+
+                    if (!isAnyOtherDimViolated()) {
+                        if (typeof recalculateMassOrDensity === 'function') recalculateMassOrDensity(anchorPart);
+                        refresh();
+                        if (typeof saveHistory === 'function') saveHistory();
+                        return true;
+                    }
+                    setProp(anchorPart, sizeProp, oldSize);
+                    setProp(anchorPart, dim.axis, oldPos);
+                } else {
+                    const isLocFree = !isAnchorLocLocked && !isPartLocationDimensioned(anchorId, dim.axis, dim.id);
+                    if (!isLocFree) {
+                        alert("invalid value");
+                        return false;
+                    }
+                }
+            }
+        }
+
+        // Try Location of anchorPart (Priority 3)
+        const isAnchorLocLocked = !!getProp(anchorPart, `locked${dim.axis.toUpperCase()}`);
+        if (!isAnchorLocLocked) {
+            const oldPos = safeParse(getProp(anchorPart, dim.axis)) || 0;
+            setProp(anchorPart, dim.axis, oldPos + anchorDelta);
+
+            if (!isAnyOtherDimViolated()) {
+                refresh();
+                if (typeof saveHistory === 'function') saveHistory();
+                return true;
+            }
+            setProp(anchorPart, dim.axis, oldPos);
+        }
+    }
+
+    // Nothing could satisfy the dimension without violating other dimensions or limits
+    alert("overdefined");
+    return false;
+}
+
+function deleteDimension(dimId) {
+    const dims = getActiveDimensions();
+    const idx = dims.findIndex(d => d.id === dimId);
+    if (idx !== -1) {
+        dims.splice(idx, 1);
+        if (App.state.selectedDimensionId === dimId) {
+            App.state.selectedDimensionId = null;
+        }
+        closeDimensionModifyDialog();
+        renderAircraft();
+        if (typeof saveHistory === 'function') saveHistory();
+    }
+}
+
+function openDimensionModifyDialog(dimId, clientX, clientY) {
+    const popover = document.getElementById('dim-edit-popover');
+    const input = document.getElementById('dim-input-val');
+    const unitLabel = document.getElementById('dim-unit-label');
+    if (!popover || !input) return;
+
+    const dim = getActiveDimensions().find(d => d.id === dimId);
+    if (!dim) return;
+
+    App.state.selectedDimensionId = dimId;
+
+    const refA = dim.refA || { partId: dim.partA, featureType: 'center' };
+    const refB = dim.refB || { partId: dim.partB, featureType: 'center' };
+
+    const coordA = getFeatureCoord(refA, dim.axis, dim.view);
+    const coordB = getFeatureCoord(refB, dim.axis, dim.view);
+    const currentDistCAD = Math.abs(coordB - coordA);
+    const dScale = getDimScalar();
+    const currentDistDisplay = (currentDistCAD * dScale).toFixed(2);
+
+    input.value = currentDistDisplay;
+    if (unitLabel) unitLabel.textContent = (App.state.unitScales && App.state.unitScales.dim) || 'cm';
+
+    const container = document.getElementById('canvas-container');
+    const rect = container ? container.getBoundingClientRect() : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
+
+    let posX = (clientX !== undefined && clientX > 0) ? (clientX - rect.left + 15) : (rect.width / 2 - 70);
+    let posY = (clientY !== undefined && clientY > 0) ? (clientY - rect.top - 20) : (rect.height / 2 - 20);
+
+    posX = Math.max(10, Math.min(posX, rect.width - 220));
+    posY = Math.max(10, Math.min(posY, rect.height - 60));
+
+    popover.style.left = posX + 'px';
+    popover.style.top = posY + 'px';
+    popover.style.display = 'flex';
+
+    setTimeout(() => {
+        input.focus();
+        input.select();
+    }, 50);
+}
+
+function closeDimensionModifyDialog() {
+    const popover = document.getElementById('dim-edit-popover');
+    if (popover) popover.style.display = 'none';
+}
+
+function confirmDimensionModify() {
+    const input = document.getElementById('dim-input-val');
+    if (!input || !App.state.selectedDimensionId) return;
+
+    const val = parseFloat(input.value);
+    if (isNaN(val) || val <= 0) {
+        alert("invalid value");
+        return;
+    }
+
+    const dim = getActiveDimensions().find(d => d.id === App.state.selectedDimensionId);
+    if (!dim) return;
+
+    const dScale = getDimScalar();
+    const valCAD = val / dScale;
+
+    const success = applyDrivingDimension(dim, valCAD);
+    if (success) {
+        closeDimensionModifyDialog();
+    } else {
+        const refA = dim.refA || { partId: dim.partA, featureType: 'center' };
+        const refB = dim.refB || { partId: dim.partB, featureType: 'center' };
+        const coordA = getFeatureCoord(refA, dim.axis, dim.view);
+        const coordB = getFeatureCoord(refB, dim.axis, dim.view);
+        input.value = (Math.abs(coordB - coordA) * dScale).toFixed(2);
+    }
+}
+
+function renderDimensionLines(dimLayer, currentView, screenRatio, absoluteScaledFont) {
+    const dims = getActiveDimensions();
+    const dScale = getDimScalar();
+    const unitDim = (App.state.unitScales && App.state.unitScales.dim) || 'cm';
+    const arrowLen = 7 * screenRatio;
+    const arrowHalfWidth = 2.5 * screenRatio;
+    const witnessOvershoot = 4 * screenRatio;
+    const witnessGap = 2 * screenRatio;
+    const fontSz = absoluteScaledFont || ((parseFloat(document.getElementById('settings-label-size')?.value) || 12) * screenRatio);
+
+    dims.forEach(dim => {
+        if (dim.view !== currentView) return;
+
+        const refA = dim.refA || { partId: dim.partA, featureType: 'center' };
+        const refB = dim.refB || { partId: dim.partB, featureType: 'center' };
+
+        const ptA = getFeature2D(refA, currentView);
+        const ptB = getFeature2D(refB, currentView);
+
+        const coordA = getFeatureCoord(refA, dim.axis, currentView);
+        const coordB = getFeatureCoord(refB, dim.axis, currentView);
+        const distCAD = Math.abs(coordB - coordA);
+        const distDisplay = (distCAD * dScale).toFixed(2);
+
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.setAttribute('class', 'dim-group');
+        g.dataset.dimId = dim.id;
+
+        const midU = (ptA.u + ptB.u) / 2;
+        const midV = (ptA.v + ptB.v) / 2;
+        const uMid = midU;
+        const vMid = midV;
+
+        if (dim.orientation === 'horizontal') {
+            const vDim = (dim.relOffset !== undefined) ? (midV + dim.relOffset) : dim.offset;
+            const uMin = Math.min(ptA.u, ptB.u);
+            const uMax = Math.max(ptA.u, ptB.u);
+
+            const signA = (vDim >= ptA.v) ? 1 : -1;
+            const wLineA = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            wLineA.setAttribute('class', 'dim-witness');
+            wLineA.setAttribute('x1', ptA.u);
+            wLineA.setAttribute('y1', ptA.v + signA * witnessGap);
+            wLineA.setAttribute('x2', ptA.u);
+            wLineA.setAttribute('y2', vDim + signA * witnessOvershoot);
+            g.appendChild(wLineA);
+
+            const signB = (vDim >= ptB.v) ? 1 : -1;
+            const wLineB = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            wLineB.setAttribute('class', 'dim-witness');
+            wLineB.setAttribute('x1', ptB.u);
+            wLineB.setAttribute('y1', ptB.v + signB * witnessGap);
+            wLineB.setAttribute('x2', ptB.u);
+            wLineB.setAttribute('y2', vDim + signB * witnessOvershoot);
+            g.appendChild(wLineB);
+
+            const dLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            dLine.setAttribute('class', 'dim-line');
+            dLine.setAttribute('x1', uMin);
+            dLine.setAttribute('y1', vDim);
+            dLine.setAttribute('x2', uMax);
+            dLine.setAttribute('y2', vDim);
+            g.appendChild(dLine);
+
+            const span = uMax - uMin;
+            const inward = span >= (arrowLen * 2.5);
+
+            const leftArrow = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            if (inward) {
+                leftArrow.setAttribute('points', `${uMin},${vDim} ${uMin + arrowLen},${vDim - arrowHalfWidth} ${uMin + arrowLen},${vDim + arrowHalfWidth}`);
+            } else {
+                leftArrow.setAttribute('points', `${uMin},${vDim} ${uMin - arrowLen},${vDim - arrowHalfWidth} ${uMin - arrowLen},${vDim + arrowHalfWidth}`);
+            }
+            leftArrow.setAttribute('fill', 'var(--accent-yellow)');
+            g.appendChild(leftArrow);
+
+            const rightArrow = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            if (inward) {
+                rightArrow.setAttribute('points', `${uMax},${vDim} ${uMax - arrowLen},${vDim - arrowHalfWidth} ${uMax - arrowLen},${vDim + arrowHalfWidth}`);
+            } else {
+                rightArrow.setAttribute('points', `${uMax},${vDim} ${uMax + arrowLen},${vDim - arrowHalfWidth} ${uMax + arrowLen},${vDim + arrowHalfWidth}`);
+            }
+            rightArrow.setAttribute('fill', 'var(--accent-yellow)');
+            g.appendChild(rightArrow);
+
+            const badgeG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            badgeG.setAttribute('class', 'dim-badge');
+            badgeG.style.cursor = 'pointer';
+
+            const badgeText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            badgeText.textContent = `${distDisplay} ${unitDim}`;
+            badgeText.setAttribute('x', uMid);
+            badgeText.setAttribute('y', vDim);
+            badgeText.setAttribute('fill', 'var(--accent-yellow)');
+            badgeText.setAttribute('font-size', `${fontSz}px`);
+            badgeText.setAttribute('font-weight', 'bold');
+            badgeText.setAttribute('text-anchor', 'middle');
+            badgeText.setAttribute('dominant-baseline', 'central');
+            badgeText.setAttribute('stroke', 'var(--bg-black)');
+            badgeText.setAttribute('stroke-width', `${2.5 * screenRatio}px`);
+            badgeText.setAttribute('paint-order', 'stroke fill');
+
+            badgeG.appendChild(badgeText);
+
+            badgeG.onclick = (e) => {
+                e.stopPropagation();
+                openDimensionModifyDialog(dim.id, e.clientX, e.clientY);
+            };
+            badgeG.oncontextmenu = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                deleteDimension(dim.id);
+            };
+
+            g.appendChild(badgeG);
+
+        } else { // Vertical
+            const uDim = (dim.relOffset !== undefined) ? (midU + dim.relOffset) : dim.offset;
+            const vMin = Math.min(ptA.v, ptB.v);
+            const vMax = Math.max(ptA.v, ptB.v);
+
+            const signA = (uDim >= ptA.u) ? 1 : -1;
+            const wLineA = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            wLineA.setAttribute('class', 'dim-witness');
+            wLineA.setAttribute('x1', ptA.u + signA * witnessGap);
+            wLineA.setAttribute('y1', ptA.v);
+            wLineA.setAttribute('x2', uDim + signA * witnessOvershoot);
+            wLineA.setAttribute('y2', ptA.v);
+            g.appendChild(wLineA);
+
+            const signB = (uDim >= ptB.u) ? 1 : -1;
+            const wLineB = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            wLineB.setAttribute('class', 'dim-witness');
+            wLineB.setAttribute('x1', ptB.u + signB * witnessGap);
+            wLineB.setAttribute('y1', ptB.v);
+            wLineB.setAttribute('x2', uDim + signB * witnessOvershoot);
+            wLineB.setAttribute('y2', ptB.v);
+            g.appendChild(wLineB);
+
+            const dLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            dLine.setAttribute('class', 'dim-line');
+            dLine.setAttribute('x1', uDim);
+            dLine.setAttribute('y1', vMin);
+            dLine.setAttribute('x2', uDim);
+            dLine.setAttribute('y2', vMax);
+            g.appendChild(dLine);
+
+            const span = vMax - vMin;
+            const inward = span >= (arrowLen * 2.5);
+
+            const topArrow = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            if (inward) {
+                topArrow.setAttribute('points', `${uDim},${vMin} ${uDim - arrowHalfWidth},${vMin + arrowLen} ${uDim + arrowHalfWidth},${vMin + arrowLen}`);
+            } else {
+                topArrow.setAttribute('points', `${uDim},${vMin} ${uDim - arrowHalfWidth},${vMin - arrowLen} ${uDim + arrowHalfWidth},${vMin - arrowLen}`);
+            }
+            topArrow.setAttribute('fill', 'var(--accent-yellow)');
+            g.appendChild(topArrow);
+
+            const bottomArrow = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            if (inward) {
+                bottomArrow.setAttribute('points', `${uDim},${vMax} ${uDim - arrowHalfWidth},${vMax - arrowLen} ${uDim + arrowHalfWidth},${vMax - arrowLen}`);
+            } else {
+                bottomArrow.setAttribute('points', `${uDim},${vMax} ${uDim - arrowHalfWidth},${vMax + arrowLen} ${uDim + arrowHalfWidth},${vMax + arrowLen}`);
+            }
+            bottomArrow.setAttribute('fill', 'var(--accent-yellow)');
+            g.appendChild(bottomArrow);
+
+            const badgeG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            badgeG.setAttribute('class', 'dim-badge');
+            badgeG.style.cursor = 'pointer';
+
+            const badgeText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            badgeText.textContent = `${distDisplay} ${unitDim}`;
+            badgeText.setAttribute('x', uDim);
+            badgeText.setAttribute('y', vMid);
+            badgeText.setAttribute('fill', 'var(--accent-yellow)');
+            badgeText.setAttribute('font-size', `${fontSz}px`);
+            badgeText.setAttribute('font-weight', 'bold');
+            badgeText.setAttribute('text-anchor', 'middle');
+            badgeText.setAttribute('dominant-baseline', 'central');
+            badgeText.setAttribute('stroke', 'var(--bg-black)');
+            badgeText.setAttribute('stroke-width', `${2.5 * screenRatio}px`);
+            badgeText.setAttribute('paint-order', 'stroke fill');
+
+            badgeG.appendChild(badgeText);
+
+            badgeG.onclick = (e) => {
+                e.stopPropagation();
+                openDimensionModifyDialog(dim.id, e.clientX, e.clientY);
+            };
+            badgeG.oncontextmenu = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                deleteDimension(dim.id);
+            };
+
+            g.appendChild(badgeG);
+        }
+
+        dimLayer.appendChild(g);
+    });
+
+    // 2. Add snap and preview groups
+    const snapGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    snapGroup.setAttribute('id', 'dim-snap-group');
+    dimLayer.appendChild(snapGroup);
+
+    const prevGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    prevGroup.setAttribute('id', 'dim-preview-group');
+    dimLayer.appendChild(prevGroup);
+
+    // Render snap overlay initial state
+    if (App.state.dimTool && App.state.dimTool.active) {
+        updateDimensionSnapOverlay(currentView, screenRatio, fontSz);
+    }
+
+    // 3. Render live preview when Dimension Tool is in step 2
+    if (App.state.dimTool && App.state.dimTool.active && App.state.dimTool.step === 2 && App.state.dimTool.previewPos && App.state.dimTool.refA && App.state.dimTool.refB) {
+        const refA = App.state.dimTool.refA;
+        const refB = App.state.dimTool.refB;
+        const ptA = getFeature2D(refA, currentView);
+        const ptB = getFeature2D(refB, currentView);
+        const u = App.state.dimTool.previewPos.u;
+        const v = App.state.dimTool.previewPos.v;
+
+        const midU = (ptA.u + ptB.u) / 2;
+        const midV = (ptA.v + ptB.v) / 2;
+        const distU = Math.abs(u - midU);
+        const distV = Math.abs(v - midV);
+
+        let orientation = 'horizontal';
+        if (Math.abs(ptB.u - ptA.u) < 0.001) orientation = 'vertical';
+        else if (Math.abs(ptB.v - ptA.v) < 0.001) orientation = 'horizontal';
+        else orientation = (distV > distU) ? 'horizontal' : 'vertical';
+
+        let axis = 'x';
+        if (currentView === 'top') axis = (orientation === 'horizontal') ? 'x' : 'y';
+        else if (currentView === 'side') axis = (orientation === 'horizontal') ? 'x' : 'z';
+        else axis = (orientation === 'horizontal') ? 'y' : 'z';
+
+        const coordA = getFeatureCoord(refA, axis, currentView);
+        const coordB = getFeatureCoord(refB, axis, currentView);
+        const distDisplay = (Math.abs(coordB - coordA) * dScale).toFixed(2);
+
+        const prevG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        prevG.setAttribute('opacity', '0.75');
+        prevG.setAttribute('pointer-events', 'none');
+
+        if (orientation === 'horizontal') {
+            const uMin = Math.min(ptA.u, ptB.u);
+            const uMax = Math.max(ptA.u, ptB.u);
+            const signA = (v >= ptA.v) ? 1 : -1;
+            const signB = (v >= ptB.v) ? 1 : -1;
+
+            prevG.innerHTML = `
+                <line class="dim-witness" x1="${ptA.u}" y1="${ptA.v + signA * witnessGap}" x2="${ptA.u}" y2="${v + signA * witnessOvershoot}"></line>
+                <line class="dim-witness" x1="${ptB.u}" y1="${ptB.v + signB * witnessGap}" x2="${ptB.u}" y2="${v + signB * witnessOvershoot}"></line>
+                <line class="dim-line" x1="${uMin}" y1="${v}" x2="${uMax}" y2="${v}" stroke-dasharray="3,3"></line>
+                <text x="${(uMin + uMax) / 2}" y="${v - 5 * screenRatio}" fill="var(--accent-yellow)" font-size="${fontSz}px" font-weight="bold" text-anchor="middle">${distDisplay} ${unitDim}</text>
+            `;
+        } else {
+            const vMin = Math.min(ptA.v, ptB.v);
+            const vMax = Math.max(ptA.v, ptB.v);
+            const signA = (u >= ptA.u) ? 1 : -1;
+            const signB = (u >= ptB.u) ? 1 : -1;
+
+            prevG.innerHTML = `
+                <line class="dim-witness" x1="${ptA.u + signA * witnessGap}" y1="${ptA.v}" x2="${u + signA * witnessOvershoot}" y2="${ptA.v}"></line>
+                <line class="dim-witness" x1="${ptB.u + signB * witnessGap}" y1="${ptB.v}" x2="${u + signB * witnessOvershoot}" y2="${ptB.v}"></line>
+                <line class="dim-line" x1="${u}" y1="${vMin}" x2="${u}" y2="${vMax}" stroke-dasharray="3,3"></line>
+                <text x="${u + 5 * screenRatio}" y="${(vMin + vMax) / 2}" fill="var(--accent-yellow)" font-size="${fontSz}px" font-weight="bold" text-anchor="start" dominant-baseline="central">${distDisplay} ${unitDim}</text>
+            `;
+        }
+        prevGroup.appendChild(prevG);
+    }
 }
 
 /*##############################################################
@@ -8275,6 +9899,17 @@ function renderMassProfileUI() {
         if (typeof handleDeleteMassProfile === 'function') handleDeleteMassProfile();
     });
 
+    const dimBtn = document.createElement('button');
+    dimBtn.className = 'view-btn' + (App.state.dimTool && App.state.dimTool.active ? ' active' : '');
+    dimBtn.id = 'tool-btn-dim';
+    dimBtn.title = 'Smart Driving Dimension (D)';
+    dimBtn.style.cssText = 'display: inline-flex; align-items: center; gap: 4px;';
+    dimBtn.innerText = 'Dimension';
+    dimBtn.addEventListener('click', () => {
+        toggleDimensionTool();
+    });
+    container.appendChild(dimBtn);
+
     container.appendChild(addBtn);
     container.appendChild(delBtn);
 }
@@ -8802,10 +10437,29 @@ function handleUpdateYBounds(id, type, val) {
 
 function handleGlobalKeyDown(e) {
 	
-	if (e.key === 'Escape' && App.ui.eyedropperAxis) {
-        App.ui.eyedropperAxis = null;
-        document.body.classList.remove('eyedropper-mode');
-        return;
+	if (e.key === 'Escape') {
+        const popover = document.getElementById('dim-edit-popover');
+        if (popover && popover.style.display !== 'none') {
+            closeDimensionModifyDialog();
+            return;
+        }
+        if (App.state.dimTool && App.state.dimTool.active) {
+            if (App.state.dimTool.step > 0) {
+                App.state.dimTool.step = 0;
+                App.state.dimTool.refA = null;
+                App.state.dimTool.refB = null;
+                App.state.dimTool.previewPos = null;
+                renderAircraft();
+            } else {
+                toggleDimensionTool(false);
+            }
+            return;
+        }
+        if (App.ui.eyedropperAxis) {
+            App.ui.eyedropperAxis = null;
+            document.body.classList.remove('eyedropper-mode');
+            return;
+        }
     }
     
 	const { drag, viewParams } = App.ui;
@@ -8821,6 +10475,16 @@ function handleGlobalKeyDown(e) {
 
     const key = e.key.toLowerCase();
     const ctrl = e.ctrlKey || e.metaKey;
+
+    if (!ctrl && key === 'd') {
+        toggleDimensionTool();
+        return;
+    }
+
+    if ((e.key === 'Delete' || e.key === 'Backspace') && App.state.selectedDimensionId) {
+        deleteDimension(App.state.selectedDimensionId);
+        return;
+    }
 
     if (ctrl && key === 'h') {
         e.preventDefault();
@@ -9275,6 +10939,13 @@ function deleteCurrentThemePreset() {
 
 function setView(view) {
     App.state.currentView = view;
+    closeDimensionModifyDialog();
+    if (App.state.dimTool && App.state.dimTool.active && App.state.dimTool.step > 0) {
+        App.state.dimTool.step = 0;
+        App.state.dimTool.refA = null;
+        App.state.dimTool.refB = null;
+        App.state.dimTool.previewPos = null;
+    }
     
     // Clear all active classes
     document.querySelectorAll('#view-controls .view-btn').forEach(btn => {
@@ -9626,6 +11297,10 @@ function handleAddComponent() {
 
 function startDrag(e, id) {
     e.stopPropagation(); 
+    if (App.state.dimTool && App.state.dimTool.active) {
+        handleDimToolClick(e, id);
+        return;
+    }
     if (App.state.drag.dragging || id === 'main-wing') return;
     
     App.state.drag.dragging = true; 
@@ -9648,6 +11323,10 @@ function startDrag(e, id) {
 
 function startVertexDrag(e, compId, idx) {
     e.stopPropagation();
+    if (App.state.dimTool && App.state.dimTool.active) {
+        handleDimToolClick(e, compId);
+        return;
+    }
     
     // Path to UI viewParams instead of root state
     if (!App.ui.viewParams.isIsolated || !compId) return;
@@ -9742,6 +11421,10 @@ function startVertexDrag(e, compId, idx) {
 }
 
 function doDrag(e) {
+    if (App.state.dimTool && App.state.dimTool.active) {
+        handleDimToolMouseMove(e);
+        return;
+    }
     const svg = document.getElementById('visualizer');
     const drag = App.state.drag;
     const SNAP_THRESHOLD = parseFloat(document.getElementById('snap-threshold')?.value) || 0.8;
@@ -10235,17 +11918,37 @@ function executeConfigCreation(sourceCfg, type) {
         // LINK to Base
         clone.wing = App.state.configurations[0].wing; 
         clone.components = App.state.configurations[0].components; 
+        clone.dimensions = App.state.configurations[0].dimensions || [];
         if (sourceCfg.overrides) clone.overrides = JSON.parse(JSON.stringify(sourceCfg.overrides));
     } else if (type === 'unique') {
         // UNIQUE Deep Copy
         clone.wing = JSON.parse(JSON.stringify(sourceCfg.wing));
+        const oldWingId = clone.wing.id;
         clone.wing.id = 'wing-' + Date.now() + Math.floor(Math.random() * 1000);
+        const idMap = { [oldWingId]: clone.wing.id, 'main-wing': 'main-wing' };
         clone.components = JSON.parse(JSON.stringify(sourceCfg.components));
-        clone.components.forEach(c => { c.id = 'comp-' + Date.now() + Math.floor(Math.random() * 10000); });
+        clone.components.forEach(c => {
+            const oldId = c.id;
+            c.id = 'comp-' + Date.now() + Math.floor(Math.random() * 10000);
+            idMap[oldId] = c.id;
+        });
+        const sourceDims = sourceCfg.dimensions || (App.state.configurations[0] ? App.state.configurations[0].dimensions : []) || [];
+        clone.dimensions = JSON.parse(JSON.stringify(sourceDims)).map(d => {
+            const copy = {
+                ...d,
+                id: 'dim-' + Date.now() + Math.floor(Math.random() * 10000),
+                partA: idMap[d.partA] || d.partA,
+                partB: idMap[d.partB] || d.partB
+            };
+            if (copy.refA && idMap[copy.refA.partId]) copy.refA.partId = idMap[copy.refA.partId];
+            if (copy.refB && idMap[copy.refB.partId]) copy.refB.partId = idMap[copy.refB.partId];
+            return copy;
+        });
     } else {
         // BLANK Config
         clone.wing = JSON.parse(JSON.stringify(sourceCfg.wing));
         clone.wing.id = 'wing-' + Date.now() + Math.floor(Math.random() * 1000);
+        clone.dimensions = [];
     }
 
     App.state.configurations.push(clone);
@@ -10384,6 +12087,10 @@ function loadStateFromData(data) {
         }];
         App.state.globalComponents = [];
     }
+
+    App.state.configurations.forEach(cfg => {
+        if (!cfg.dimensions) cfg.dimensions = [];
+    });
 
     function migrateLegacyComponent(c) {
         if (c.rotX === undefined) c.rotX = 0;
@@ -10533,7 +12240,8 @@ function newProject() {
         isActive: true,
         isExpanded: true,
         wing: freshWing,
-        components: []
+        components: [],
+        dimensions: []
     };
 
     App.state.configurations = [freshConfig];
@@ -10925,7 +12633,12 @@ function bindWingEvents() {
             resolveWingCascade(id, inputVal);
             refresh();
         });
-        el.addEventListener('change', () => { if (typeof saveHistory === 'function') saveHistory(); });
+        el.addEventListener('change', () => { 
+            if (['b', 'cr', 'ct', 'area', 'ar'].includes(id) && safeParse(el.value) <= 0) {
+                renderInspector();
+            }
+            if (typeof saveHistory === 'function') saveHistory(); 
+        });
     });
 
     ['sweep','dihedral','pivot','color'].forEach(id => {
@@ -11248,13 +12961,16 @@ function bindPropertyEvents() {
                 e.target.value = 0;
             }
             const newSize = rawNum / getDimScalar();
-            if (currentDispSize <= 0 || newSize <= 0) return;
-            const scale = newSize / currentDispSize;
-
-            setProp(p, field, getProp(p, field) * scale);
+            if (newSize <= 0) return;
+            if (currentDispSize > 0) {
+                const scale = newSize / currentDispSize;
+                setProp(p, field, getProp(p, field) * scale);
+            } else {
+                setProp(p, field, newSize);
+            }
 
             const axis = field.substring(1); 
-            if (['x', 'y', 'z'].includes(axis) && getProp(p, `locked${axis.toUpperCase()}`)) {
+            if (['x', 'y', 'z'].includes(axis) && getProp(p, `locked${axis.toUpperCase()}`) && currentDispSize > 0) {
                 const delta = newSize - currentDispSize;
                 setProp(p, axis, safeParse(getProp(p, axis)) - (delta / 2));
             }
@@ -11265,6 +12981,9 @@ function bindPropertyEvents() {
             refresh();
         });
         el.addEventListener('change', () => {
+            if (safeParse(el.value) <= 0) {
+                renderInspector();
+            }
             if (typeof saveHistory === 'function') saveHistory();
         });
     });
@@ -11562,104 +13281,29 @@ function bindStaticUI() {
     });
     document.getElementById('theme-dark-text')?.addEventListener('change', updateThemeColors);
     document.getElementById('theme-grad-opacity')?.addEventListener('input', updateGradientStrength);
-}
 
-function bindInputScrubbers() {
-    let activeInput = null;
-    let startX = 0;
-    let startY = 0;
-    let startVal = 0;
-    let step = 1;
-    let hasMoved = false;
-    const DRAG_THRESHOLD = 3;
-
-    function getStepForInput(input) {
-        if (input.step && !isNaN(parseFloat(input.step))) {
-            return parseFloat(input.step);
-        }
-        return 1;
-    }
-
-    function getPrecisionFromStep(s) {
-        const str = s.toString();
-        if (str.includes('.')) {
-            return str.split('.')[1].length;
-        }
-        return 0;
-    }
-
-    document.addEventListener('mousedown', (e) => {
-        // Only trigger on left click
-        if (e.button !== 0) return;
-        const target = e.target;
-        if (!target || target.tagName !== 'INPUT' || target.type !== 'number' || target.disabled) return;
-
-        // If user already clicked into the input and it has focus, allow normal text editing/selection
-        if (document.activeElement === target) return;
-
-        activeInput = target;
-        startX = e.clientX;
-        startY = e.clientY;
-        startVal = parseFloat(target.value) || 0;
-        step = getStepForInput(target);
-        hasMoved = false;
+    // Dimension Modify Popover
+    document.getElementById('dim-btn-confirm')?.addEventListener('click', confirmDimensionModify);
+    document.getElementById('dim-btn-delete')?.addEventListener('click', () => {
+        if (App.state.selectedDimensionId) deleteDimension(App.state.selectedDimensionId);
+    });
+    document.getElementById('dim-btn-cancel')?.addEventListener('click', closeDimensionModifyDialog);
+    document.getElementById('dim-input-val')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') confirmDimensionModify();
+        if (e.key === 'Escape') closeDimensionModifyDialog();
     });
 
-    window.addEventListener('mousemove', (e) => {
-        if (!activeInput) return;
-
-        const deltaX = e.clientX - startX;
-        const deltaY = e.clientY - startY;
-
-        if (!hasMoved) {
-            if (Math.abs(deltaX) > DRAG_THRESHOLD && Math.abs(deltaX) >= Math.abs(deltaY)) {
-                hasMoved = true;
-                document.body.classList.add('is-scrubbing');
-            } else if (Math.abs(deltaY) > DRAG_THRESHOLD) {
-                // Vertical intent, abort scrubbing
-                activeInput = null;
-                return;
-            }
-        }
-
-        if (hasMoved) {
-            e.preventDefault();
-            // Sensitivity multiplier: shift key gives fine control (0.1x), alt/ctrl gives coarse (10x)
-            let multiplier = 1;
-            if (e.shiftKey) multiplier = 0.1;
-            else if (e.ctrlKey || e.altKey) multiplier = 10;
-
-            const change = (e.clientX - startX) * (step * 0.2) * multiplier;
-            let newVal = startVal + change;
-
-            // Constrain by min/max if defined
-            if (activeInput.min !== '' && !isNaN(parseFloat(activeInput.min))) {
-                newVal = Math.max(parseFloat(activeInput.min), newVal);
-            }
-            if (activeInput.max !== '' && !isNaN(parseFloat(activeInput.max))) {
-                newVal = Math.min(parseFloat(activeInput.max), newVal);
-            }
-
-            const prec = Math.min(6, Math.max(getPrecisionFromStep(step), multiplier < 1 ? getPrecisionFromStep(step) + 1 : 0));
-            activeInput.value = Number(newVal.toFixed(prec));
-            activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+    // Visualizer Dimension Placement Click & Mousemove
+    const visualizerSvg = document.getElementById('visualizer');
+    visualizerSvg?.addEventListener('click', (e) => {
+        if (App.state.dimTool && App.state.dimTool.active) {
+            handleDimToolClick(e);
         }
     });
-
-    window.addEventListener('mouseup', (e) => {
-        if (!activeInput) return;
-
-        if (hasMoved) {
-            document.body.classList.remove('is-scrubbing');
-            activeInput.dispatchEvent(new Event('change', { bubbles: true }));
-        } else {
-            // It was a click without dragging: focus and select all for text editing
-            activeInput.focus();
-            activeInput.select();
+    visualizerSvg?.addEventListener('mousemove', (e) => {
+        if (App.state.dimTool && App.state.dimTool.active) {
+            handleDimToolMouseMove(e);
         }
-
-        activeInput = null;
-        hasMoved = false;
     });
 }
 
@@ -11684,7 +13328,6 @@ function initialize() {
     if (typeof bindDragEvents === 'function') bindDragEvents();
     if (typeof bindGridResizers === 'function') bindGridResizers();
     if (typeof bindStaticUI === 'function') bindStaticUI();
-    if (typeof bindInputScrubbers === 'function') bindInputScrubbers();
 
     // SYSTEMATIC FIX: Force the CSS to sync with any browser-cached color picker values on load
     if (typeof initThemePresets === 'function') initThemePresets();
