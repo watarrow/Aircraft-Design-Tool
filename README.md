@@ -2,8 +2,11 @@ This is meant as a design too to help visualize your ideas and give you quick me
 Its also useful for mass tracking to see if you're on track during the manufacturing process of your plane.
 Save your design as a json to be able to migrate up versions.
 
-To use, download the latest html document. To get approximate stall speeds and such and for airfoil optimization, download the airfoil-data-clean.js, and heatmap-data-clean.js too and place it in the same folder as the html. Double click to open in your browser and have fun! I recommend using it with 90% zoom on your browser.
+**"Installation"**
+For basic functionality: Download the AircraftDesign Tool html file and double click it to open it in your browser
+For additional functionality involving airfoil analysis: Download airfoil-data-clean and heatmap-data-clean. Put those two int he same folder as the main html file.
 
+That's it!
 
 
 **Features:**
@@ -54,8 +57,6 @@ This version is not thoroughly tested so it may have lots more bugs
 
 
 **No bugs that I know of in S01.7:**
-
 Planning to add control surfaces
 
-Planning to add ability to draw dimension lines
 

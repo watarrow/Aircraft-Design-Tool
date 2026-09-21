@@ -1,0 +1,1395 @@
+{
+  "title": "Prototype 1.1",
+  "state": {
+    "selectedComponentId": "comp-1789910336036",
+    "graphSweep": {
+      "isSimulating": false,
+      "sweepState": {
+        "minX": 2,
+        "maxX": 7,
+        "minY": 0,
+        "maxY": 0,
+        "active": true
+      },
+      "targetX": "wing-ar",
+      "targetXLabel": "WING-AR",
+      "minX": 2,
+      "maxX": 7,
+      "yVars": [
+        {
+          "id": 1789820854295,
+          "target": "wing-mass-display",
+          "label": "WING-MASS-DISPLAY",
+          "visible": true,
+          "color": "hsl(327, 80%, 60%)",
+          "data": [
+            {
+              "normX": 0,
+              "y": 343.29
+            },
+            {
+              "normX": 0.01,
+              "y": 339.08
+            },
+            {
+              "normX": 0.02,
+              "y": 335.02
+            },
+            {
+              "normX": 0.03,
+              "y": 331.1
+            },
+            {
+              "normX": 0.04,
+              "y": 327.31
+            },
+            {
+              "normX": 0.05,
+              "y": 323.66
+            },
+            {
+              "normX": 0.06,
+              "y": 320.12
+            },
+            {
+              "normX": 0.07,
+              "y": 316.7
+            },
+            {
+              "normX": 0.08,
+              "y": 313.38
+            },
+            {
+              "normX": 0.09,
+              "y": 310.16
+            },
+            {
+              "normX": 0.1,
+              "y": 307.05
+            },
+            {
+              "normX": 0.11,
+              "y": 304.02
+            },
+            {
+              "normX": 0.12,
+              "y": 301.08
+            },
+            {
+              "normX": 0.13,
+              "y": 298.23
+            },
+            {
+              "normX": 0.14,
+              "y": 295.46
+            },
+            {
+              "normX": 0.15,
+              "y": 292.76
+            },
+            {
+              "normX": 0.16,
+              "y": 290.13
+            },
+            {
+              "normX": 0.17,
+              "y": 287.58
+            },
+            {
+              "normX": 0.18,
+              "y": 285.09
+            },
+            {
+              "normX": 0.19,
+              "y": 282.66
+            },
+            {
+              "normX": 0.2,
+              "y": 280.29
+            },
+            {
+              "normX": 0.21,
+              "y": 277.99
+            },
+            {
+              "normX": 0.22,
+              "y": 275.74
+            },
+            {
+              "normX": 0.23,
+              "y": 273.54
+            },
+            {
+              "normX": 0.24,
+              "y": 271.39
+            },
+            {
+              "normX": 0.25,
+              "y": 269.3
+            },
+            {
+              "normX": 0.26,
+              "y": 267.25
+            },
+            {
+              "normX": 0.27,
+              "y": 265.25
+            },
+            {
+              "normX": 0.28,
+              "y": 263.29
+            },
+            {
+              "normX": 0.29,
+              "y": 261.38
+            },
+            {
+              "normX": 0.3,
+              "y": 259.5
+            },
+            {
+              "normX": 0.31,
+              "y": 257.67
+            },
+            {
+              "normX": 0.32,
+              "y": 255.87
+            },
+            {
+              "normX": 0.33,
+              "y": 254.11
+            },
+            {
+              "normX": 0.34,
+              "y": 252.39
+            },
+            {
+              "normX": 0.35,
+              "y": 250.7
+            },
+            {
+              "normX": 0.36,
+              "y": 249.05
+            },
+            {
+              "normX": 0.37,
+              "y": 247.43
+            },
+            {
+              "normX": 0.38,
+              "y": 245.83
+            },
+            {
+              "normX": 0.39,
+              "y": 244.27
+            },
+            {
+              "normX": 0.4,
+              "y": 242.74
+            },
+            {
+              "normX": 0.41,
+              "y": 241.24
+            },
+            {
+              "normX": 0.42,
+              "y": 239.76
+            },
+            {
+              "normX": 0.43,
+              "y": 238.32
+            },
+            {
+              "normX": 0.44,
+              "y": 236.89
+            },
+            {
+              "normX": 0.45,
+              "y": 235.49
+            },
+            {
+              "normX": 0.46,
+              "y": 234.12
+            },
+            {
+              "normX": 0.47,
+              "y": 232.77
+            },
+            {
+              "normX": 0.48,
+              "y": 231.45
+            },
+            {
+              "normX": 0.49,
+              "y": 230.14
+            },
+            {
+              "normX": 0.5,
+              "y": 228.86
+            },
+            {
+              "normX": 0.51,
+              "y": 227.6
+            },
+            {
+              "normX": 0.52,
+              "y": 226.36
+            },
+            {
+              "normX": 0.53,
+              "y": 225.14
+            },
+            {
+              "normX": 0.54,
+              "y": 223.94
+            },
+            {
+              "normX": 0.55,
+              "y": 222.76
+            },
+            {
+              "normX": 0.56,
+              "y": 221.59
+            },
+            {
+              "normX": 0.57,
+              "y": 220.45
+            },
+            {
+              "normX": 0.58,
+              "y": 219.32
+            },
+            {
+              "normX": 0.59,
+              "y": 218.21
+            },
+            {
+              "normX": 0.6,
+              "y": 217.12
+            },
+            {
+              "normX": 0.61,
+              "y": 216.04
+            },
+            {
+              "normX": 0.62,
+              "y": 214.98
+            },
+            {
+              "normX": 0.63,
+              "y": 213.93
+            },
+            {
+              "normX": 0.64,
+              "y": 212.9
+            },
+            {
+              "normX": 0.65,
+              "y": 211.88
+            },
+            {
+              "normX": 0.66,
+              "y": 210.88
+            },
+            {
+              "normX": 0.67,
+              "y": 209.89
+            },
+            {
+              "normX": 0.68,
+              "y": 208.92
+            },
+            {
+              "normX": 0.69,
+              "y": 207.96
+            },
+            {
+              "normX": 0.7,
+              "y": 207.01
+            },
+            {
+              "normX": 0.71,
+              "y": 206.08
+            },
+            {
+              "normX": 0.72,
+              "y": 205.15
+            },
+            {
+              "normX": 0.73,
+              "y": 204.25
+            },
+            {
+              "normX": 0.74,
+              "y": 203.35
+            },
+            {
+              "normX": 0.75,
+              "y": 202.46
+            },
+            {
+              "normX": 0.76,
+              "y": 201.59
+            },
+            {
+              "normX": 0.77,
+              "y": 200.72
+            },
+            {
+              "normX": 0.78,
+              "y": 199.87
+            },
+            {
+              "normX": 0.79,
+              "y": 199.03
+            },
+            {
+              "normX": 0.8,
+              "y": 198.2
+            },
+            {
+              "normX": 0.81,
+              "y": 197.38
+            },
+            {
+              "normX": 0.82,
+              "y": 196.57
+            },
+            {
+              "normX": 0.83,
+              "y": 195.77
+            },
+            {
+              "normX": 0.84,
+              "y": 194.98
+            },
+            {
+              "normX": 0.85,
+              "y": 194.19
+            },
+            {
+              "normX": 0.86,
+              "y": 193.42
+            },
+            {
+              "normX": 0.87,
+              "y": 192.66
+            },
+            {
+              "normX": 0.88,
+              "y": 191.9
+            },
+            {
+              "normX": 0.89,
+              "y": 191.16
+            },
+            {
+              "normX": 0.9,
+              "y": 190.42
+            },
+            {
+              "normX": 0.91,
+              "y": 189.69
+            },
+            {
+              "normX": 0.92,
+              "y": 188.97
+            },
+            {
+              "normX": 0.93,
+              "y": 188.26
+            },
+            {
+              "normX": 0.94,
+              "y": 187.56
+            },
+            {
+              "normX": 0.95,
+              "y": 186.86
+            },
+            {
+              "normX": 0.96,
+              "y": 186.17
+            },
+            {
+              "normX": 0.97,
+              "y": 185.49
+            },
+            {
+              "normX": 0.98,
+              "y": 184.82
+            },
+            {
+              "normX": 0.99,
+              "y": 184.15
+            },
+            {
+              "normX": 1,
+              "y": 183.5
+            }
+          ]
+        },
+        {
+          "id": 1789821830772,
+          "target": "top-mass",
+          "label": "TOTAL MASS",
+          "visible": true,
+          "color": "hsl(20, 80%, 60%)",
+          "data": [
+            {
+              "normX": 0,
+              "y": 389.27291718364427
+            },
+            {
+              "normX": 0.01,
+              "y": 385.50762763824645
+            },
+            {
+              "normX": 0.02,
+              "y": 381.88826858963307
+            },
+            {
+              "normX": 0.03,
+              "y": 378.40618088818763
+            },
+            {
+              "normX": 0.04,
+              "y": 375.05340245701973
+            },
+            {
+              "normX": 0.05,
+              "y": 371.82259794815957
+            },
+            {
+              "normX": 0.06,
+              "y": 368.7069968748159
+            },
+            {
+              "normX": 0.07,
+              "y": 365.70033903927106
+            },
+            {
+              "normX": 0.08,
+              "y": 362.79682626161866
+            },
+            {
+              "normX": 0.09,
+              "y": 359.99107956779966
+            },
+            {
+              "normX": 0.1,
+              "y": 357.2781011224191
+            },
+            {
+              "normX": 0.11,
+              "y": 354.65324029756005
+            },
+            {
+              "normX": 0.12,
+              "y": 352.1121633571606
+            },
+            {
+              "normX": 0.13,
+              "y": 349.6508263106159
+            },
+            {
+              "normX": 0.14,
+              "y": 347.26545055163325
+            },
+            {
+              "normX": 0.15,
+              "y": 344.9525009510416
+            },
+            {
+              "normX": 0.16,
+              "y": 342.70866611688916
+            },
+            {
+              "normX": 0.17,
+              "y": 340.5308405731073
+            },
+            {
+              "normX": 0.18,
+              "y": 338.41610864036033
+            },
+            {
+              "normX": 0.19,
+              "y": 336.3617298303765
+            },
+            {
+              "normX": 0.2,
+              "y": 334.3651255887671
+            },
+            {
+              "normX": 0.21,
+              "y": 332.42386724175003
+            },
+            {
+              "normX": 0.22,
+              "y": 330.535665019779
+            },
+            {
+              "normX": 0.23,
+              "y": 328.6983580462829
+            },
+            {
+              "normX": 0.24,
+              "y": 326.90990519289505
+            },
+            {
+              "normX": 0.25,
+              "y": 325.1683767139928
+            },
+            {
+              "normX": 0.26,
+              "y": 323.47194658333035
+            },
+            {
+              "normX": 0.27,
+              "y": 321.81888546423716
+            },
+            {
+              "normX": 0.28,
+              "y": 320.207554252454
+            },
+            {
+              "normX": 0.29,
+              "y": 318.63639813733624
+            },
+            {
+              "normX": 0.3,
+              "y": 317.10394113300435
+            },
+            {
+              "normX": 0.31,
+              "y": 315.60878103615363
+            },
+            {
+              "normX": 0.32,
+              "y": 314.1495847717816
+            },
+            {
+              "normX": 0.33,
+              "y": 312.72508409208024
+            },
+            {
+              "normX": 0.34,
+              "y": 311.3340715972903
+            },
+            {
+              "normX": 0.35,
+              "y": 309.97539705044704
+            },
+            {
+              "normX": 0.36,
+              "y": 308.6479639607314
+            },
+            {
+              "normX": 0.37,
+              "y": 307.35072641261957
+            },
+            {
+              "normX": 0.38,
+              "y": 306.08268612022323
+            },
+            {
+              "normX": 0.39,
+              "y": 304.8428896881851
+            },
+            {
+              "normX": 0.4,
+              "y": 303.6304260622454
+            },
+            {
+              "normX": 0.41,
+              "y": 302.4444241541702
+            },
+            {
+              "normX": 0.42,
+              "y": 301.28405062713614
+            },
+            {
+              "normX": 0.43,
+              "y": 300.1485078289347
+            },
+            {
+              "normX": 0.44,
+              "y": 299.03703186148584
+            },
+            {
+              "normX": 0.45,
+              "y": 297.94889077617813
+            },
+            {
+              "normX": 0.46,
+              "y": 296.883382885468
+            },
+            {
+              "normX": 0.47,
+              "y": 295.83983518200114
+            },
+            {
+              "normX": 0.48,
+              "y": 294.81760185726495
+            },
+            {
+              "normX": 0.49,
+              "y": 293.8160629124628
+            },
+            {
+              "normX": 0.5,
+              "y": 292.83462285490754
+            },
+            {
+              "normX": 0.51,
+              "y": 291.87270947378926
+            },
+            {
+              "normX": 0.52,
+              "y": 290.92977268967877
+            },
+            {
+              "normX": 0.53,
+              "y": 290.00528347257864
+            },
+            {
+              "normX": 0.54,
+              "y": 289.0987328237558
+            },
+            {
+              "normX": 0.55,
+              "y": 288.2096308169655
+            },
+            {
+              "normX": 0.56,
+              "y": 287.33750569502024
+            },
+            {
+              "normX": 0.57,
+              "y": 286.4819030179731
+            },
+            {
+              "normX": 0.58,
+              "y": 285.6423848594715
+            },
+            {
+              "normX": 0.59,
+              "y": 284.81852904810046
+            },
+            {
+              "normX": 0.6,
+              "y": 284.009928450771
+            },
+            {
+              "normX": 0.61,
+              "y": 283.2161902954346
+            },
+            {
+              "normX": 0.62,
+              "y": 282.4369355305993
+            },
+            {
+              "normX": 0.63,
+              "y": 281.6717982193132
+            },
+            {
+              "normX": 0.64,
+              "y": 280.9204249654469
+            },
+            {
+              "normX": 0.65,
+              "y": 280.1824743702635
+            },
+            {
+              "normX": 0.66,
+              "y": 279.45761651740736
+            },
+            {
+              "normX": 0.67,
+              "y": 278.7455324845744
+            },
+            {
+              "normX": 0.68,
+              "y": 278.04591388024954
+            },
+            {
+              "normX": 0.69,
+              "y": 277.35846240400474
+            },
+            {
+              "normX": 0.7,
+              "y": 276.6828894289597
+            },
+            {
+              "normX": 0.71,
+              "y": 276.018915605097
+            },
+            {
+              "normX": 0.72,
+              "y": 275.36627048221453
+            },
+            {
+              "normX": 0.73,
+              "y": 274.7246921513803
+            },
+            {
+              "normX": 0.74,
+              "y": 274.09392690382424
+            },
+            {
+              "normX": 0.75,
+              "y": 273.4737289062796
+            },
+            {
+              "normX": 0.76,
+              "y": 272.86385989184305
+            },
+            {
+              "normX": 0.77,
+              "y": 272.2640888654878
+            },
+            {
+              "normX": 0.78,
+              "y": 271.67419182341587
+            },
+            {
+              "normX": 0.79,
+              "y": 271.09395148549146
+            },
+            {
+              "normX": 0.8,
+              "y": 270.5231570400381
+            },
+            {
+              "normX": 0.81,
+              "y": 269.9616039003362
+            },
+            {
+              "normX": 0.82,
+              "y": 269.40909347218894
+            },
+            {
+              "normX": 0.83,
+              "y": 268.86543293197127
+            },
+            {
+              "normX": 0.84,
+              "y": 268.33043501460685
+            },
+            {
+              "normX": 0.85,
+              "y": 267.80391781095443
+            },
+            {
+              "normX": 0.86,
+              "y": 267.28570457411433
+            },
+            {
+              "normX": 0.87,
+              "y": 266.7756235341964
+            },
+            {
+              "normX": 0.88,
+              "y": 266.27350772111606
+            },
+            {
+              "normX": 0.89,
+              "y": 265.7791947950117
+            },
+            {
+              "normX": 0.9,
+              "y": 265.29252688389977
+            },
+            {
+              "normX": 0.91,
+              "y": 264.8133504282062
+            },
+            {
+              "normX": 0.92,
+              "y": 264.3415160318331
+            },
+            {
+              "normX": 0.93,
+              "y": 263.8768783194387
+            },
+            {
+              "normX": 0.94,
+              "y": 263.41929579962857
+            },
+            {
+              "normX": 0.95,
+              "y": 262.9686307337701
+            },
+            {
+              "normX": 0.96,
+              "y": 262.52474901016063
+            },
+            {
+              "normX": 0.97,
+              "y": 262.0875200232926
+            },
+            {
+              "normX": 0.98,
+              "y": 261.65681655797493
+            },
+            {
+              "normX": 0.99,
+              "y": 261.2325146780815
+            },
+            {
+              "normX": 1,
+              "y": 260.8144936197108
+            }
+          ]
+        }
+      ]
+    },
+    "history": {
+      "stack": [],
+      "index": -1
+    },
+    "drag": {
+      "dragging": false,
+      "dragComponentId": "comp-1789910336036",
+      "draggingVertexIndex": -1,
+      "dragStartX": 48.0782585144043,
+      "dragStartY": -3.188263416290283,
+      "componentStartX": 47.34574270248413,
+      "componentStartY": -5,
+      "componentStartZ": -5,
+      "vDragInitState": {},
+      "activeSnapLines": []
+    },
+    "massProfiles": [
+      "budget",
+      "measured",
+      "predicted"
+    ],
+    "activeMassProfile": "budget",
+    "spreadsheet": {
+      "colA": "budget",
+      "colB": "measured"
+    },
+    "currentView": "top",
+    "isIsolated": false,
+    "isolatedSet": {},
+    "isFocused": false,
+    "dimTool": {
+      "active": false,
+      "step": 0,
+      "refA": null,
+      "refB": null,
+      "previewPos": null
+    },
+    "selectedDimensionId": null,
+    "sysVariables": [
+      {
+        "id": 1784600455135,
+        "name": "WingSpan",
+        "value": 128,
+        "targetId": "main-wing:wing-b",
+        "targetLabel": "main-wing - WING-B",
+        "unit": "cm"
+      },
+      {
+        "id": 1785100538470,
+        "name": "ServoMass",
+        "value": 12,
+        "targetId": "",
+        "unit": "g"
+      }
+    ],
+    "sysEquations": [
+      {
+        "id": 1785100640508,
+        "targets": [
+          {
+            "id": "comp-1779044494428:prop-mass-val-budget",
+            "label": "comp-1779044494428 - PROP-MASS-VAL (budget)"
+          },
+          {
+            "id": "comp-1779044465220:prop-mass-val-budget",
+            "label": "comp-1779044465220 - PROP-MASS-VAL (budget)"
+          }
+        ],
+        "equation": "ServoMass",
+        "nickname": "For single servos"
+      },
+      {
+        "id": 1785100692151,
+        "targets": [
+          {
+            "id": "comp-1779044508866:prop-mass-val-budget",
+            "label": "comp-1779044508866 - PROP-MASS-VAL (budget)"
+          },
+          {
+            "id": "comp-1779298878926:prop-mass-val-budget",
+            "label": "comp-1779298878926 - PROP-MASS-VAL (budget)"
+          }
+        ],
+        "equation": "ServoMass*2",
+        "nickname": "For mirrored servos"
+      }
+    ],
+    "globalComponents": [],
+    "configurations": [
+      {
+        "id": "config-1789602885523",
+        "name": "Base Configuration",
+        "isActive": true,
+        "isExpanded": true,
+        "wing": {
+          "id": "main-wing",
+          "name": "Main Wing Panel",
+          "b": 128,
+          "cr": 33,
+          "ct": 32.99999999999989,
+          "sweep": 0,
+          "dihedral": 0,
+          "rho": 0.01668,
+          "color": "#1b1b1b",
+          "isHollow": false,
+          "wallT": 0.5,
+          "nacaRoot": "6412",
+          "nacaTip": "6412",
+          "aoa": 2.8,
+          "syncAirfoil": true,
+          "budgetMass": 88.81222673891646,
+          "measuredMass": 0,
+          "notes": "Making wing hollow can help",
+          "valA": 90,
+          "valB": 0,
+          "deltaMass": -90,
+          "predictedMass": 0,
+          "cd0": 0.04,
+          "lockedarea": true,
+          "lockedmass": false,
+          "lockedrho": false,
+          "lockedcr": false,
+          "lockedb": false,
+          "lockedct": false,
+          "lockedar": false,
+          "linkChords": true,
+          "fallbackAR": 3.8787878787878856,
+          "fallbackTaper": 0.9999999999999968,
+          "fallbackB": 128,
+          "fallbackCr": 33,
+          "fallbackCt": 32.99999999999989
+        },
+        "components": [
+          {
+            "id": "comp-1779241854755",
+            "name": "Spar",
+            "type": "body",
+            "x": 6,
+            "y": -59.999999999999986,
+            "z": 0.30000000000000004,
+            "sx": 1,
+            "sy": 120,
+            "sz": 1,
+            "rho": 0.4166666666666667,
+            "color": "#dfdfdf",
+            "lockedX": true,
+            "lockedY": true,
+            "lockedZ": false,
+            "anchorX": "min",
+            "anchorY": "center",
+            "anchorZ": "center",
+            "showLabel": false,
+            "isHollow": false,
+            "wallT": 0.2,
+            "isMirrored": false,
+            "rotX": 0,
+            "rotY": 0,
+            "rotZ": 0,
+            "lockedMass": false,
+            "lockedRho": true,
+            "thrustAuto": false,
+            "thrust": 0,
+            "propDia": 5,
+            "propPitch": 3,
+            "motorKV": 2300,
+            "battCells": 3,
+            "budgetMass": 40,
+            "measuredMass": 42,
+            "notes": "",
+            "valA": 50,
+            "valB": 42,
+            "deltaMass": -8,
+            "predictedMass": 0,
+            "ty": 120,
+            "tz": 1,
+            "dy": 0,
+            "dz": 0,
+            "isSymmetrical": false,
+            "sections": [
+              {
+                "x": 0,
+                "w": 1,
+                "h": 1,
+                "dy": 0,
+                "dz": 0
+              },
+              {
+                "x": 1,
+                "w": 1,
+                "h": 1,
+                "dy": 0,
+                "dz": 0
+              }
+            ]
+          },
+          {
+            "id": "comp-1779242396440",
+            "name": "Spar Rear",
+            "type": "body",
+            "x": 12.8,
+            "y": -30,
+            "z": 0.15000000000000002,
+            "sx": 0.7,
+            "sy": 60,
+            "sz": 0.7,
+            "rho": 0.3401360544217687,
+            "color": "#dfdfdf",
+            "lockedX": true,
+            "lockedY": true,
+            "lockedZ": false,
+            "anchorX": "min",
+            "anchorY": "center",
+            "anchorZ": "center",
+            "showLabel": false,
+            "isHollow": false,
+            "wallT": 0.2,
+            "isMirrored": false,
+            "rotX": 0,
+            "rotY": 0,
+            "rotZ": 0,
+            "lockedMass": true,
+            "lockedRho": false,
+            "thrustAuto": false,
+            "thrust": 0,
+            "propDia": 5,
+            "propPitch": 3,
+            "motorKV": 2300,
+            "battCells": 3,
+            "budgetMass": 10,
+            "measuredMass": 8,
+            "notes": "",
+            "valA": 10,
+            "valB": 8,
+            "deltaMass": -2,
+            "predictedMass": 0,
+            "ty": 60,
+            "tz": 0.7,
+            "dy": 0,
+            "dz": 0,
+            "isSymmetrical": false,
+            "sections": [
+              {
+                "x": 0,
+                "w": 1,
+                "h": 1,
+                "dy": 0,
+                "dz": 0
+              },
+              {
+                "x": 1,
+                "w": 1,
+                "h": 1,
+                "dy": 0,
+                "dz": 0
+              }
+            ]
+          },
+          {
+            "id": "comp-1789910336036",
+            "parentId": null,
+            "name": "Weight of rest of aircraft",
+            "type": "body",
+            "x": 47.34574270248413,
+            "y": -5,
+            "z": -5,
+            "sx": 10,
+            "sy": 10,
+            "sz": 10,
+            "sections": [
+              {
+                "x": 0,
+                "w": 1,
+                "h": 1,
+                "dy": 0,
+                "dz": 0
+              },
+              {
+                "x": 1,
+                "w": 1,
+                "h": 1,
+                "dy": 0,
+                "dz": 0
+              }
+            ],
+            "rho": 1.04,
+            "measuredMass": 0,
+            "predictedMass": 0,
+            "color": "#f1c40f",
+            "lockedX": false,
+            "lockedY": true,
+            "lockedZ": false,
+            "anchorX": "min",
+            "anchorY": "center",
+            "anchorZ": "center",
+            "showLabel": false,
+            "isHollow": false,
+            "wallT": 0.2,
+            "isMirrored": false,
+            "isSymmetrical": false,
+            "rotX": 0,
+            "rotY": 0,
+            "rotZ": 0,
+            "lockedMass": false,
+            "lockedRho": false,
+            "isSuppressed": false,
+            "thrustAuto": false,
+            "thrust": 0,
+            "propDia": 5,
+            "propPitch": 3,
+            "motorKV": 2300,
+            "battCells": 3,
+            "ty": 10,
+            "tz": 10,
+            "dy": 0,
+            "dz": 0
+          }
+        ],
+        "dimensions": []
+      }
+    ],
+    "wingData": {
+      "id": "main-wing",
+      "name": "Main Wing Panel",
+      "b": 128,
+      "cr": 33,
+      "ct": 32.99999999999989,
+      "sweep": 0,
+      "dihedral": 0,
+      "rho": 0.01668,
+      "color": "#1b1b1b",
+      "isHollow": false,
+      "wallT": 0.5,
+      "nacaRoot": "6412",
+      "nacaTip": "6412",
+      "aoa": 2.8,
+      "syncAirfoil": true,
+      "budgetMass": 88.81222673891646,
+      "measuredMass": 0,
+      "notes": "Making wing hollow can help",
+      "valA": 90,
+      "valB": 0,
+      "deltaMass": -90,
+      "predictedMass": 0,
+      "cd0": 0.04,
+      "lockedarea": true,
+      "lockedmass": false,
+      "lockedrho": false,
+      "lockedcr": false,
+      "lockedb": false,
+      "lockedct": false,
+      "lockedar": false,
+      "linkChords": true,
+      "fallbackAR": 3.8787878787878856,
+      "fallbackTaper": 0.9999999999999968,
+      "fallbackB": 128,
+      "fallbackCr": 33,
+      "fallbackCt": 32.99999999999989
+    },
+    "components": [
+      {
+        "id": "comp-1779241854755",
+        "name": "Spar",
+        "type": "body",
+        "x": 6,
+        "y": -59.999999999999986,
+        "z": 0.30000000000000004,
+        "sx": 1,
+        "sy": 120,
+        "sz": 1,
+        "rho": 0.4166666666666667,
+        "color": "#dfdfdf",
+        "lockedX": true,
+        "lockedY": true,
+        "lockedZ": false,
+        "anchorX": "min",
+        "anchorY": "center",
+        "anchorZ": "center",
+        "showLabel": false,
+        "isHollow": false,
+        "wallT": 0.2,
+        "isMirrored": false,
+        "rotX": 0,
+        "rotY": 0,
+        "rotZ": 0,
+        "lockedMass": false,
+        "lockedRho": true,
+        "thrustAuto": false,
+        "thrust": 0,
+        "propDia": 5,
+        "propPitch": 3,
+        "motorKV": 2300,
+        "battCells": 3,
+        "budgetMass": 40,
+        "measuredMass": 42,
+        "notes": "",
+        "valA": 50,
+        "valB": 42,
+        "deltaMass": -8,
+        "predictedMass": 0,
+        "ty": 120,
+        "tz": 1,
+        "dy": 0,
+        "dz": 0,
+        "isSymmetrical": false,
+        "sections": [
+          {
+            "x": 0,
+            "w": 1,
+            "h": 1,
+            "dy": 0,
+            "dz": 0
+          },
+          {
+            "x": 1,
+            "w": 1,
+            "h": 1,
+            "dy": 0,
+            "dz": 0
+          }
+        ]
+      },
+      {
+        "id": "comp-1779242396440",
+        "name": "Spar Rear",
+        "type": "body",
+        "x": 12.8,
+        "y": -30,
+        "z": 0.15000000000000002,
+        "sx": 0.7,
+        "sy": 60,
+        "sz": 0.7,
+        "rho": 0.3401360544217687,
+        "color": "#dfdfdf",
+        "lockedX": true,
+        "lockedY": true,
+        "lockedZ": false,
+        "anchorX": "min",
+        "anchorY": "center",
+        "anchorZ": "center",
+        "showLabel": false,
+        "isHollow": false,
+        "wallT": 0.2,
+        "isMirrored": false,
+        "rotX": 0,
+        "rotY": 0,
+        "rotZ": 0,
+        "lockedMass": true,
+        "lockedRho": false,
+        "thrustAuto": false,
+        "thrust": 0,
+        "propDia": 5,
+        "propPitch": 3,
+        "motorKV": 2300,
+        "battCells": 3,
+        "budgetMass": 10,
+        "measuredMass": 8,
+        "notes": "",
+        "valA": 10,
+        "valB": 8,
+        "deltaMass": -2,
+        "predictedMass": 0,
+        "ty": 60,
+        "tz": 0.7,
+        "dy": 0,
+        "dz": 0,
+        "isSymmetrical": false,
+        "sections": [
+          {
+            "x": 0,
+            "w": 1,
+            "h": 1,
+            "dy": 0,
+            "dz": 0
+          },
+          {
+            "x": 1,
+            "w": 1,
+            "h": 1,
+            "dy": 0,
+            "dz": 0
+          }
+        ]
+      },
+      {
+        "id": "comp-1789910336036",
+        "parentId": null,
+        "name": "Weight of rest of aircraft",
+        "type": "body",
+        "x": 47.34574270248413,
+        "y": -5,
+        "z": -5,
+        "sx": 10,
+        "sy": 10,
+        "sz": 10,
+        "sections": [
+          {
+            "x": 0,
+            "w": 1,
+            "h": 1,
+            "dy": 0,
+            "dz": 0
+          },
+          {
+            "x": 1,
+            "w": 1,
+            "h": 1,
+            "dy": 0,
+            "dz": 0
+          }
+        ],
+        "rho": 1.04,
+        "measuredMass": 0,
+        "predictedMass": 0,
+        "color": "#f1c40f",
+        "lockedX": false,
+        "lockedY": true,
+        "lockedZ": false,
+        "anchorX": "min",
+        "anchorY": "center",
+        "anchorZ": "center",
+        "showLabel": false,
+        "isHollow": false,
+        "wallT": 0.2,
+        "isMirrored": false,
+        "isSymmetrical": false,
+        "rotX": 0,
+        "rotY": 0,
+        "rotZ": 0,
+        "lockedMass": false,
+        "lockedRho": false,
+        "isSuppressed": false,
+        "thrustAuto": false,
+        "thrust": 0,
+        "propDia": 5,
+        "propPitch": 3,
+        "motorKV": 2300,
+        "battCells": 3,
+        "ty": 10,
+        "tz": 10,
+        "dy": 0,
+        "dz": 0
+      }
+    ],
+    "globalCGX": 44.97087567947636,
+    "globalCGZ": 0.03486602299317932,
+    "rec_cg_33": 10.889999999999981,
+    "wingCGZ": 0
+  }
+}
