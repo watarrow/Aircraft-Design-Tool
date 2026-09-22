@@ -52,9 +52,12 @@ Import/Export: Use "Save JSON" and "Load". Export as "Save HTML" for a self-cont
 
 
 **Bugs in S01.7:**
-This version is not thoroughly tested so it may have lots more bugs
 
+T tail warning only happens when H stab is moved by dragging, not by adjusting position values
 
+Colour of wing wake should be something opposite to background colour, same with wing wake text.
+
+When two parallel edges are selected for dimensioning, the dimension line should always be the perpendicular distance between them. This is not the case right now.
 
 **No bugs that I know of in S01.7:**
 Planning to add control surfaces
