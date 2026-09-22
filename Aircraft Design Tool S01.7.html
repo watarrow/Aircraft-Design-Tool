@@ -272,7 +272,7 @@
         justify-content: flex-end;
     }
 
-    #mass-preset-controls .view-btn[id^="btn-profile-"] {
+    #mass-preset-controls .view-btn[data-mass-profile] {
         flex: 1 1 auto;
         min-width: 40px;
         max-width: 100px;
@@ -283,8 +283,24 @@
         padding-right: 6px;
     }
 
-    #mass-preset-controls span, 
-    #mass-preset-controls button[title] {
+    #btn-profile-add,
+    #btn-profile-del {
+        flex: 0 0 28px;
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        max-width: 28px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1em;
+        line-height: 1;
+        box-sizing: border-box;
+        margin: 0;
+    }
+
+    #mass-preset-controls span {
         flex-shrink: 0;
     }
 	
@@ -1246,7 +1262,7 @@ Reference Airframes:
             <button class="view-btn" id="view-btn-graph">Graph Sweep</button>
             <button class="view-btn" id="view-btn-vars">Variables</button>
             <div style="width: 1px; height: 16px; background: var(--border-grey); margin: 0 4px;"></div>
-            <div id="mass-preset-controls" style="gap: 6px; align-items: center;"><span style="font-size: 0.7em; color: var(--text-dim); text-transform: uppercase; font-weight: bold; flex-shrink: 0;">Mass Set:</span><button class="view-btn active" id="btn-profile-budget" title="Budget">Budget</button><button class="view-btn" id="btn-profile-measured" title="Measured">Measured</button><button class="view-btn" id="btn-profile-predicted" title="Predicted">Predicted</button><button class="view-btn" title="Add Custom Profile" style="margin: 0px; padding: 4px 8px; font-weight: bold; color: rgb(46, 204, 113); flex-shrink: 0;">+</button><button class="view-btn" title="Delete Active Profile" style="margin: 0px; padding: 4px 8px; font-weight: bold; color: rgb(231, 76, 60); flex-shrink: 0;">-</button></div>
+            <div id="mass-preset-controls" style="gap: 6px; align-items: center;"><span style="font-size: 0.7em; color: var(--text-dim); text-transform: uppercase; font-weight: bold; flex-shrink: 0;">Mass Set:</span><button class="view-btn active" id="btn-profile-budget" data-mass-profile="budget" title="Budget" onclick="handleProfileClick('budget')">Budget</button><button class="view-btn" id="btn-profile-measured" data-mass-profile="measured" title="Measured" onclick="handleProfileClick('measured')">Measured</button><button class="view-btn" id="btn-profile-predicted" data-mass-profile="predicted" title="Predicted" onclick="handleProfileClick('predicted')">Predicted</button><button class="view-btn" id="btn-profile-add" title="Add Custom Profile" onclick="handleAddMassProfile()" style="color: rgb(46, 204, 113); font-weight: bold;">+</button><button class="view-btn" id="btn-profile-del" title="Delete Active Profile" onclick="handleDeleteMassProfile()" style="color: rgb(231, 76, 60); font-weight: bold;">-</button></div>
         </div>
         
         <div id="canvas-container">
@@ -4744,13 +4760,6 @@ function getWingVolumeCm3(profile = App.state.activeMassProfile) {
     const b = safeParse(wing.b), cr = safeParse(wing.cr), ct = safeParse(wing.ct);
     const tRootPerc = wing.nacaRoot ? parseInt(wing.nacaRoot.substring(2)) / 100 : 0.12;
     const tTipPerc = wing.nacaTip ? parseInt(wing.nacaTip.substring(2)) / 100 : 0.12;
-    const isHol = getIsHollow(wing, profile);
-    const wt = isHol ? safeParse(wing.wallT) : 0;
-    
-    const cacheKey = `${profile}_${b}_${cr}_${ct}_${wing.nacaRoot}_${wing.nacaTip}_${wt}`;
-    if (wing._volCache && wing._volCache.key === cacheKey) {
-        return wing._volCache.val;
-    }
 
     const actualTRoot = cr * tRootPerc;
     const actualTTip = ct * tTipPerc;
@@ -4759,8 +4768,8 @@ function getWingVolumeCm3(profile = App.state.activeMassProfile) {
     const tip_area = ct * actualTTip * (0.082 / 0.12);
     const totalVol = ((b / 2) / 3) * (root_area + tip_area + Math.sqrt(root_area * tip_area)) * 2;
     
-    let res = totalVol;
-    if (isHol && wt > 0) {
+    if (getIsHollow(wing, profile) && safeParse(wing.wallT) > 0) {
+        const wt = safeParse(wing.wallT);
         const inner_cr = Math.max(0, cr - (wt * 2));
         const inner_ct = Math.max(0, ct - (wt * 2));
         const inner_tRoot = Math.max(0, actualTRoot - (wt * 2));
@@ -4770,26 +4779,20 @@ function getWingVolumeCm3(profile = App.state.activeMassProfile) {
         const inner_root_area = inner_cr * inner_tRoot * (0.082 / 0.12);
         const inner_tip_area = inner_ct * inner_tTip * (0.082 / 0.12);
         const innerVol = ((inner_b / 2) / 3) * (inner_root_area + inner_tip_area + Math.sqrt(inner_root_area * inner_tip_area)) * 2;
-        res = Math.max(0.01, totalVol - innerVol);
+        return Math.max(0.01, totalVol - innerVol);
     }
-    wing._volCache = { key: cacheKey, val: res };
-    return res;
+    return totalVol;
 }
 
 function getComponentVolumeCm3(c, profile = App.state.activeMassProfile) {
     if (!c || !c.sections || c.sections.length < 2) return 0.01;
     
     const sx = safeParse(c.sx), sy = safeParse(c.sy), sz = safeParse(c.sz);
-    const isHol = getIsHollow(c, profile);
-    const wt = isHol ? safeParse(c.wallT) : 0;
-    
-    const cacheKey = `${profile}_${sx}_${sy}_${sz}_${wt}_${c.sections.length}`;
-    if (c._volCache && c._volCache.key === cacheKey) {
-        return c._volCache.val;
-    }
-
     let totalVol = 0;
     let innerVol = 0;
+    
+    const isHol = getIsHollow(c, profile);
+    const wt = isHol ? safeParse(c.wallT) : 0;
 
     for (let i = 0; i < c.sections.length - 1; i++) {
         const s1 = c.sections[i];
@@ -4811,9 +4814,7 @@ function getComponentVolumeCm3(c, profile = App.state.activeMassProfile) {
         }
     }
     
-    const res = Math.max(0.01, totalVol - innerVol);
-    c._volCache = { key: cacheKey, val: res };
-    return res;
+    return Math.max(0.01, totalVol - innerVol);
 }
 
 const nacaPointsCache = new Map();
@@ -9922,70 +9923,34 @@ function renderMassProfileUI() {
     const container = document.getElementById('mass-preset-controls');
     if (!container) return;
 
-    // Fast path: if buttons already exist for all current profiles, just update the active class
+    // Fast path: if buttons already exist for all current profiles in order, just update the active class
     const currentKeys = App.state.massProfiles;
-    const existingButtons = container.querySelectorAll('button[id^="btn-profile-"]');
-    if (existingButtons.length === currentKeys.length) {
-        let allMatch = true;
-        for (let i = 0; i < currentKeys.length; i++) {
-            if (existingButtons[i].id !== `btn-profile-${currentKeys[i]}`) {
-                allMatch = false;
-                break;
-            }
-        }
-        if (allMatch) {
-            existingButtons.forEach(btn => {
-                const prof = btn.id.replace('btn-profile-', '');
-                btn.classList.toggle('active', prof === App.state.activeMassProfile);
-            });
-            return;
-        }
+    const profileButtons = Array.from(container.querySelectorAll('button[data-mass-profile]'));
+    const keysMatch = profileButtons.length === currentKeys.length && 
+                      currentKeys.every((k, idx) => profileButtons[idx] && profileButtons[idx].getAttribute('data-mass-profile') === k);
+    
+    if (keysMatch && container.querySelector('#btn-profile-add') && container.querySelector('#btn-profile-del')) {
+        profileButtons.forEach(btn => {
+            const prof = btn.getAttribute('data-mass-profile');
+            btn.classList.toggle('active', prof === App.state.activeMassProfile);
+        });
+        return;
     }
     
     // Apply systematic flexbox spacing
     container.style.gap = '6px';
     container.style.alignItems = 'center';
     
-    container.innerHTML = '<span style="font-size: 0.7em; color: var(--text-dim); text-transform: uppercase; font-weight: bold; flex-shrink: 0;">Mass Set:</span>';
+    let html = '<span style="font-size: 0.7em; color: var(--text-dim); text-transform: uppercase; font-weight: bold; flex-shrink: 0;">Mass Set:</span>';
+    currentKeys.forEach(prof => {
+        const isActive = prof === App.state.activeMassProfile;
+        const label = prof.charAt(0).toUpperCase() + prof.slice(1);
+        html += `<button class="view-btn ${isActive ? 'active' : ''}" id="btn-profile-${prof}" data-mass-profile="${prof}" title="${label}" onclick="handleProfileClick('${prof}')" ondblclick="handleRenameMassProfile('${prof}')">${label}</button>`;
+    });
+    html += '<button class="view-btn" id="btn-profile-add" title="Add Custom Profile" onclick="handleAddMassProfile()" style="color: rgb(46, 204, 113); font-weight: bold;">+</button>';
+    html += '<button class="view-btn" id="btn-profile-del" title="Delete Active Profile" onclick="handleDeleteMassProfile()" style="color: rgb(231, 76, 60); font-weight: bold;">-</button>';
     
-    App.state.massProfiles.forEach(prof => {
-        const btn = document.createElement('button');
-        btn.className = 'view-btn';
-        btn.id = `btn-profile-${prof}`;
-        btn.title = prof.charAt(0).toUpperCase() + prof.slice(1); 
-        btn.innerText = prof.charAt(0).toUpperCase() + prof.slice(1);
-        
-        btn.addEventListener('click', () => {
-            if (typeof handleProfileClick === 'function') handleProfileClick(prof);
-        });
-        
-        if (prof === App.state.activeMassProfile) {
-            btn.classList.add('active'); 
-        }
-        
-        container.appendChild(btn);
-    });
-
-    const addBtn = document.createElement('button');
-    addBtn.className = 'view-btn';
-    addBtn.title = 'Add Custom Profile';
-    addBtn.style.cssText = 'margin: 0; padding: 4px 8px; font-weight: bold; color: #2ecc71; flex-shrink: 0;';
-    addBtn.innerText = '+';
-    addBtn.addEventListener('click', () => {
-        if (typeof handleAddMassProfile === 'function') handleAddMassProfile();
-    });
-    
-    const delBtn = document.createElement('button');
-    delBtn.className = 'view-btn';
-    delBtn.title = 'Delete Active Profile';
-    delBtn.style.cssText = 'margin: 0; padding: 4px 8px; font-weight: bold; color: #e74c3c; flex-shrink: 0;';
-    delBtn.innerText = '-';
-    delBtn.addEventListener('click', () => {
-        if (typeof handleDeleteMassProfile === 'function') handleDeleteMassProfile();
-    });
-
-    container.appendChild(addBtn);
-    container.appendChild(delBtn);
+    container.innerHTML = html;
 }
 
 function updateAirfoilPreview(isFromTyping = false) {
@@ -10712,17 +10677,9 @@ function handleGlobalKeyUp(e) {
 }
 
 function handleProfileClick(profile) {
-    if (App.ui.timers.profileClick) {
-        clearTimeout(App.ui.timers.profileClick);
-        App.ui.timers.profileClick = null;
-        handleRenameMassProfile(profile);
-    } else {
-        App.ui.timers.profileClick = setTimeout(() => {
-            setActiveMassProfileModel(profile);
-            App.ui.timers.profileClick = null;
-            refresh();
-        }, 220);
-    }
+    if (App.state.activeMassProfile === profile) return;
+    setActiveMassProfileModel(profile);
+    refresh();
 }
 
 function handleAddMassProfile() {
