@@ -9,6 +9,7 @@ For additional functionality involving airfoil analysis: Download airfoil-data-c
 That's it!
 
 
+
 **Features:**
 
 Rendering: Renders top, side and front view of a simplified model of your airplane so you can visualize the CG location, mean chord and the scale of your design.
@@ -51,13 +52,10 @@ Import/Export: Use "Save JSON" and "Load". Export as "Save HTML" for a self-cont
 
 
 
-**Bugs in S01.8:**
+**Bugs in S01.9:**
 
 T tail warning only happens when H stab is moved by dragging, not by adjusting position values
 
-Colour of wing wake should be something opposite to background colour, same with wing wake text.
-
-**No bugs that I know of in S01.8:**
+**No bugs that I know of in S01.9:**
 Planning to add control surfaces
-
 

@@ -50,19 +50,13 @@ async def run_cdp_tests():
         current_url = await eval_js("window.location.href")
         print("Loaded page URL:", current_url)
 
-        # 1. Check for basic DOM elements
+        # 1. Check for basic DOM elements (Dimension button removed in favor of 'D' shortcut)
         has_dim_btn = await eval_js("!!document.getElementById('tool-btn-dim')")
         has_dim_layer = await eval_js("!!document.getElementById('dimensions-layer')")
         has_popover = await eval_js("!!document.getElementById('dim-edit-popover')")
-        print(f"Elements: btn={has_dim_btn}, layer={has_dim_layer}, popover={has_popover}")
-        assert has_dim_btn and has_dim_layer and has_popover, "DOM elements missing"
-
-        # Check button position: between Front View and Graph Sweep
-        dim_btn_prev = await eval_js("document.getElementById('tool-btn-dim').previousElementSibling ? document.getElementById('tool-btn-dim').previousElementSibling.innerText.trim() : ''")
-        dim_btn_next = await eval_js("document.getElementById('tool-btn-dim').nextElementSibling ? document.getElementById('tool-btn-dim').nextElementSibling.innerText.trim() : ''")
-        print("Dim button prev sibling text:", dim_btn_prev, "next:", dim_btn_next)
-        assert dim_btn_prev == "Front View", f"Expected prev sibling Front View, found: {dim_btn_prev}"
-        assert dim_btn_next == "Graph Sweep", f"Expected next sibling Graph Sweep, found: {dim_btn_next}"
+        print(f"Elements: btn={has_dim_btn} (should be False), layer={has_dim_layer}, popover={has_popover}")
+        assert not has_dim_btn, "tool-btn-dim should be removed from toolbar"
+        assert has_dim_layer and has_popover, "DOM elements missing"
 
         # Check shortcuts legend has 'D' Dimension
         legend_html = await eval_js("document.getElementById('shortcuts-legend').innerHTML")
@@ -70,19 +64,17 @@ async def run_cdp_tests():
 
         # 2. Test toggleDimensionTool()
         tool_active_1 = await eval_js("toggleDimensionTool(); App.state.dimTool.active")
-        btn_has_class = await eval_js("document.getElementById('tool-btn-dim').classList.contains('active')")
-        btn_no_old_class = await eval_js("!document.getElementById('tool-btn-dim').classList.contains('tool-active')")
         tool_active_2 = await eval_js("toggleDimensionTool(); App.state.dimTool.active")
-        print(f"Tool toggle: active={tool_active_1}, btnActive={btn_has_class}, noOldClass={btn_no_old_class}, deactivated={not tool_active_2}")
-        assert tool_active_1 and btn_has_class and btn_no_old_class and not tool_active_2, "Dimension tool toggle failed"
+        print(f"Tool toggle: active={tool_active_1}, deactivated={not tool_active_2}")
+        assert tool_active_1 and not tool_active_2, "Dimension tool toggle failed"
 
-        # Test Keyboard shortcut 'd'
+        # Test Keyboard shortcut 'd' to activate, 'Escape' to deactivate
         await eval_js("window.dispatchEvent(new KeyboardEvent('keydown', { key: 'd', bubbles: true }))")
         shortcut_active = await eval_js("App.state.dimTool.active")
         assert shortcut_active, "Keyboard shortcut 'd' failed to activate dimension tool"
-        await eval_js("window.dispatchEvent(new KeyboardEvent('keydown', { key: 'd', bubbles: true }))")
+        await eval_js("window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))")
         shortcut_inactive = await eval_js("!App.state.dimTool.active")
-        assert shortcut_inactive, "Keyboard shortcut 'd' failed to deactivate dimension tool"
+        assert shortcut_inactive, "Keyboard shortcut 'Escape' failed to deactivate dimension tool"
 
         # 3. Test interactive placement via handleDimToolClick & finalizeDimensionPlacement
         await eval_js("toggleDimensionTool(true);")

@@ -1260,7 +1260,6 @@ Vh_eff = (η_tail × Sh × Lh + η_canard × Sc × Lc) / (Sw × MAC)">
             <button class="view-btn active" id="view-btn-top">Top View</button>
             <button class="view-btn" id="view-btn-side">Side View</button>
             <button class="view-btn" id="view-btn-front">Front View</button>
-            <button class="view-btn" id="tool-btn-dim" onclick="toggleDimensionTool()" title="Smart Driving Dimension (D)" style="display: inline-flex; align-items: center; gap: 4px;">Dimension</button>
             <button class="view-btn" id="view-btn-graph">Graph Sweep</button>
             <button class="view-btn" id="view-btn-vars">Variables</button>
             <div style="width: 1px; height: 16px; background: var(--border-grey); margin: 0 4px;"></div>
@@ -1407,6 +1406,7 @@ Vh_eff = (η_tail × Sh × Lh + η_canard × Sc × Lc) / (Sw × MAC)">
 					</pattern>
 				</defs>
                 <rect fill="url(#gridPattern)" height="10000%" id="bg-grid-fill" pointer-events="none" width="10000%" x="-5000%" y="-5000%"></rect>
+                <g id="axes-layer" pointer-events="none"></g>
                 
                 <g id="wing-layer"><path d="M 0 0 L 0 -51.5 L 27.999999999999943 -51.5 L 28 0 Z M 0 0 L 0 51.5 L 27.999999999999943 51.5 L 28 0 Z" fill="#1b1b1b" fill-opacity="0.4" stroke="#888" stroke-width="1" class="interactive-shape active-part" transform="translate(0, 0) scale(0.9986295347545738, 1) translate(0, 0)"></path></g>
                 <g id="wake-layer" pointer-events="none"></g>
@@ -1414,6 +1414,7 @@ Vh_eff = (η_tail × Sh × Lh + η_canard × Sc × Lc) / (Sw × MAC)">
                 <g id="mac-layer" pointer-events="none"><line x1="0" y1="25.749999999999993" x2="27.999999999999968" y2="25.749999999999993" stroke="#2ecc71" stroke-width="0.25655573504863743"></line><line x1="9.23999999999999" y1="25.236888529902718" x2="9.23999999999999" y2="26.263111470097268" stroke="#2ecc71" stroke-width="0.25655573504863743"></line><line x1="0" y1="-25.749999999999993" x2="27.999999999999968" y2="-25.749999999999993" stroke="#2ecc71" stroke-width="0.25655573504863743"></line><line x1="9.23999999999999" y1="-26.263111470097268" x2="9.23999999999999" y2="-25.236888529902718" stroke="#2ecc71" stroke-width="0.25655573504863743"></line></g>
                 <g id="cg-layer" pointer-events="none"><g><circle cx="9.23999999999999" cy="0" r="0.7692946058091286" fill="#000" stroke="#fff" stroke-width="0.12821576763485476"></circle><path d="M 9.23999999999999 0 L 9.23999999999999 -0.7692946058091286 A 0.7692946058091286 0.7692946058091286 0 0 1 10.009294605809117 0 Z" fill="#2ecc71"></path><path d="M 9.23999999999999 0 L 9.23999999999999 0.7692946058091286 A 0.7692946058091286 0.7692946058091286 0 0 1 8.470705394190862 0 Z" fill="#2ecc71"></path><line x1="8.214273858921153" y1="0" x2="10.265726141078826" y2="0" stroke="#fff" stroke-width="0.12821576763485476"></line><line x1="9.23999999999999" y1="-1.025726141078838" x2="9.23999999999999" y2="1.025726141078838" stroke="#fff" stroke-width="0.12821576763485476"></line></g><g><circle cx="9.47129927862013" cy="0" r="0.7692946058091286" fill="#000" stroke="#fff" stroke-width="0.12821576763485476"></circle><path d="M 9.47129927862013 0 L 9.47129927862013 -0.7692946058091286 A 0.7692946058091286 0.7692946058091286 0 0 1 10.24059388442926 0 Z" fill="#f1c40f"></path><path d="M 9.47129927862013 0 L 9.47129927862013 0.7692946058091286 A 0.7692946058091286 0.7692946058091286 0 0 1 8.702004672811 0 Z" fill="#f1c40f"></path><line x1="8.445573137541292" y1="0" x2="10.497025419698968" y2="0" stroke="#fff" stroke-width="0.12821576763485476"></line><line x1="9.47129927862013" y1="-1.025726141078838" x2="9.47129927862013" y2="1.025726141078838" stroke="#fff" stroke-width="0.12821576763485476"></line></g></g>
                 <g id="dimensions-layer"><g id="dim-snap-group"></g><g id="dim-preview-group"></g></g>
+                <g id="modal-transform-layer" pointer-events="none"></g>
             </svg>
 
             <!-- CAD View Legends -->
@@ -1424,7 +1425,7 @@ Vh_eff = (η_tail × Sh × Lh + η_canard × Sc × Lc) / (Sw × MAC)">
                 <div class="legend-item"><div class="legend-color" style="background: transparent; border-top: 2px dashed #e73ce1; height: 0; width: 15px;"></div> Thrust Vector</div>
             </div>
             
-			<div id="shortcuts-legend" style="position: absolute; bottom: 10px; right: 10px; background: var(--bg-black); padding: 8px; border-radius: 4px; font-size: 0.65em; border: 1px solid var(--border-grey); color: var(--text-dim); pointer-events: none; text-align: left; display: flex; flex-direction: column; gap: 4px; z-index: 10;"><div style="color: var(--accent-yellow); font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid var(--border-grey); padding-bottom: 2px;">Shortcuts</div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Hold P</kbd></span> <span>Peek Prev Panel</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">F2</kbd></span> <span>Rename Part</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">H</kbd></span> <span>Hide Part</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">F</kbd></span> <span>Focus Part</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">W</kbd></span> <span>Wing Wake</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">D</kbd></span> <span>Dimension</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+H</kbd></span> <span>Unhide All</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+Z</kbd></span> <span>Undo</span></div></div>
+			<div id="shortcuts-legend" style="position: absolute; bottom: 10px; right: 10px; background: var(--bg-black); padding: 8px; border-radius: 4px; font-size: 0.65em; border: 1px solid var(--border-grey); color: var(--text-dim); pointer-events: none; text-align: left; display: flex; flex-direction: column; gap: 4px; z-index: 10;"><div style="color: var(--text-main); font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid var(--border-grey); padding-bottom: 2px;">Shortcuts</div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Hold P</kbd></span> <span>Peek Prev Panel</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">F2</kbd></span> <span>Rename Part</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">H</kbd></span> <span>Hide Part</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">F</kbd></span> <span>Focus Part</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">W</kbd></span> <span>Wing Wake</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">D</kbd></span> <span>Dimension</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+H</kbd></span> <span>Unhide All</span></div><div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+Z</kbd></span> <span>Undo</span></div></div>
 
             <!-- Dimension Modify Popover -->
             <div id="dim-edit-popover" style="display: none; position: absolute; z-index: 1000; background: var(--panel-grey); border: 1px solid var(--accent-yellow); border-radius: 6px; padding: 6px 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); font-family: inherit; font-size: 0.85em; gap: 6px; align-items: center;">
@@ -2179,6 +2180,11 @@ Drag (CD): 0.0189</title></circle></svg>
                 <label for="snap-threshold" style="color: var(--text-dim); font-size: 0.85em;">Snapping (cm):</label>
                 <input type="number" id="snap-threshold" value="0.1" min="0" max="10" step="0.1" style="background: var(--bg-black); color: var(--text-main); border: 1px solid var(--border-grey); width: 70px; padding: 2px 4px;">
             </div>
+            
+            <div class="setting-row" style="display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center;">
+                <label for="settings-drag-move" style="color: var(--text-dim); font-size: 0.85em;">Click & Drag to Move:</label>
+                <input type="checkbox" id="settings-drag-move" onchange="App.ui.enableDragToMove = this.checked;">
+            </div>
 			            
             <div class="input-group" style="border-top: 1px solid var(--border-grey); padding-top: 6px;">
                 <label>Label Screen Size (px)</label>
@@ -2249,6 +2255,21 @@ Drag (CD): 0.0189</title></circle></svg>
                         <option value="custom">Custom...</option>
                     </select>
                     <input type="number" id="prop-custom-eff" min="0" max="2.0" step="0.05" style="flex: 1 1 0%; display: none; opacity: 1; border-color: var(--border-grey); border-style: solid;" value="0.6" onchange="updateComponentProperty('eff', this.value)">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Geometry Shape</label>
+                <div style="display: flex; gap: 6px;">
+                    <select id="prop-shape" onchange="updateComponentProperty('shape', this.value)" style="flex: 1; opacity: 1; border-color: var(--border-grey); border-style: solid;">
+                        <option value="box">Box (Rectangular)</option>
+                        <option value="cylinder">Cylinder / Wheel</option>
+                    </select>
+                    <select id="prop-cylinder-axis" onchange="updateComponentProperty('cylinderAxis', this.value)" style="flex: 1; display: none; opacity: 1; border-color: var(--border-grey); border-style: solid;" title="Cylinder Axis of Revolution">
+                        <option value="y">Axis: Y (Wheel)</option>
+                        <option value="x">Axis: X (Pod)</option>
+                        <option value="z">Axis: Z (Strut)</option>
+                    </select>
                 </div>
             </div>
 
@@ -2345,9 +2366,9 @@ Drag (CD): 0.0189</title></circle></svg>
             <div style="border-top: 1px solid var(--border-grey); padding-top: 6px; margin-bottom: 6px;">
                 <label style="margin-bottom: 4px; color: var(--accent-yellow);">Dimensions</label>
                 <div class="input-row-3col">
-                    <div><label style="font-size: 0.55em; color: var(--text-dim);">Length (X)</label><input id="prop-sx" min="0" step="0.1" type="number" data-mech-locked="false" value="48.51" style="opacity: 1; border-color: var(--border-grey); border-style: solid;"></div>
-                    <div><label style="font-size: 0.55em; color: var(--text-dim);">Width (Y)</label><input id="prop-sy" min="0" step="0.1" type="number" data-mech-locked="false" value="8.00" style="opacity: 1; border-color: var(--border-grey); border-style: solid;" class=""></div>
-                    <div><label style="font-size: 0.55em; color: var(--text-dim);">Height (Z)</label><input id="prop-sz" min="0" step="0.1" type="number" data-mech-locked="false" value="10.14" style="opacity: 1; border-color: var(--border-grey); border-style: solid;"></div>
+                    <div><label id="lbl-prop-sx" style="font-size: 0.55em; color: var(--text-dim);">Length (X)</label><input id="prop-sx" min="0" step="0.1" type="number" data-mech-locked="false" value="48.51" style="opacity: 1; border-color: var(--border-grey); border-style: solid;"></div>
+                    <div><label id="lbl-prop-sy" style="font-size: 0.55em; color: var(--text-dim);">Width (Y)</label><input id="prop-sy" min="0" step="0.1" type="number" data-mech-locked="false" value="8.00" style="opacity: 1; border-color: var(--border-grey); border-style: solid;" class=""></div>
+                    <div><label id="lbl-prop-sz" style="font-size: 0.55em; color: var(--text-dim);">Height (Z)</label><input id="prop-sz" min="0" step="0.1" type="number" data-mech-locked="false" value="10.14" style="opacity: 1; border-color: var(--border-grey); border-style: solid;"></div>
                 </div>
             </div>
             
@@ -2468,21 +2489,7 @@ Drag (CD): 0.0189</title></circle></svg>
                 <input id="wing-bending" readonly="" style="color:var(--accent-yellow); background: var(--panel-grey);" type="text" value="1.254 N·m" data-raw="1.254090984375">
             </div>
 			
-			<!-- TAIL CONFIG UI -->
-            <div class="input-group" style="border-top: 1px solid var(--border-grey); padding-top: 6px; margin-top: 6px;">
-                <label>Tail Configuration</label>
-                <div style="display: flex; gap: 6px;">
-                    <select id="wing-tailConfig" style="flex: 2 1 0%; background: var(--bg-black); opacity: 1; border-color: var(--border-grey); border-style: solid;" onchange="updateComponentProperty('tailConfig', this.value)" title="">
-                        <option value="conventional" selected="true">Conventional, Efficiency = 0.6</option>
-                        <option value="t-tail">T-Tail, Efficiency = 0.85</option>
-                        <option value="v-tail">V-Tail, Efficiency = 0.55</option>
-                        <option value="a-tail">A-Tail, Efficiency = 0.55</option>
-                        <option value="flying-wing">Flying Wing, Efficiency = 0.0</option>
-                        <option value="custom">Custom...</option>
-                    </select>
-                    <input type="number" id="wing-tailEff" min="0" step="0.05" style="flex: 1 1 0%; display: none; opacity: 1; border-color: var(--border-grey); border-style: solid;" value="0.6" onchange="updateComponentProperty('tailEff', this.value)">
-                </div>
-            </div>
+
 
             <div id="airfoil-panel" style="margin-top: 15px; border-top: 2px solid var(--border-grey); padding-top: 10px;">
                 <h2>Airfoil &amp; Envelope</h2>
@@ -2727,6 +2734,8 @@ const App = {
     },
     
     ui: {
+        enableDragToMove: false,
+        modalTransform: null,
         showSettings: false,
         showWingWake: false,
         activeCalculator: null,
@@ -3297,14 +3306,22 @@ function updateTooltipPosition(e, tooltip) {
 #
 ##############################################################*/
 
-function createComponent(parentId = null) {
+function createComponent(parentId = null, shape = 'box', cylinderAxis = 'y') {
     const id = 'comp-' + Date.now();
+    const isCylinder = shape === 'cylinder';
     const newComp = { 
         id, 
         parentId, 
-        name: parentId ? "Instance" : "New Component", 
+        name: parentId ? "Instance" : (isCylinder ? (cylinderAxis === 'y' ? "Wheel" : "Cylinder") : "New Component"), 
         type: 'body', 
-        x: 0, y: -5, z: -5, sx: 10, sy: 10, sz: 10, 
+        shape: shape || 'box',
+        cylinderAxis: cylinderAxis || 'y',
+        x: 0, 
+        y: isCylinder && cylinderAxis === 'y' ? -1 : -5, 
+        z: isCylinder && cylinderAxis === 'y' ? -3 : -5, 
+        sx: isCylinder && cylinderAxis === 'y' ? 6 : 10, 
+        sy: isCylinder && cylinderAxis === 'y' ? 2 : 10, 
+        sz: isCylinder && cylinderAxis === 'y' ? 6 : 10, 
         sections: [
             { x: 0, w: 1, h: 1, dy: 0, dz: 0 }, 
             { x: 1, w: 1, h: 1, dy: 0, dz: 0 }  
@@ -3312,7 +3329,7 @@ function createComponent(parentId = null) {
         rho: 0,
         measuredMass: 0,
         predictedMass: 0,
-        color: "#f1c40f", 
+        color: isCylinder ? "#95a5a6" : "#f1c40f", 
         lockedX: false, lockedY: false, lockedZ: false, 
         anchorX: 'min', anchorY: 'center', anchorZ: 'center', 
         showLabel: false, isHollow: false, wallT: 0.2, isMirrored: false, isSymmetrical: false,
@@ -3642,17 +3659,16 @@ function toggleComponentVisibilityModel(id) {
     }
 }
 
-function performLoopCut(id) {
-    const active = getAllActiveParts().find(c => c.id === id);
-    if (!active || !active.sections || active.sections.length < 2) return;
-
-    let insertIdx = 1;
-    let foundByMouse = false;
+function findClosestSegment(active, clientX, clientY) {
+    if (!active || !active.sections || active.sections.length < 2) return 0;
 
     const svg = document.getElementById('visualizer');
-    if (svg && App.ui && App.ui.mouseX !== undefined && App.ui.mouseY !== undefined) {
-        const mousePt = getSVGPoint(svg, App.ui.mouseX, App.ui.mouseY);
-        const currentView = App.ui.currentView || 'top';
+    const mX = clientX !== undefined ? clientX : App.ui?.mouseX;
+    const mY = clientY !== undefined ? clientY : App.ui?.mouseY;
+
+    if (svg && mX !== undefined && mY !== undefined) {
+        const mousePt = getSVGPoint(svg, mX, mY);
+        const currentView = App.state.currentView || App.ui.currentView || 'top';
 
         const pointToSegDist = (px, py, x1, y1, x2, y2) => {
             const dx = x2 - x1;
@@ -3710,32 +3726,252 @@ function performLoopCut(id) {
             }
         });
 
-        if (bestSegIdx >= 0) {
-            insertIdx = bestSegIdx + 1;
-            foundByMouse = true;
-        }
+        if (bestSegIdx >= 0) return bestSegIdx;
     }
 
-    // Fallback if mouse position was unavailable
-    if (!foundByMouse) {
-        let maxGap = 0;
-        for (let i = 0; i < active.sections.length - 1; i++) {
-            const gap = active.sections[i+1].x - active.sections[i].x;
-            if (gap > maxGap) { maxGap = gap; insertIdx = i + 1; }
-        }
+    // Fallback: segment with max length
+    let maxGap = 0, best = 0;
+    for (let i = 0; i < active.sections.length - 1; i++) {
+        const gap = active.sections[i+1].x - active.sections[i].x;
+        if (gap > maxGap) { maxGap = gap; best = i; }
+    }
+    return best;
+}
+
+function getInterpolatedSectionPoints2D(c, s1, s2, t, isMirrored, currentView) {
+    const sx = safeParse(getProp(c, 'sx')), sy = safeParse(getProp(c, 'sy')), sz = safeParse(getProp(c, 'sz'));
+    const cx = safeParse(getProp(c, 'x')) + sx / 2;
+    const cy = (isMirrored ? -safeParse(getProp(c, 'y')) - sy : safeParse(getProp(c, 'y'))) + sy / 2;
+    const cz = safeParse(getProp(c, 'z')) + sz / 2;
+
+    let rX = (safeParse(getProp(c, 'rotX') || 0) * Math.PI) / 180;
+    let rY = (safeParse(getProp(c, 'rotY') || 0) * Math.PI) / 180;
+    let rZ = (safeParse(getProp(c, 'rotZ') || 0) * Math.PI) / 180;
+    if (isMirrored) { rX = -rX; rZ = -rZ; }
+
+    const secX = s1.x + t * (s2.x - s1.x);
+    const secW = s1.w + t * (s2.w - s1.w);
+    const secH = s1.h + t * (s2.h - s1.h);
+    const secDy = s1.dy + t * (s2.dy - s1.dy);
+    const secDz = s1.dz + t * (s2.dz - s1.dz);
+
+    const base_hx = sx / 2;
+    const loc_x = (secX * sx) - base_hx;
+    const loc_hy = (secW * sy) / 2;
+    const loc_hz = (secH * sz) / 2;
+    const loc_dy = isMirrored ? -(secDy * sy) : (secDy * sy);
+    const loc_dz = secDz * sz;
+
+    const localVertices = [
+        { x: loc_x, y: -loc_hy + loc_dy, z: -loc_hz + loc_dz },
+        { x: loc_x, y: loc_hy + loc_dy, z: -loc_hz + loc_dz },
+        { x: loc_x, y: loc_hy + loc_dy, z: loc_hz + loc_dz },
+        { x: loc_x, y: -loc_hy + loc_dy, z: loc_hz + loc_dz }
+    ];
+
+    return localVertices.map(v => {
+        let x1 = v.x;
+        let y1 = v.y * Math.cos(rX) - v.z * Math.sin(rX);
+        let z1 = v.y * Math.sin(rX) + v.z * Math.cos(rX);
+
+        let x2 = x1 * Math.cos(rY) + z1 * Math.sin(rY);
+        let y2 = y1;
+        let z2 = -x1 * Math.sin(rY) + z1 * Math.cos(rY);
+
+        let x3 = x2 * Math.cos(rZ) - y2 * Math.sin(rZ);
+        let y3 = x2 * Math.sin(rZ) + y2 * Math.cos(rZ);
+
+        const wx = x3 + cx;
+        const wy = y3 + cy;
+        const wz = z2 + cz;
+
+        if (currentView === 'top') return { u: wx, v: wy };
+        if (currentView === 'side') return { u: wx, v: -wz };
+        return { u: wy, v: -wz }; // front
+    });
+}
+
+function clearLoopCutPreview() {
+    const layer = document.getElementById('loop-cut-preview-layer');
+    if (layer) layer.innerHTML = '';
+}
+
+function renderLoopCutPreview() {
+    const svg = document.getElementById('visualizer');
+    if (!svg || !App.ui.loopCutModal) {
+        clearLoopCutPreview();
+        return;
     }
 
-    const s1 = active.sections[insertIdx - 1];
+    let layer = document.getElementById('loop-cut-preview-layer');
+    if (!layer) {
+        layer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        layer.setAttribute('id', 'loop-cut-preview-layer');
+        layer.setAttribute('pointer-events', 'none');
+        svg.appendChild(layer);
+    }
+    layer.innerHTML = '';
+
+    const { componentId, numCuts, segIdx } = App.ui.loopCutModal;
+    const c = getAllActiveParts().find(comp => comp.id === componentId);
+    if (!c || !c.sections || segIdx < 0 || segIdx >= c.sections.length - 1) return;
+
+    const s1 = c.sections[segIdx];
+    const s2 = c.sections[segIdx + 1];
+    const currentView = App.state.currentView || 'top';
+    const screenRatio = (typeof getVisualizerScreenRatio === 'function') ? getVisualizerScreenRatio() : 1;
+    const mirStates = getIsMirrored(c) ? [false, true] : [false];
+
+    let lastMidPt = null;
+
+    for (let k = 1; k <= numCuts; k++) {
+        const t = k / (numCuts + 1);
+        mirStates.forEach(mirState => {
+            const pts2D = getInterpolatedSectionPoints2D(c, s1, s2, t, mirState, currentView);
+            if (!pts2D || pts2D.length < 4) return;
+
+            const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            poly.setAttribute('points', pts2D.map(p => `${p.u},${p.v}`).join(' '));
+            poly.setAttribute('fill', 'rgba(241, 196, 15, 0.12)');
+            poly.setAttribute('stroke', '#f1c40f');
+            poly.setAttribute('stroke-width', (2.0 * screenRatio).toString());
+            poly.setAttribute('stroke-dasharray', `${4 * screenRatio},${3 * screenRatio}`);
+            layer.appendChild(poly);
+
+            pts2D.forEach(p => {
+                const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                dot.setAttribute('cx', p.u);
+                dot.setAttribute('cy', p.v);
+                dot.setAttribute('r', (2.8 * screenRatio).toString());
+                dot.setAttribute('fill', '#f1c40f');
+                layer.appendChild(dot);
+            });
+
+            if (!mirState && !lastMidPt) {
+                lastMidPt = { u: (pts2D[0].u + pts2D[2].u) / 2, v: (pts2D[0].v + pts2D[2].v) / 2 };
+            }
+        });
+    }
+
+    const badgePt = lastMidPt || (App.ui.lastCADMouse || { u: 0, v: 0 });
+    const fontSz = 12 * screenRatio;
+    const labelStr = `${numCuts}`;
+    const badgeW = Math.max(18 * screenRatio, (labelStr.length * 8 + 10) * screenRatio);
+    const badgeH = 18 * screenRatio;
+
+    const bgRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    bgRect.setAttribute('x', (badgePt.u - badgeW / 2).toString());
+    bgRect.setAttribute('y', (badgePt.v - badgeH - 6 * screenRatio).toString());
+    bgRect.setAttribute('width', badgeW.toString());
+    bgRect.setAttribute('height', badgeH.toString());
+    bgRect.setAttribute('rx', (3 * screenRatio).toString());
+    bgRect.setAttribute('fill', 'rgba(0, 0, 0, 0.85)');
+    bgRect.setAttribute('stroke', '#f1c40f');
+    bgRect.setAttribute('stroke-width', (1 * screenRatio).toString());
+    layer.appendChild(bgRect);
+
+    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    text.setAttribute('x', badgePt.u.toString());
+    text.setAttribute('y', (badgePt.v - badgeH - 6 * screenRatio + 13 * screenRatio).toString());
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('fill', '#f1c40f');
+    text.setAttribute('font-size', `${fontSz}px`);
+    text.setAttribute('font-weight', 'bold');
+    text.setAttribute('font-family', 'monospace');
+    text.textContent = labelStr;
+    layer.appendChild(text);
+}
+
+function startLoopCutModal(compId) {
+    if (!compId || compId === 'main-wing') return;
+    const c = getAllActiveParts().find(comp => comp.id === compId);
+    if (!c || !c.sections || c.sections.length < 2 || c.shape === 'cylinder') return;
+
+    if (App.ui.modalTransform) confirmModalTransform();
+    if (App.ui.loopCutModal) confirmLoopCutModal();
+
+    const segIdx = findClosestSegment(c, App.ui.mouseX, App.ui.mouseY);
+
+    App.ui.loopCutModal = {
+        componentId: compId,
+        numCuts: 1,
+        segIdx: segIdx,
+        view: App.state.currentView
+    };
+
+    const svg = document.getElementById('visualizer');
+    if (svg) svg.style.cursor = 'crosshair';
+
+    renderLoopCutPreview();
+    if (typeof renderShortcutsLegend === 'function') renderShortcutsLegend();
+}
+
+function updateLoopCutModalFromMouse(e) {
+    if (!App.ui.loopCutModal) return;
+    const c = getAllActiveParts().find(comp => comp.id === App.ui.loopCutModal.componentId);
+    if (!c) return;
+
+    const newSegIdx = findClosestSegment(c, e.clientX, e.clientY);
+    if (newSegIdx !== App.ui.loopCutModal.segIdx) {
+        App.ui.loopCutModal.segIdx = newSegIdx;
+    }
+    renderLoopCutPreview();
+}
+
+function confirmLoopCutModal() {
+    if (!App.ui.loopCutModal) return;
+    const { componentId, numCuts, segIdx } = App.ui.loopCutModal;
+    App.ui.loopCutModal = null;
+    clearLoopCutPreview();
+
+    const svg = document.getElementById('visualizer');
+    if (svg) svg.style.cursor = 'default';
+
+    performLoopCut(componentId, numCuts, segIdx);
+    refresh();
+    if (typeof saveHistory === 'function') saveHistory();
+    if (typeof renderShortcutsLegend === 'function') renderShortcutsLegend();
+}
+
+function cancelLoopCutModal() {
+    if (!App.ui.loopCutModal) return;
+    App.ui.loopCutModal = null;
+    clearLoopCutPreview();
+
+    const svg = document.getElementById('visualizer');
+    if (svg) svg.style.cursor = 'default';
+
+    if (typeof renderShortcutsLegend === 'function') renderShortcutsLegend();
+    refresh();
+}
+
+function performLoopCut(id, numCuts = 1, targetSegIdx = null) {
+    const active = getAllActiveParts().find(c => c.id === id);
+    if (!active || !active.sections || active.sections.length < 2) return;
+    numCuts = Math.max(1, parseInt(numCuts) || 1);
+
+    let segIdx = targetSegIdx;
+    if (segIdx === null || segIdx === undefined || segIdx < 0 || segIdx >= active.sections.length - 1) {
+        segIdx = findClosestSegment(active, App.ui?.mouseX, App.ui?.mouseY);
+    }
+
+    const insertIdx = segIdx + 1;
+    const s1 = active.sections[segIdx];
     const s2 = active.sections[insertIdx];
 
-    active.sections.splice(insertIdx, 0, {
-        x: (s1.x + s2.x) / 2,
-        w: (s1.w + s2.w) / 2,
-        h: (s1.h + s2.h) / 2,
-        dy: (s1.dy + s2.dy) / 2,
-        dz: (s1.dz + s2.dz) / 2
-    });
+    const newSecs = [];
+    for (let k = 1; k <= numCuts; k++) {
+        const t = k / (numCuts + 1);
+        newSecs.push({
+            x: s1.x + t * (s2.x - s1.x),
+            w: s1.w + t * (s2.w - s1.w),
+            h: s1.h + t * (s2.h - s1.h),
+            dy: s1.dy + t * (s2.dy - s1.dy),
+            dz: s1.dz + t * (s2.dz - s1.dz)
+        });
+    }
 
+    active.sections.splice(insertIdx, 0, ...newSecs);
     setProp(active, 'sections', active.sections); // <-- ROUTE TO DELTA
 
     if (typeof recalculateMassOrDensity === 'function') {
@@ -4094,6 +4330,9 @@ function setUIData(id, value, precision = 2, suffix = '') {
 
 function isEffectivelyVisible(id, isHidden) {
     if (App.ui.viewParams.isIsolated) {
+        if (id === 'main-wing' || (App.state.wingData && id === App.state.wingData.id)) {
+            return App.ui.viewParams.isolatedSet.has('main-wing') || (App.state.wingData && App.ui.viewParams.isolatedSet.has(App.state.wingData.id));
+        }
         return App.ui.viewParams.isolatedSet.has(id);
     }
     return !isHidden;
@@ -4827,15 +5066,26 @@ function getWingVolumeCm3(profile = App.state.activeMassProfile) {
 
 function getComponentVolumeCm3(c, profile = App.state.activeMassProfile) {
     if (!c) return 0.01;
-    const sections = getProp(c, 'sections') || c.sections;
-    if (!sections || sections.length < 2) return 0.01;
-    
     const sx = safeParse(getProp(c, 'sx')), sy = safeParse(getProp(c, 'sy')), sz = safeParse(getProp(c, 'sz'));
-    let totalVol = 0;
-    let innerVol = 0;
+    const shape = getProp(c, 'shape') || c.shape || 'box';
+    const isCyl = shape === 'cylinder';
     
     const isHol = getIsHollow(c, profile);
     const wt = isHol ? safeParse(getProp(c, 'wallT')) : 0;
+
+    if (isCyl) {
+        const outerVol = (Math.PI / 4) * sx * sy * sz;
+        if (isHol && wt > 0) {
+            const innerVolCyl = (Math.PI / 4) * Math.max(0, sx - wt * 2) * Math.max(0, sy - wt * 2) * Math.max(0, sz - wt * 2);
+            return Math.max(0.01, outerVol - innerVolCyl);
+        }
+        return Math.max(0.01, outerVol);
+    }
+
+    const sections = getProp(c, 'sections') || c.sections;
+    if (!sections || sections.length < 2) return 0.01;
+    let totalVol = 0;
+    let innerVol = 0;
 
     for (let i = 0; i < sections.length - 1; i++) {
         const s1 = sections[i];
@@ -5772,22 +6022,57 @@ function getRotatedVertices(c, isMirroredAxis = false) {
     if (isMirroredAxis) { rX = -rX; rZ = -rZ; }
 
     const localVertices = [];
-    const base_hx = sx / 2;
+    const shape = getProp(c, 'shape') || c.shape || 'box';
+    const cylAxis = getProp(c, 'cylinderAxis') || c.cylinderAxis || 'y';
 
-    if (!c.sections || c.sections.length < 2) return [];
+    if (shape === 'cylinder') {
+        const numPts = 32;
+        const hx = sx / 2, hy = sy / 2, hz = sz / 2;
+        if (cylAxis === 'y') {
+            for (let i = 0; i < numPts; i++) {
+                const angle = (i / numPts) * Math.PI * 2;
+                localVertices.push({ x: hx * Math.cos(angle), y: -hy, z: hz * Math.sin(angle) });
+            }
+            for (let i = 0; i < numPts; i++) {
+                const angle = (i / numPts) * Math.PI * 2;
+                localVertices.push({ x: hx * Math.cos(angle), y: hy, z: hz * Math.sin(angle) });
+            }
+        } else if (cylAxis === 'x') {
+            for (let i = 0; i < numPts; i++) {
+                const angle = (i / numPts) * Math.PI * 2;
+                localVertices.push({ x: -hx, y: hy * Math.cos(angle), z: hz * Math.sin(angle) });
+            }
+            for (let i = 0; i < numPts; i++) {
+                const angle = (i / numPts) * Math.PI * 2;
+                localVertices.push({ x: hx, y: hy * Math.cos(angle), z: hz * Math.sin(angle) });
+            }
+        } else { // 'z'
+            for (let i = 0; i < numPts; i++) {
+                const angle = (i / numPts) * Math.PI * 2;
+                localVertices.push({ x: hx * Math.cos(angle), y: hy * Math.sin(angle), z: -hz });
+            }
+            for (let i = 0; i < numPts; i++) {
+                const angle = (i / numPts) * Math.PI * 2;
+                localVertices.push({ x: hx * Math.cos(angle), y: hy * Math.sin(angle), z: hz });
+            }
+        }
+    } else {
+        const base_hx = sx / 2;
+        if (!c.sections || c.sections.length < 2) return [];
 
-    c.sections.forEach(sec => {
-        const loc_x = (sec.x * sx) - base_hx;
-        const loc_hy = (sec.w * sy) / 2;
-        const loc_hz = (sec.h * sz) / 2;
-        const loc_dy = isMirroredAxis ? -(sec.dy * sy) : (sec.dy * sy);
-        const loc_dz = (sec.dz * sz);
+        c.sections.forEach(sec => {
+            const loc_x = (sec.x * sx) - base_hx;
+            const loc_hy = (sec.w * sy) / 2;
+            const loc_hz = (sec.h * sz) / 2;
+            const loc_dy = isMirroredAxis ? -(sec.dy * sy) : (sec.dy * sy);
+            const loc_dz = (sec.dz * sz);
 
-        localVertices.push({x: loc_x, y: -loc_hy + loc_dy, z: -loc_hz + loc_dz});
-        localVertices.push({x: loc_x, y: loc_hy + loc_dy, z: -loc_hz + loc_dz});
-        localVertices.push({x: loc_x, y: loc_hy + loc_dy, z: loc_hz + loc_dz});
-        localVertices.push({x: loc_x, y: -loc_hy + loc_dy, z: loc_hz + loc_dz});
-    });
+            localVertices.push({x: loc_x, y: -loc_hy + loc_dy, z: -loc_hz + loc_dz});
+            localVertices.push({x: loc_x, y: loc_hy + loc_dy, z: -loc_hz + loc_dz});
+            localVertices.push({x: loc_x, y: loc_hy + loc_dy, z: loc_hz + loc_dz});
+            localVertices.push({x: loc_x, y: -loc_hy + loc_dy, z: loc_hz + loc_dz});
+        });
+    }
 
     return localVertices.map(v => {
         let x1 = v.x;
@@ -5806,11 +6091,11 @@ function getRotatedVertices(c, isMirroredAxis = false) {
 }
 
 function getConvexHull2D(points) {
-    points.sort((a, b) => a.u !== b.u ? a.u - b.u : a.v - b.v);
+    const pts = points.slice().sort((a, b) => a.u !== b.u ? a.u - b.u : a.v - b.v);
     const crossProduct = (o, a, b) => (a.u - o.u) * (b.v - o.v) - (a.v - o.v) * (b.u - o.u);
 
     const lower = [];
-    for (let p of points) {
+    for (let p of pts) {
         while (lower.length >= 2 && crossProduct(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) {
             lower.pop();
         }
@@ -5818,8 +6103,8 @@ function getConvexHull2D(points) {
     }
 
     const upper = [];
-    for (let i = points.length - 1; i >= 0; i--) {
-        let p = points[i];
+    for (let i = pts.length - 1; i >= 0; i--) {
+        let p = pts[i];
         while (upper.length >= 2 && crossProduct(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) {
             upper.pop();
         }
@@ -6417,6 +6702,7 @@ function renderAircraft() {
     const compLayer = document.getElementById('components-layer');
     const macLayer = document.getElementById('mac-layer');
     const cgLayer = document.getElementById('cg-layer');
+    const axesLayer = document.getElementById('axes-layer');
     
     if (!svg || !wingLayer || !compLayer || !wingData) return;
 
@@ -6438,6 +6724,8 @@ function renderAircraft() {
     wingLayer.innerHTML = ''; compLayer.innerHTML = ''; 
     macLayer.innerHTML = ''; cgLayer.innerHTML = '';
     if (wakeLayer) wakeLayer.innerHTML = '';
+    if (axesLayer) axesLayer.innerHTML = '';
+    renderOriginAxes(currentView);
 
     const b = safeParse(wingData.b), cr = safeParse(wingData.cr), ct = safeParse(wingData.ct);
     const sweep = safeParse(wingData.sweep), dihedral = safeParse(wingData.dihedral);
@@ -6531,7 +6819,13 @@ function renderAircraft() {
             handleFocusComponent(wingData.id);
         };
         p.setAttribute('transform', `translate(${pX}, 0) scale(${Math.cos(currentAoA * Math.PI / 180)}, 1) translate(${-pX}, 0)`);
-        if (isEffectivelyVisible(wingData.id, wingData.isHidden)) wingLayer.appendChild(p);
+        const isWingIsolated = !isIsolated || isolatedSet.has(wingData.id) || isolatedSet.has('main-wing');
+        if (!isWingIsolated) {
+            p.style.opacity = '0.15';
+            p.style.pointerEvents = 'none';
+        }
+        const showWing = isIsolated ? (!wingData.isHidden || isWingIsolated) : !wingData.isHidden;
+        if (showWing) wingLayer.appendChild(p);
     } else if (currentView === 'side') {
         const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
         p.setAttribute('d', `${generateAirfoilSvgPath(sweep, -z_delta, ct, wingData.nacaTip)} ${generateAirfoilSvgPath(0, 0, cr, wingData.nacaRoot)}`);
@@ -6552,7 +6846,13 @@ function renderAircraft() {
             handleFocusComponent(wingData.id);
         };
         p.setAttribute('transform', `rotate(${currentAoA}, ${pX}, 0)`); 
-        if (isEffectivelyVisible(wingData.id, wingData.isHidden)) wingLayer.appendChild(p);
+        const isWingIsolated = !isIsolated || isolatedSet.has(wingData.id) || isolatedSet.has('main-wing');
+        if (!isWingIsolated) {
+            p.style.opacity = '0.15';
+            p.style.pointerEvents = 'none';
+        }
+        const showWing = isIsolated ? (!wingData.isHidden || isWingIsolated) : !wingData.isHidden;
+        if (showWing) wingLayer.appendChild(p);
     } else {
         const aoaRad = currentAoA * Math.PI / 180;
         const appTRoot = Math.abs((safeParse(wingData.cr) * (wingData.nacaRoot ? parseInt(wingData.nacaRoot.substring(2))/100 : 0.12)) * Math.cos(aoaRad)) + Math.abs(cr * Math.sin(aoaRad));
@@ -6578,7 +6878,13 @@ function renderAircraft() {
             e.stopPropagation();
             handleFocusComponent(wingData.id);
         };
-        if (isEffectivelyVisible(wingData.id, wingData.isHidden)) wingLayer.appendChild(p);
+        const isWingIsolated = !isIsolated || isolatedSet.has(wingData.id) || isolatedSet.has('main-wing');
+        if (!isWingIsolated) {
+            p.style.opacity = '0.15';
+            p.style.pointerEvents = 'none';
+        }
+        const showWing = isIsolated ? (!wingData.isHidden || isWingIsolated) : !wingData.isHidden;
+        if (showWing) wingLayer.appendChild(p);
     }
 
     // Render Wing Wake Corridor if enabled
@@ -6589,7 +6895,8 @@ function renderAircraft() {
     // Draw Components
     activeParts.forEach(c => {
         if (!c.sections) return; 
-        if (isIsolated && !isolatedSet.has(c.id)) return;
+        const isPartIsolated = !isIsolated || isolatedSet.has(c.id);
+        if (c.isHidden && !isPartIsolated) return;
         if (!isIsolated && c.isHidden) return;
         
         [false, true].forEach(mirState => {
@@ -6597,61 +6904,124 @@ function renderAircraft() {
             const vertices3D = getPartVertices(c, mirState);
             const compGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
             compGroup.setAttribute('class', 'interactive-shape');
-            compGroup.onmousedown = (e) => startDrag(e, c.id);
-            compGroup.ondblclick = (e) => {
-                e.stopPropagation();
-                handleFocusComponent(c.id);
-            };
+            if (isPartIsolated) {
+                compGroup.onmousedown = (e) => startDrag(e, c.id);
+                compGroup.ondblclick = (e) => {
+                    e.stopPropagation();
+                    handleFocusComponent(c.id);
+                };
+            } else {
+                compGroup.style.opacity = '0.15';
+                compGroup.style.pointerEvents = 'none';
+            }
 
-            const isCActive = (c.id === selectedComponentId);
+            const isCActive = (c.id === selectedComponentId) && isPartIsolated;
             const fillGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
             fillGroup.setAttribute('opacity', mirState ? '0.2' : '0.4');
             const edgeMap = new Map();
 
-            for (let s = 0; s < c.sections.length - 1; s++) {
-                const segVerts = vertices3D.slice(s * 4, s * 4 + 8);
-                const points2D = segVerts.map(v => {
+            if (c.shape === 'cylinder') {
+                const points2D = vertices3D.map(v => {
                     if (currentView === 'top') return { u: v.x, v: v.y };
                     if (currentView === 'side') return { u: v.x, v: -v.z };
                     return { u: v.y, v: -v.z }; 
                 });
-                
                 const hull = getConvexHull2D(points2D);
-                if (hull.length === 0) continue;
+                if (hull.length > 0) {
+                    const fillPoly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                    fillPoly.setAttribute('points', hull.map(pt => `${pt.u},${pt.v}`).join(' '));
+                    fillPoly.setAttribute('fill', c.color);
+                    fillPoly.setAttribute('stroke', 'none'); 
+                    fillGroup.appendChild(fillPoly);
 
-                const fillPoly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-                fillPoly.setAttribute('points', hull.map(pt => `${pt.u},${pt.v}`).join(' '));
-                fillPoly.setAttribute('fill', c.color);
-                fillPoly.setAttribute('stroke', c.color); 
-                fillPoly.setAttribute('stroke-width', '0.5');
-                fillGroup.appendChild(fillPoly);
+                    const pathD = hull.map((pt, i) => (i === 0 ? `M ${pt.u} ${pt.v}` : `L ${pt.u} ${pt.v}`)).join(' ') + ' Z';
 
-                for (let i = 0; i < hull.length; i++) {
-                    const p1 = hull[i], p2 = hull[(i + 1) % hull.length];
-                    const k1 = `${p1.u.toFixed(4)},${p1.v.toFixed(4)}`;
-                    const k2 = `${p2.u.toFixed(4)},${p2.v.toFixed(4)}`;
-                    if (edgeMap.has(`${k2}|${k1}`)) edgeMap.delete(`${k2}|${k1}`);
-                    else edgeMap.set(`${k1}|${k2}`, { p1, p2 });
+                    const outlinePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    outlinePath.setAttribute('d', pathD);
+                    outlinePath.setAttribute('fill', 'none');
+                    outlinePath.setAttribute('stroke', isCActive ? 'var(--accent-yellow)' : c.color);
+                    outlinePath.setAttribute('stroke-width', isCActive ? '2' : '1');
+                    outlinePath.setAttribute('stroke-linecap', 'round'); 
+                    if (mirState) outlinePath.setAttribute('stroke-dasharray', '2,2');
+                    if (isCActive) outlinePath.setAttribute('class', 'active-part');
+
+                    compGroup.appendChild(fillGroup);
+                    compGroup.appendChild(outlinePath);
+                    compLayer.appendChild(compGroup);
                 }
+            } else if (currentView === 'front') {
+                const points2D = vertices3D.map(v => ({ u: v.y, v: -v.z }));
+                const hull = getConvexHull2D(points2D);
+                if (hull.length > 0) {
+                    const fillPoly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                    fillPoly.setAttribute('points', hull.map(pt => `${pt.u},${pt.v}`).join(' '));
+                    fillPoly.setAttribute('fill', c.color);
+                    fillPoly.setAttribute('stroke', 'none'); 
+                    fillGroup.appendChild(fillPoly);
+
+                    const pathD = hull.map((pt, i) => (i === 0 ? `M ${pt.u} ${pt.v}` : `L ${pt.u} ${pt.v}`)).join(' ') + ' Z';
+                    const outlinePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    outlinePath.setAttribute('d', pathD);
+                    outlinePath.setAttribute('fill', 'none');
+                    outlinePath.setAttribute('stroke', isCActive ? 'var(--accent-yellow)' : c.color);
+                    outlinePath.setAttribute('stroke-width', isCActive ? '2' : '1');
+                    outlinePath.setAttribute('stroke-linecap', 'round'); 
+                    if (mirState) outlinePath.setAttribute('stroke-dasharray', '2,2');
+                    if (isCActive) outlinePath.setAttribute('class', 'active-part');
+
+                    compGroup.appendChild(fillGroup);
+                    compGroup.appendChild(outlinePath);
+                    compLayer.appendChild(compGroup);
+                }
+            } else {
+                for (let s = 0; s < c.sections.length - 1; s++) {
+                    const segVerts = vertices3D.slice(s * 4, s * 4 + 8);
+                    const points2D = segVerts.map((v, i) => {
+                        const secIdx = (i < 4) ? s : (s + 1);
+                        if (currentView === 'top') return { u: v.x, v: v.y, sec: secIdx };
+                        if (currentView === 'side') return { u: v.x, v: -v.z, sec: secIdx };
+                        return { u: v.y, v: -v.z, sec: secIdx }; 
+                    });
+                    
+                    const hull = getConvexHull2D(points2D);
+                    if (hull.length === 0) continue;
+
+                    const fillPoly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                    fillPoly.setAttribute('points', hull.map(pt => `${pt.u},${pt.v}`).join(' '));
+                    fillPoly.setAttribute('fill', c.color);
+                    fillPoly.setAttribute('stroke', 'none'); 
+                    fillGroup.appendChild(fillPoly);
+
+                    for (let i = 0; i < hull.length; i++) {
+                        const p1 = hull[i], p2 = hull[(i + 1) % hull.length];
+                        if (p1.sec === p2.sec && p1.sec > 0 && p1.sec < c.sections.length - 1) {
+                            continue; // Skip internal loop cut lines
+                        }
+                        const k1 = `${p1.u.toFixed(4)},${p1.v.toFixed(4)}`;
+                        const k2 = `${p2.u.toFixed(4)},${p2.v.toFixed(4)}`;
+                        if (edgeMap.has(`${k2}|${k1}`)) edgeMap.delete(`${k2}|${k1}`);
+                        else edgeMap.set(`${k1}|${k2}`, { p1, p2 });
+                    }
+                }
+
+                let pathD = "";
+                edgeMap.forEach(edge => { pathD += `M ${edge.p1.u} ${edge.p1.v} L ${edge.p2.u} ${edge.p2.v} `; });
+                
+                const outlinePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                outlinePath.setAttribute('d', pathD);
+                outlinePath.setAttribute('fill', 'none');
+                outlinePath.setAttribute('stroke', isCActive ? 'var(--accent-yellow)' : c.color);
+                outlinePath.setAttribute('stroke-width', isCActive ? '2' : '1');
+                outlinePath.setAttribute('stroke-linecap', 'round'); 
+                if (mirState) outlinePath.setAttribute('stroke-dasharray', '2,2');
+                if (isCActive) outlinePath.setAttribute('class', 'active-part');
+
+                compGroup.appendChild(fillGroup);
+                compGroup.appendChild(outlinePath);
+                compLayer.appendChild(compGroup);
             }
 
-            let pathD = "";
-            edgeMap.forEach(edge => { pathD += `M ${edge.p1.u} ${edge.p1.v} L ${edge.p2.u} ${edge.p2.v} `; });
-            
-            const outlinePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            outlinePath.setAttribute('d', pathD);
-            outlinePath.setAttribute('fill', 'none');
-            outlinePath.setAttribute('stroke', isCActive ? 'var(--accent-yellow)' : c.color);
-            outlinePath.setAttribute('stroke-width', isCActive ? '2' : '1');
-            outlinePath.setAttribute('stroke-linecap', 'round'); 
-            if (mirState) outlinePath.setAttribute('stroke-dasharray', '2,2');
-            if (isCActive) outlinePath.setAttribute('class', 'active-part');
-
-            compGroup.appendChild(fillGroup);
-            compGroup.appendChild(outlinePath);
-            compLayer.appendChild(compGroup);
-
-            if (c.showLabel && !mirState) {
+            if (c.showLabel && !mirState && isPartIsolated) {
                 const allPoints2D = vertices3D.map(v => {
                     if (currentView === 'top') return { u: v.x, v: v.y };
                     if (currentView === 'side') return { u: v.x, v: -v.z };
@@ -6845,7 +7215,7 @@ function renderAircraft() {
     if (isIsolated) {
         isolatedSet.forEach(id => {
             const c = getAllActiveParts().find(comp => comp.id === id);
-            if (!c) return;
+            if (!c || c.shape === 'cylinder') return;
             getRotatedVertices(c, false).forEach((v, i) => {
                 let u, _v;
                 if (currentView === 'top') { u = v.x; _v = v.y; }
@@ -6895,37 +7265,71 @@ function renderShortcutsLegend() {
     
     legend.style.display = 'flex';
 
-    let html = `<div style="color: var(--accent-yellow); font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid var(--border-grey); padding-bottom: 2px;">Shortcuts</div>`;
+    let html = `<div style="color: var(--text-main); font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid var(--border-grey); padding-bottom: 2px;">Shortcuts</div>`;
     
     if (App.ui.panelHistory && App.ui.panelHistory.previous) {
         if (App.ui.panelHistory.isPeeking) {
-            html += `<div style="display:flex; justify-content:space-between; gap:15px; color:var(--accent-yellow); font-weight:bold;"><span><kbd style="color:var(--accent-yellow); font-family:monospace; font-weight:bold;">Holding P</kbd></span> <span>Peeking Prev Panel</span></div>`;
+            html += `<div style="display:flex; justify-content:space-between; gap:15px; font-weight:bold;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Holding P</kbd></span> <span>Peeking Prev Panel</span></div>`;
         } else {
             html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Hold P</kbd></span> <span>Peek Prev Panel</span></div>`;
         }
     }
 
-    if (selectedComponentId) {
-        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">F2</kbd></span> <span>Rename Part</span></div>`;
-        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">H</kbd></span> <span>Hide Part</span></div>`;
-        if (selectedComponentId !== 'main-wing') {
-            html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">I</kbd></span> <span>${viewParams.isIsolated ? 'Exit Isolation' : 'Isolate (Edit)'}</span></div>`;
-            html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">O</kbd></span> <span>Set Origin (Hover/CoM)</span></div>`;
+    if (App.ui.loopCutModal) {
+        const lc = App.ui.loopCutModal;
+        html += `<div style="display:flex; justify-content:space-between; gap:15px; font-weight:bold;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">LOOP CUT</kbd></span> <span>${lc.numCuts} ${lc.numCuts === 1 ? 'Cut' : 'Cuts'}</span></div>`;
+        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Scroll / + -</kbd></span> <span>Number of Cuts</span></div>`;
+        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Click / Enter</kbd></span> <span>Confirm</span></div>`;
+        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Esc / R-Click</kbd></span> <span>Cancel</span></div>`;
+    } else if (App.ui.modalTransform) {
+        const mt = App.ui.modalTransform;
+        const modeLabel = mt.mode === 'grab' ? 'GRAB (MOVE)' : 'ROTATE';
+        const axisLabel = mt.axis ? `${mt.axis.toUpperCase()} Axis Locked` : (mt.mode === 'rotate' ? 'View Plane' : 'Free 2D Move');
+        html += `<div style="display:flex; justify-content:space-between; gap:15px; font-weight:bold;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">${modeLabel}</kbd></span> <span>${axisLabel}</span></div>`;
+        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">X / Y / Z</kbd></span> <span>${mt.axis ? 'Toggle / Switch Axis' : 'Lock to Axis'}</span></div>`;
+        if (mt.mode === 'rotate') {
+            html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl / Shift</kbd></span> <span>Snap 5° / Fine</span></div>`;
+            html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">0-9</kbd></span> <span>Type Angle</span></div>`;
+        } else if (mt.mode === 'grab') {
+            html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl / Shift</kbd></span> <span>Snap 1cm / Fine</span></div>`;
+            html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">0-9</kbd></span> <span>Type Distance</span></div>`;
         }
-    }
-    
-    html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">F</kbd></span> <span>Reset View (Whole Plane)</span></div>`;
-    html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">MMB Drag</kbd></span> <span>Pan View</span></div>`;
-    html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Scroll</kbd></span> <span>Zoom to Cursor</span></div>`;
-    html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">W</kbd></span> <span>${App.ui.showWingWake ? 'Hide Wake' : 'Wing Wake'}</span></div>`;
-    html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">D</kbd></span> <span>Dimension</span></div>`;
-    html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+H</kbd></span> <span>Unhide All</span></div>`;
-    html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+Z</kbd></span> <span>Undo</span></div>`;
+        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Click / Enter</kbd></span> <span>Confirm</span></div>`;
+        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Esc / R-Click</kbd></span> <span>Cancel</span></div>`;
+    } else {
+        if (selectedComponentId) {
+            html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">F2</kbd></span> <span>Rename Part</span></div>`;
+            html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">H</kbd></span> <span>Hide Part</span></div>`;
+            if (selectedComponentId !== 'main-wing') {
+                html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">G</kbd></span> <span>Grab (Move)</span></div>`;
+                html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">R</kbd></span> <span>Rotate</span></div>`;
+                html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+C / Ctrl+V</kbd></span> <span>Duplicate</span></div>`;
+                html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Shift+D</kbd></span> <span>Create Instance</span></div>`;
+                html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">I</kbd></span> <span>${viewParams.isIsolated ? 'Exit Isolation' : 'Isolate (Edit)'}</span></div>`;
+                html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">O</kbd></span> <span>Set Origin (Hover/CoM)</span></div>`;
+                html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Del</kbd></span> <span>Delete Part</span></div>`;
+            }
+        }
+        
+        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">F</kbd></span> <span>Reset View (Whole Plane)</span></div>`;
+        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">MMB Drag</kbd></span> <span>Pan View</span></div>`;
+        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Scroll</kbd></span> <span>Zoom to Cursor</span></div>`;
+        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">W</kbd></span> <span>${App.ui.showWingWake ? 'Hide Wake' : 'Wing Wake'}</span></div>`;
+        if (App.state.dimTool && App.state.dimTool.active) {
+            html += `<div style="display:flex; justify-content:space-between; gap:15px; font-weight:bold;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Esc</kbd></span> <span>Exit Dimensioning</span></div>`;
+            html += `<div style="display:flex; justify-content:space-between; gap:15px; font-weight:bold;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Enter</kbd></span> <span>Confirm Dimension</span></div>`;
+        } else {
+            html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">D</kbd></span> <span>Dimension Mode</span></div>`;
+        }
+        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Shift+A</kbd></span> <span>Add Part</span></div>`;
+        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+H</kbd></span> <span>Unhide All</span></div>`;
+        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+Z</kbd></span> <span>Undo</span></div>`;
 
-    if (viewParams.isIsolated && selectedComponentId !== 'main-wing') {
-        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+R</kbd></span> <span>Loop Cut</span></div>`;
-        html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">X</kbd></span> <span>Delete Loop (Hover)</span></div>`;
-        html += `<div style="display:flex; justify-content:space-between; gap:15px; margin-top:4px; border-top:1px solid var(--border-grey); padding-top:4px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Hold Ctrl</kbd></span> <span>Disable Snapping</span></div>`;
+        if (viewParams.isIsolated && selectedComponentId !== 'main-wing') {
+            html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Ctrl+R</kbd></span> <span>Loop Cut</span></div>`;
+            html += `<div style="display:flex; justify-content:space-between; gap:15px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">X</kbd></span> <span>Delete Loop (Hover)</span></div>`;
+            html += `<div style="display:flex; justify-content:space-between; gap:15px; margin-top:4px; border-top:1px solid var(--border-grey); padding-top:4px;"><span><kbd style="color:var(--text-main); font-family:monospace; font-weight:bold;">Hold Ctrl</kbd></span> <span>Disable Snapping</span></div>`;
+        }
     }
 
     if (legend.innerHTML !== html) {
@@ -6946,6 +7350,44 @@ function drawAviationTarget(layer, x, y, colorCode, baseRadiusPixels, viewScale)
     g.innerHTML += `<line x1="${x}" y1="${y-r-(strokeW*2)}" x2="${x}" y2="${y+r+(strokeW*2)}" stroke="#fff" stroke-width="${strokeW}"/>`;
     
     layer.appendChild(g);
+}
+
+function renderOriginAxes(view) {
+    const axesLayer = document.getElementById('axes-layer');
+    if (!axesLayer) return;
+    axesLayer.innerHTML = '';
+
+    // Only render in 2D orthographic projection views
+    if (view !== 'top' && view !== 'side' && view !== 'front') return;
+
+    const extent = 100000;
+    const strokeWidth = 1.5;
+    const opacity = 0.55;
+
+    // Standard CAD Axis Colors: X=Red, Y=Green, Z=Blue
+    const colorX = '#e74c3c';
+    const colorY = '#2ecc71';
+    const colorZ = '#3498db';
+
+    let lines = '';
+    if (view === 'top') {
+        // Positive X axis: right (+extent, 0)
+        lines += `<line x1="0" y1="0" x2="${extent}" y2="0" stroke="${colorX}" stroke-width="${strokeWidth}" stroke-opacity="${opacity}" vector-effect="non-scaling-stroke" data-axis="x"/>`;
+        // Positive Y axis: down (0, +extent)
+        lines += `<line x1="0" y1="0" x2="0" y2="${extent}" stroke="${colorY}" stroke-width="${strokeWidth}" stroke-opacity="${opacity}" vector-effect="non-scaling-stroke" data-axis="y"/>`;
+    } else if (view === 'side') {
+        // Positive X axis: right (+extent, 0)
+        lines += `<line x1="0" y1="0" x2="${extent}" y2="0" stroke="${colorX}" stroke-width="${strokeWidth}" stroke-opacity="${opacity}" vector-effect="non-scaling-stroke" data-axis="x"/>`;
+        // Positive Z axis: up (0, -extent)
+        lines += `<line x1="0" y1="0" x2="0" y2="${-extent}" stroke="${colorZ}" stroke-width="${strokeWidth}" stroke-opacity="${opacity}" vector-effect="non-scaling-stroke" data-axis="z"/>`;
+    } else if (view === 'front') {
+        // Positive Y axis: right (+extent, 0)
+        lines += `<line x1="0" y1="0" x2="${extent}" y2="0" stroke="${colorY}" stroke-width="${strokeWidth}" stroke-opacity="${opacity}" vector-effect="non-scaling-stroke" data-axis="y"/>`;
+        // Positive Z axis: up (0, -extent)
+        lines += `<line x1="0" y1="0" x2="0" y2="${-extent}" stroke="${colorZ}" stroke-width="${strokeWidth}" stroke-opacity="${opacity}" vector-effect="non-scaling-stroke" data-axis="z"/>`;
+    }
+
+    axesLayer.innerHTML = lines;
 }
 
 function drawLocalOrigin(layer, c, view) {
@@ -7909,17 +8351,6 @@ function finalizeDimensionPlacement(e) {
     if (!App.state.dimTool || !App.state.dimTool.active || App.state.dimTool.step !== 2) return;
     if (App.state.dimTool.stepTransitionTime && (Date.now() - App.state.dimTool.stepTransitionTime < 150)) return;
 
-    const svg = document.getElementById('visualizer');
-    let u = 0, v = 0;
-    if (svg && e && e.clientX !== undefined) {
-        const p = getSVGPoint(svg, e.clientX, e.clientY);
-        u = p.x;
-        v = p.y;
-    } else if (App.state.dimTool.previewPos) {
-        u = App.state.dimTool.previewPos.u;
-        v = App.state.dimTool.previewPos.v;
-    }
-
     const refA = App.state.dimTool.refA;
     const refB = App.state.dimTool.refB;
     if (!refA || !refB) {
@@ -7930,6 +8361,20 @@ function finalizeDimensionPlacement(e) {
     const currentView = App.state.currentView;
     const ptA = getFeature2D(refA, currentView);
     const ptB = getFeature2D(refB, currentView);
+
+    const svg = document.getElementById('visualizer');
+    let u = 0, v = 0;
+    if (svg && e && e.clientX !== undefined) {
+        const p = getSVGPoint(svg, e.clientX, e.clientY);
+        u = p.x;
+        v = p.y;
+    } else if (App.state.dimTool.previewPos) {
+        u = App.state.dimTool.previewPos.u;
+        v = App.state.dimTool.previewPos.v;
+    } else if (ptA && ptB) {
+        u = (ptA.u + ptB.u) / 2;
+        v = (ptA.v + ptB.v) / 2 - 20;
+    }
 
     const midU = (ptA.u + ptB.u) / 2;
     const midV = (ptA.v + ptB.v) / 2;
@@ -8477,6 +8922,7 @@ function openDimensionModifyDialog(dimId, clientX, clientY) {
 function closeDimensionModifyDialog() {
     const popover = document.getElementById('dim-edit-popover');
     if (popover) popover.style.display = 'none';
+    App.state.selectedDimensionId = null;
 }
 
 function confirmDimensionModify() {
@@ -8501,6 +8947,573 @@ function confirmDimensionModify() {
     } else {
         input.value = (getDimensionDistance(dim) * dScale).toFixed(2);
     }
+}
+
+/*##############################################################
+#
+# SECTION 13B: BLENDER-STYLE MODAL TRANSFORMS (G: Grab, R: Rotate)
+#
+##############################################################*/
+
+function startModalTransform(mode) {
+    const selectedId = App.state.selectedComponentId;
+    if (!selectedId || selectedId === 'main-wing') return;
+    const c = App.state.components.find(comp => comp.id === selectedId);
+    if (!c) return;
+
+    if (App.ui.modalTransform) {
+        confirmModalTransform();
+    }
+
+    const svg = document.getElementById('visualizer');
+    const mouseX = App.ui.mouseX || window.innerWidth / 2;
+    const mouseY = App.ui.mouseY || window.innerHeight / 2;
+    let mouseCAD = { u: 0, v: 0 };
+    if (svg) {
+        const pt = getSVGPoint(svg, mouseX, mouseY);
+        mouseCAD = { u: pt.x, v: pt.y };
+    }
+
+    const currentView = App.state.currentView;
+    const center = getPartCenter2D(c, currentView);
+    const startAngle = Math.atan2(mouseCAD.v - center.v, mouseCAD.u - center.u);
+
+    App.ui.modalTransform = {
+        mode: mode, // 'grab' or 'rotate'
+        componentId: selectedId,
+        initialPos: { x: safeParse(c.x), y: safeParse(c.y), z: safeParse(c.z) },
+        initialRot: { rotX: safeParse(c.rotX || 0), rotY: safeParse(c.rotY || 0), rotZ: safeParse(c.rotZ || 0) },
+        mouseStartCAD: mouseCAD,
+        center2D: center,
+        startAngle: startAngle,
+        prevAngle: startAngle,
+        accumulatedDeltaDeg: 0,
+        rotationDirection: 1,
+        axis: null, // null, 'x', 'y', 'z'
+        view: currentView
+    };
+    App.ui.lastCADMouse = mouseCAD;
+
+    if (svg) svg.style.cursor = mode === 'grab' ? 'move' : 'crosshair';
+    if (typeof renderShortcutsLegend === 'function') renderShortcutsLegend();
+    renderModalTransformHUD();
+    renderTransformGuidelines();
+}
+
+function handleModalTransformAxis(axisKey) {
+    if (!App.ui.modalTransform) return false;
+    const axis = axisKey.toLowerCase();
+    if (!['x', 'y', 'z'].includes(axis)) return false;
+
+    if (App.ui.modalTransform.axis === axis) {
+        App.ui.modalTransform.axis = null;
+    } else {
+        App.ui.modalTransform.axis = axis;
+    }
+
+    if (App.ui.modalTransform.hasNumeric) {
+        if (App.ui.modalTransform.mode === 'grab') {
+            applyNumericDistance(App.ui.modalTransform);
+        } else if (App.ui.modalTransform.mode === 'rotate') {
+            applyNumericRotation(App.ui.modalTransform);
+        }
+    } else {
+        updateModalTransformFromMouse(App.ui.lastCADMouse || App.ui.modalTransform.mouseStartCAD);
+    }
+    if (typeof renderShortcutsLegend === 'function') renderShortcutsLegend();
+    renderModalTransformHUD();
+    renderTransformGuidelines();
+    return true;
+}
+
+function updateModalTransformFromMouse(cadPt, e) {
+    if (!App.ui.modalTransform) return;
+    App.ui.lastCADMouse = cadPt;
+    const mt = App.ui.modalTransform;
+    const c = App.state.components.find(comp => comp.id === mt.componentId);
+    if (!c) return;
+
+    const currentView = mt.view;
+    let du = cadPt.u - mt.mouseStartCAD.u;
+    let dv = cadPt.v - mt.mouseStartCAD.v;
+    mt.lastRawDu = du;
+    mt.lastRawDv = dv;
+
+    if (mt.mode === 'grab') {
+        if (mt.hasNumeric && mt.numericInput) {
+            applyNumericDistance(mt);
+            return;
+        }
+
+        if (e && e.ctrlKey && e.shiftKey) {
+            du = Math.round(du / 0.1) * 0.1;
+            dv = Math.round(dv / 0.1) * 0.1;
+        } else if (e && e.ctrlKey) {
+            du = Math.round(du / 1.0) * 1.0;
+            dv = Math.round(dv / 1.0) * 1.0;
+        } else if (e && e.shiftKey) {
+            du *= 0.2;
+            dv *= 0.2;
+        }
+
+        let tx = mt.initialPos.x;
+        let ty = mt.initialPos.y;
+        let tz = mt.initialPos.z;
+
+        if (mt.axis === 'x') {
+            tx = mt.initialPos.x + du;
+        } else if (mt.axis === 'y') {
+            if (currentView === 'top') {
+                ty = mt.initialPos.y + dv;
+            } else if (currentView === 'front' || currentView === 'side') {
+                ty = mt.initialPos.y + du;
+            }
+        } else if (mt.axis === 'z') {
+            tz = mt.initialPos.z - dv;
+        } else {
+            // View-plane free movement
+            if (currentView === 'top') {
+                tx = mt.initialPos.x + du;
+                ty = mt.initialPos.y + dv;
+            } else if (currentView === 'side') {
+                tx = mt.initialPos.x + du;
+                tz = mt.initialPos.z - dv;
+            } else if (currentView === 'front') {
+                ty = mt.initialPos.y + du;
+                tz = mt.initialPos.z - dv;
+            }
+        }
+
+        if (!c.lockedX) setProp(c, 'x', tx);
+        if (!c.lockedY) setProp(c, 'y', ty);
+        if (!c.lockedZ) setProp(c, 'z', tz);
+    } else if (mt.mode === 'rotate') {
+        if (mt.hasNumeric && mt.numericInput) {
+            applyNumericRotation(mt);
+            return;
+        }
+        const center = mt.center2D;
+        const curAngle = Math.atan2(cadPt.v - center.v, cadPt.u - center.u);
+        let dTheta = curAngle - (mt.prevAngle !== undefined ? mt.prevAngle : mt.startAngle);
+        while (dTheta > Math.PI) dTheta -= 2 * Math.PI;
+        while (dTheta < -Math.PI) dTheta += 2 * Math.PI;
+        mt.prevAngle = curAngle;
+        mt.accumulatedDeltaDeg = (mt.accumulatedDeltaDeg || 0) + dTheta * (180 / Math.PI);
+
+        let deltaDeg = mt.accumulatedDeltaDeg;
+
+        if (e && e.ctrlKey && e.shiftKey) {
+            deltaDeg = Math.round(deltaDeg / 1) * 1;
+        } else if (e && e.ctrlKey) {
+            deltaDeg = Math.round(deltaDeg / 5) * 5;
+        } else if (e && e.shiftKey) {
+            deltaDeg *= 0.2;
+        }
+
+        if (Math.abs(deltaDeg) > 0.05) {
+            mt.rotationDirection = deltaDeg < 0 ? -1 : 1;
+        }
+
+        let rotX = mt.initialRot.rotX;
+        let rotY = mt.initialRot.rotY;
+        let rotZ = mt.initialRot.rotZ;
+
+        if (mt.axis === 'x') {
+            rotX = Math.round(((mt.initialRot.rotX + deltaDeg) % 360) * 10) / 10;
+        } else if (mt.axis === 'y') {
+            rotY = Math.round(((mt.initialRot.rotY + deltaDeg) % 360) * 10) / 10;
+        } else if (mt.axis === 'z') {
+            rotZ = Math.round(((mt.initialRot.rotZ + deltaDeg) % 360) * 10) / 10;
+        } else {
+            if (currentView === 'top') {
+                rotZ = Math.round(((mt.initialRot.rotZ + deltaDeg) % 360) * 10) / 10;
+            } else if (currentView === 'side') {
+                rotY = Math.round(((mt.initialRot.rotY + deltaDeg) % 360) * 10) / 10;
+            } else if (currentView === 'front') {
+                rotX = Math.round(((mt.initialRot.rotX + deltaDeg) % 360) * 10) / 10;
+            }
+        }
+
+        setProp(c, 'rotX', rotX);
+        setProp(c, 'rotY', rotY);
+        setProp(c, 'rotZ', rotZ);
+    }
+
+    refresh();
+    renderTransformGuidelines();
+    renderModalTransformHUD();
+}
+
+function confirmModalTransform() {
+    if (!App.ui.modalTransform) return;
+    App.ui.modalTransform = null;
+    clearTransformGuidelines();
+    removeModalTransformHUD();
+
+    const svg = document.getElementById('visualizer');
+    if (svg) svg.style.cursor = 'default';
+
+    if (typeof saveHistory === 'function') saveHistory();
+    if (typeof renderShortcutsLegend === 'function') renderShortcutsLegend();
+    refresh();
+}
+
+function cancelModalTransform() {
+    if (!App.ui.modalTransform) return;
+    const mt = App.ui.modalTransform;
+    const c = App.state.components.find(comp => comp.id === mt.componentId);
+    if (c) {
+        setProp(c, 'x', mt.initialPos.x);
+        setProp(c, 'y', mt.initialPos.y);
+        setProp(c, 'z', mt.initialPos.z);
+        setProp(c, 'rotX', mt.initialRot.rotX);
+        setProp(c, 'rotY', mt.initialRot.rotY);
+        setProp(c, 'rotZ', mt.initialRot.rotZ);
+    }
+    App.ui.modalTransform = null;
+    clearTransformGuidelines();
+    removeModalTransformHUD();
+
+    const svg = document.getElementById('visualizer');
+    if (svg) svg.style.cursor = 'default';
+
+    if (typeof renderShortcutsLegend === 'function') renderShortcutsLegend();
+    refresh();
+}
+
+function renderTransformGuidelines() {
+    const svg = document.getElementById('visualizer');
+    if (!svg) return;
+    let layer = document.getElementById('modal-transform-layer');
+    if (!layer) {
+        layer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        layer.setAttribute('id', 'modal-transform-layer');
+        layer.setAttribute('pointer-events', 'none');
+        svg.appendChild(layer);
+    }
+    layer.innerHTML = '';
+
+    const mt = App.ui.modalTransform;
+    if (!mt) return;
+
+    const c = App.state.components.find(comp => comp.id === mt.componentId);
+    if (!c) return;
+
+    const currentView = App.state.currentView;
+    const center = getPartCenter2D(c, currentView);
+    const screenRatio = (typeof getVisualizerScreenRatio === 'function') ? getVisualizerScreenRatio() : 1;
+    const strokeW = 1.5 * screenRatio;
+    const fontSz = 11 * screenRatio;
+
+    // Line from center to current mouse
+    if (App.ui.lastCADMouse) {
+        const mouseLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        mouseLine.setAttribute('x1', center.u);
+        mouseLine.setAttribute('y1', center.v);
+        mouseLine.setAttribute('x2', App.ui.lastCADMouse.u);
+        mouseLine.setAttribute('y2', App.ui.lastCADMouse.v);
+        mouseLine.setAttribute('stroke', 'rgba(255, 255, 255, 0.45)');
+        mouseLine.setAttribute('stroke-width', strokeW);
+        mouseLine.setAttribute('stroke-dasharray', `${4 * screenRatio},${4 * screenRatio}`);
+        layer.appendChild(mouseLine);
+    }
+
+    if (mt.mode === 'grab') {
+        const axisColors = { x: '#e74c3c', y: '#2ecc71', z: '#3498db' };
+        if (mt.axis) {
+            const color = axisColors[mt.axis] || '#f1c40f';
+            const guideLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            let isHoriz = false, isVert = false;
+
+            if (mt.axis === 'x') {
+                if (currentView === 'top' || currentView === 'side') isHoriz = true;
+                else isVert = false;
+            } else if (mt.axis === 'y') {
+                if (currentView === 'top') isVert = true;
+                else if (currentView === 'front') isHoriz = true;
+            } else if (mt.axis === 'z') {
+                if (currentView === 'side' || currentView === 'front') isVert = true;
+            }
+
+            if (isHoriz) {
+                guideLine.setAttribute('x1', -50000);
+                guideLine.setAttribute('y1', center.v);
+                guideLine.setAttribute('x2', 50000);
+                guideLine.setAttribute('y2', center.v);
+            } else if (isVert) {
+                guideLine.setAttribute('x1', center.u);
+                guideLine.setAttribute('y1', -50000);
+                guideLine.setAttribute('x2', center.u);
+                guideLine.setAttribute('y2', 50000);
+            } else {
+                guideLine.setAttribute('x1', -50000);
+                guideLine.setAttribute('y1', center.v);
+                guideLine.setAttribute('x2', 50000);
+                guideLine.setAttribute('y2', center.v);
+            }
+
+            guideLine.setAttribute('stroke', color);
+            guideLine.setAttribute('stroke-width', strokeW * 1.5);
+            guideLine.setAttribute('stroke-dasharray', `${6 * screenRatio},${4 * screenRatio}`);
+            layer.appendChild(guideLine);
+
+            const badge = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            badge.setAttribute('x', center.u + 15 * screenRatio);
+            badge.setAttribute('y', center.v - 8 * screenRatio);
+            badge.setAttribute('fill', color);
+            badge.setAttribute('font-size', `${fontSz}px`);
+            badge.setAttribute('font-weight', 'bold');
+            badge.setAttribute('font-family', 'monospace');
+            badge.textContent = `${mt.axis.toUpperCase()} AXIS`;
+            layer.appendChild(badge);
+        }
+    } else if (mt.mode === 'rotate') {
+        // Dotted circle and ROT text removed per design
+    }
+}
+
+function clearTransformGuidelines() {
+    const layer = document.getElementById('modal-transform-layer');
+    if (layer) layer.innerHTML = '';
+}
+
+function applyNumericDistance(mt) {
+    if (!mt || !mt.numericInput) return;
+    const typedVal = parseFloat(mt.numericInput);
+    if (isNaN(typedVal)) {
+        renderModalTransformHUD();
+        return;
+    }
+    const c = App.state.components.find(comp => comp.id === mt.componentId);
+    if (!c) return;
+
+    const scalar = (typeof getDimScalar === 'function') ? getDimScalar() : 1;
+    const distInModel = typedVal / scalar;
+
+    let du = 0, dv = 0;
+    if (mt.axis === 'x') {
+        const raw = (mt.lastRawDu !== undefined && Math.abs(mt.lastRawDu) > 1e-4) ? mt.lastRawDu : 1;
+        const dir = raw < 0 ? -1 : 1;
+        du = distInModel * dir;
+    } else if (mt.axis === 'y') {
+        const raw = mt.view === 'top' ? mt.lastRawDv : mt.lastRawDu;
+        const dir = (raw !== undefined && raw < 0) ? -1 : 1;
+        if (mt.view === 'top') dv = distInModel * dir;
+        else du = distInModel * dir;
+    } else if (mt.axis === 'z') {
+        const raw = mt.lastRawDv;
+        const dir = (raw !== undefined && raw > 0) ? -1 : 1;
+        dv = -distInModel * dir;
+    } else {
+        const rawDu = mt.lastRawDu || 0;
+        const rawDv = mt.lastRawDv || 0;
+        const mag = Math.hypot(rawDu, rawDv);
+        if (mag > 1e-4) {
+            du = (rawDu / mag) * distInModel;
+            dv = (rawDv / mag) * distInModel;
+        } else {
+            du = distInModel;
+            dv = 0;
+        }
+    }
+
+    let tx = mt.initialPos.x;
+    let ty = mt.initialPos.y;
+    let tz = mt.initialPos.z;
+
+    if (mt.axis === 'x') {
+        tx = mt.initialPos.x + du;
+    } else if (mt.axis === 'y') {
+        if (mt.view === 'top') ty = mt.initialPos.y + dv;
+        else ty = mt.initialPos.y + du;
+    } else if (mt.axis === 'z') {
+        tz = mt.initialPos.z - dv;
+    } else {
+        if (mt.view === 'top') {
+            tx = mt.initialPos.x + du;
+            ty = mt.initialPos.y + dv;
+        } else if (mt.view === 'side') {
+            tx = mt.initialPos.x + du;
+            tz = mt.initialPos.z - dv;
+        } else if (mt.view === 'front') {
+            ty = mt.initialPos.y + du;
+            tz = mt.initialPos.z - dv;
+        }
+    }
+
+    if (!c.lockedX) setProp(c, 'x', tx);
+    if (!c.lockedY) setProp(c, 'y', ty);
+    if (!c.lockedZ) setProp(c, 'z', tz);
+
+    refresh();
+    renderTransformGuidelines();
+    renderModalTransformHUD();
+}
+
+function applyNumericRotation(mt) {
+    if (!mt || !mt.numericInput) return;
+    const typedAngle = parseFloat(mt.numericInput);
+    if (isNaN(typedAngle)) {
+        renderModalTransformHUD();
+        return;
+    }
+    const c = App.state.components.find(comp => comp.id === mt.componentId);
+    if (!c) return;
+
+    const dir = (mt.rotationDirection !== undefined) ? mt.rotationDirection : 1;
+    const effectiveAngle = typedAngle * dir;
+
+    let rotX = mt.initialRot.rotX;
+    let rotY = mt.initialRot.rotY;
+    let rotZ = mt.initialRot.rotZ;
+
+    if (mt.axis === 'x') {
+        rotX = Math.round(((mt.initialRot.rotX + effectiveAngle) % 360) * 10) / 10;
+    } else if (mt.axis === 'y') {
+        rotY = Math.round(((mt.initialRot.rotY + effectiveAngle) % 360) * 10) / 10;
+    } else if (mt.axis === 'z') {
+        rotZ = Math.round(((mt.initialRot.rotZ + effectiveAngle) % 360) * 10) / 10;
+    } else {
+        if (mt.view === 'top') {
+            rotZ = Math.round(((mt.initialRot.rotZ + effectiveAngle) % 360) * 10) / 10;
+        } else if (mt.view === 'side') {
+            rotY = Math.round(((mt.initialRot.rotY + effectiveAngle) % 360) * 10) / 10;
+        } else if (mt.view === 'front') {
+            rotX = Math.round(((mt.initialRot.rotX + effectiveAngle) % 360) * 10) / 10;
+        }
+    }
+
+    setProp(c, 'rotX', rotX);
+    setProp(c, 'rotY', rotY);
+    setProp(c, 'rotZ', rotZ);
+
+    refresh();
+    renderTransformGuidelines();
+    renderModalTransformHUD();
+}
+
+function applyDragNumericDistance() {
+    const drag = App.state.drag;
+    if (!drag || !drag.dragging || !drag.dragComponentId || !drag.numericInput) return;
+    const typedVal = parseFloat(drag.numericInput);
+    if (isNaN(typedVal)) return;
+
+    const active = App.state.components.find(c => c.id === drag.dragComponentId);
+    if (!active) return;
+
+    const scalar = (typeof getDimScalar === 'function') ? getDimScalar() : 1;
+    const distInModel = typedVal / scalar;
+
+    const rawDx = drag.lastRawDx || 0;
+    const rawDy = drag.lastRawDy || 0;
+    const mag = Math.hypot(rawDx, rawDy);
+    let du = distInModel, dv = 0;
+    if (mag > 1e-4) {
+        du = (rawDx / mag) * distInModel;
+        dv = (rawDy / mag) * distInModel;
+    }
+
+    let targetX = drag.componentStartX + du;
+    let targetY = drag.componentStartY + dv;
+    let targetZ = drag.componentStartZ - dv;
+
+    if (App.state.currentView === 'front') {
+        targetY = drag.componentStartY + du;
+        targetZ = drag.componentStartZ - dv;
+    }
+
+    if (App.state.currentView === 'top') {
+        if (!active.lockedX) setProp(active, 'x', targetX);
+        if (!active.lockedY) setProp(active, 'y', targetY);
+    } else if (App.state.currentView === 'side') {
+        if (!active.lockedX) setProp(active, 'x', targetX);
+        if (!active.lockedZ) setProp(active, 'z', targetZ);
+    } else if (App.state.currentView === 'front') {
+        if (!active.lockedY) setProp(active, 'y', targetY);
+        if (!active.lockedZ) setProp(active, 'z', targetZ);
+    }
+
+    let badge = document.getElementById('cursor-transform-badge');
+    if (!badge) {
+        badge = document.createElement('div');
+        badge.id = 'cursor-transform-badge';
+        badge.style.cssText = "position:fixed; background:rgba(18,18,18,0.92); border:1px solid var(--border-grey); color:var(--text-main); padding:4px 8px; border-radius:4px; font-family:monospace; font-size:11px; z-index:9999; box-shadow:0 2px 8px rgba(0,0,0,0.5); pointer-events:none; white-space:nowrap; display:flex; gap:8px; align-items:center;";
+        document.body.appendChild(badge);
+    }
+    const mouseX = (App.ui.mouseX !== undefined) ? App.ui.mouseX : window.innerWidth / 2;
+    const mouseY = (App.ui.mouseY !== undefined) ? App.ui.mouseY : window.innerHeight / 2;
+    badge.style.left = (mouseX + 16) + 'px';
+    badge.style.top = (mouseY + 16) + 'px';
+
+    const unit = (App.state.unitScales && App.state.unitScales.dim) || 'cm';
+    const cdx = (safeParse(active.x) - drag.componentStartX) * scalar;
+    const cdy = (safeParse(active.y) - drag.componentStartY) * scalar;
+    const cdz = (safeParse(active.z) - drag.componentStartZ) * scalar;
+    badge.innerHTML = `<span style="font-weight:bold;">${drag.numericInput} ${unit}</span> | dx:${cdx >= 0 ? '+' : ''}${cdx.toFixed(2)} dy:${cdy >= 0 ? '+' : ''}${cdy.toFixed(2)} dz:${cdz >= 0 ? '+' : ''}${cdz.toFixed(2)} ${unit}`;
+
+    refresh();
+}
+
+function renderModalTransformHUD() {
+    const oldHud = document.getElementById('modal-transform-hud');
+    if (oldHud) oldHud.remove();
+
+    const mt = App.ui.modalTransform;
+    let badge = document.getElementById('cursor-transform-badge');
+    if (!mt) {
+        if (badge) badge.remove();
+        return;
+    }
+
+    const c = App.state.components.find(comp => comp.id === mt.componentId);
+    if (!c) {
+        if (badge) badge.remove();
+        return;
+    }
+
+    if (!badge) {
+        badge = document.createElement('div');
+        badge.id = 'cursor-transform-badge';
+        badge.style.cssText = "position:fixed; background:rgba(18,18,18,0.92); border:1px solid var(--border-grey); color:var(--text-main); padding:4px 8px; border-radius:4px; font-family:monospace; font-size:11px; z-index:9999; box-shadow:0 2px 8px rgba(0,0,0,0.5); pointer-events:none; white-space:nowrap; display:flex; gap:8px; align-items:center;";
+        document.body.appendChild(badge);
+    }
+
+    const mouseX = (App.ui.mouseX !== undefined) ? App.ui.mouseX : window.innerWidth / 2;
+    const mouseY = (App.ui.mouseY !== undefined) ? App.ui.mouseY : window.innerHeight / 2;
+    badge.style.left = (mouseX + 16) + 'px';
+    badge.style.top = (mouseY + 16) + 'px';
+
+    const unit = (App.state.unitScales && App.state.unitScales.dim) || 'cm';
+    const scalar = (typeof getDimScalar === 'function') ? getDimScalar() : 1;
+
+    if (mt.mode === 'grab') {
+        const dx = (safeParse(c.x) - mt.initialPos.x) * scalar;
+        const dy = (safeParse(c.y) - mt.initialPos.y) * scalar;
+        const dz = (safeParse(c.z) - mt.initialPos.z) * scalar;
+        const axisText = mt.axis ? `[${mt.axis.toUpperCase()}] ` : '';
+        const numText = mt.hasNumeric ? `<span style="font-weight:bold;">${mt.numericInput} ${unit}</span> | ` : '';
+        badge.innerHTML = `${axisText}${numText}dx:${dx >= 0 ? '+' : ''}${dx.toFixed(2)} dy:${dy >= 0 ? '+' : ''}${dy.toFixed(2)} dz:${dz >= 0 ? '+' : ''}${dz.toFixed(2)} ${unit}`;
+    } else if (mt.mode === 'rotate') {
+        const dRotX = (safeParse(c.rotX) - mt.initialRot.rotX);
+        const dRotY = (safeParse(c.rotY) - mt.initialRot.rotY);
+        const dRotZ = (safeParse(c.rotZ) - mt.initialRot.rotZ);
+        const activeAxis = mt.axis ? mt.axis.toUpperCase() : (mt.view === 'top' ? 'Z' : (mt.view === 'side' ? 'Y' : 'X'));
+        const delta = activeAxis === 'X' ? dRotX : (activeAxis === 'Y' ? dRotY : dRotZ);
+        if (mt.hasNumeric && mt.numericInput) {
+            const dir = (mt.rotationDirection !== undefined) ? mt.rotationDirection : 1;
+            const sign = (dir < 0 && !mt.numericInput.startsWith('-')) ? '-' : '';
+            badge.innerHTML = `<span style="font-weight:bold;">${sign}${mt.numericInput}°</span>`;
+        } else {
+            badge.innerHTML = `${delta >= 0 ? '+' : ''}${delta.toFixed(1)}°`;
+        }
+    }
+}
+
+function removeModalTransformHUD() {
+    const oldHud = document.getElementById('modal-transform-hud');
+    if (oldHud) oldHud.remove();
+    const badge = document.getElementById('cursor-transform-badge');
+    if (badge) badge.remove();
 }
 
 function renderDimensionLines(dimLayer, currentView, screenRatio, absoluteScaledFont) {
@@ -9867,10 +10880,7 @@ function renderInspector() {
     if (hstabOpt) {
         hstabOpt.textContent = `Horizontal Stabilizer, Efficiency = ${currentHStabEff}`;
     }
-    const convOpt = document.querySelector('#wing-tailConfig option[value="conventional"]');
-    if (convOpt) {
-        convOpt.textContent = `Conventional, Efficiency = ${currentHStabEff}`;
-    }
+
 
     if (App.state.selectedComponentId === 'main-wing' || (App.state.wingData && App.state.selectedComponentId === App.state.wingData.id)) {
         standardForm.style.display = 'none'; 
@@ -9883,19 +10893,7 @@ function renderInspector() {
         safeUpdate('wing-name', wingData.name || '');
         safeUpdate('wing-color', wingData.color || '#ffffff');
 
-        const tailCfg = wingData.tailConfig || 'conventional';
-        const cfgEl = document.getElementById('wing-tailConfig');
-        if (cfgEl && document.activeElement !== cfgEl) cfgEl.value = tailCfg;
-        
-        const effEl = document.getElementById('wing-tailEff');
-        if (effEl) {
-            if (tailCfg === 'custom') {
-                effEl.style.display = 'block';
-                if (document.activeElement !== effEl) safeUpdate('wing-tailEff', wingData.tailEff !== undefined ? wingData.tailEff : 0.6);
-            } else {
-                effEl.style.display = 'none';
-            }
-        }
+
         
         const isHollow = getIsHollow(wingData);
         const wingIsHollowEl = document.getElementById('wing-is-hollow');
@@ -9984,8 +10982,8 @@ function renderInspector() {
         }
 
         // --- NEW: Apply delta styling to the wing! ---
-        ['name', 'color', 'tailConfig', 'tailEff', 'isHollow', 'wallT', 'syncAirfoil', 'cd0-preset', 'cd0-custom', 'b', 'cr', 'ct', 'area', 'ar', 'sweep', 'dihedral', 'pivot', 'rho'].forEach(prop => {
-            const inputId = prop === 'name' ? 'wing-name' : prop === 'isHollow' ? 'wing-is-hollow' : prop === 'wallT' ? 'wing-wall-t' : prop === 'syncAirfoil' ? 'wing-sync-airfoil' : prop === 'tailConfig' ? 'wing-tailConfig' : prop === 'tailEff' ? 'wing-tailEff' : `wing-${prop}`;
+        ['name', 'color', 'isHollow', 'wallT', 'syncAirfoil', 'cd0-preset', 'cd0-custom', 'b', 'cr', 'ct', 'area', 'ar', 'sweep', 'dihedral', 'pivot', 'rho'].forEach(prop => {
+            const inputId = prop === 'name' ? 'wing-name' : prop === 'isHollow' ? 'wing-is-hollow' : prop === 'wallT' ? 'wing-wall-t' : prop === 'syncAirfoil' ? 'wing-sync-airfoil' : `wing-${prop}`;
             const objProp = prop.replace('-preset','').replace('-custom','');
             styleField(inputId, objProp, true, wingData);
         });
@@ -10008,6 +11006,24 @@ function renderInspector() {
         safeUpdate('prop-type', activeType);
         styleField('prop-name', 'name', false, activePart);
         styleField('prop-type', 'type', false, activePart);
+
+        const shapeEl = document.getElementById('prop-shape');
+        const cylAxisEl = document.getElementById('prop-cylinder-axis');
+        const currentShape = getProp(activePart, 'shape') || 'box';
+        const currentCylAxis = getProp(activePart, 'cylinderAxis') || 'y';
+
+        if (shapeEl && document.activeElement !== shapeEl) {
+            shapeEl.value = currentShape;
+        }
+        styleField('prop-shape', 'shape', false, activePart);
+
+        if (cylAxisEl) {
+            cylAxisEl.style.display = (currentShape === 'cylinder') ? 'block' : 'none';
+            if (document.activeElement !== cylAxisEl) {
+                cylAxisEl.value = currentCylAxis;
+            }
+            styleField('prop-cylinder-axis', 'cylinderAxis', false, activePart);
+        }
 
         const customEffEl = document.getElementById('prop-custom-eff');
         if (customEffEl) {
@@ -10113,7 +11129,7 @@ function renderInspector() {
         let maxYSpan = getProp(activePart, 'sy') || 0;
         let maxZSpan = getProp(activePart, 'sz') || 0;
 
-        if (activePart.sections && activePart.sections.length > 0) {
+        if (activePart.sections && activePart.sections.length > 0 && currentShape !== 'cylinder') {
             let minY = Infinity, maxY = -Infinity, minZ = Infinity, maxZ = -Infinity, minX = Infinity, maxX = -Infinity;
             
             activePart.sections.forEach(sec => {
@@ -10128,6 +11144,29 @@ function renderInspector() {
             });
             
             maxYSpan = maxY - minY; maxZSpan = maxZ - minZ; maxXSpan = maxX - minX;
+        }
+
+        const lblSx = document.getElementById('lbl-prop-sx');
+        const lblSy = document.getElementById('lbl-prop-sy');
+        const lblSz = document.getElementById('lbl-prop-sz');
+        if (currentShape === 'cylinder') {
+            if (currentCylAxis === 'y') {
+                if (lblSx) lblSx.textContent = 'Dia (X)';
+                if (lblSy) lblSy.textContent = 'Thick (Y)';
+                if (lblSz) lblSz.textContent = 'Dia (Z)';
+            } else if (currentCylAxis === 'x') {
+                if (lblSx) lblSx.textContent = 'Length (X)';
+                if (lblSy) lblSy.textContent = 'Dia (Y)';
+                if (lblSz) lblSz.textContent = 'Dia (Z)';
+            } else {
+                if (lblSx) lblSx.textContent = 'Dia (X)';
+                if (lblSy) lblSy.textContent = 'Dia (Y)';
+                if (lblSz) lblSz.textContent = 'Height (Z)';
+            }
+        } else {
+            if (lblSx) lblSx.textContent = 'Length (X)';
+            if (lblSy) lblSy.textContent = 'Width (Y)';
+            if (lblSz) lblSz.textContent = 'Height (Z)';
         }
 
         [
@@ -10564,6 +11603,19 @@ function resetViewToWholePlane() {
 }
 
 function handleWheel(e) {
+    if (App.ui.loopCutModal) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.deltaY < 0) {
+            App.ui.loopCutModal.numCuts = (App.ui.loopCutModal.numCuts || 1) + 1;
+        } else if (e.deltaY > 0) {
+            App.ui.loopCutModal.numCuts = Math.max(1, (App.ui.loopCutModal.numCuts || 1) - 1);
+        }
+        renderLoopCutPreview();
+        if (typeof renderShortcutsLegend === 'function') renderShortcutsLegend();
+        return;
+    }
+
     const svg = document.getElementById('visualizer');
     const container = document.getElementById('visualizer-container') || svg;
     if (!svg || !container) return;
@@ -10979,27 +12031,188 @@ function renameSelectedPart() {
 
 function handleGlobalKeyDown(e) {
 	
+	if (App.ui.loopCutModal) {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+            cancelLoopCutModal();
+            return;
+        }
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            confirmLoopCutModal();
+            return;
+        }
+        if (e.key === '+' || e.key === '=' || e.key === 'PageUp' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            e.stopPropagation();
+            App.ui.loopCutModal.numCuts = (App.ui.loopCutModal.numCuts || 1) + 1;
+            renderLoopCutPreview();
+            if (typeof renderShortcutsLegend === 'function') renderShortcutsLegend();
+            return;
+        }
+        if (e.key === '-' || e.key === '_' || e.key === 'PageDown' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            e.stopPropagation();
+            App.ui.loopCutModal.numCuts = Math.max(1, (App.ui.loopCutModal.numCuts || 1) - 1);
+            renderLoopCutPreview();
+            if (typeof renderShortcutsLegend === 'function') renderShortcutsLegend();
+            return;
+        }
+    }
+
+	if (App.ui.modalTransform) {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+            cancelModalTransform();
+            return;
+        }
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            confirmModalTransform();
+            return;
+        }
+        if (e.key === 'Control' || e.key === 'Shift') {
+            if (App.ui.lastCADMouse) {
+                updateModalTransformFromMouse(App.ui.lastCADMouse, e);
+            }
+        }
+        const key = e.key.toLowerCase();
+        if (['x', 'y', 'z'].includes(key) && !e.ctrlKey && !e.altKey && !e.metaKey) {
+            e.preventDefault();
+            e.stopPropagation();
+            handleModalTransformAxis(key);
+            return;
+        }
+        if (App.ui.modalTransform.mode === 'grab') {
+            if (/^[0-9.]$/.test(e.key) || (e.key === '-' && !App.ui.modalTransform.numericInput)) {
+                e.preventDefault();
+                e.stopPropagation();
+                App.ui.modalTransform.numericInput = (App.ui.modalTransform.numericInput || '') + e.key;
+                App.ui.modalTransform.hasNumeric = true;
+                applyNumericDistance(App.ui.modalTransform);
+                return;
+            }
+            if (e.key === 'Backspace') {
+                e.preventDefault();
+                e.stopPropagation();
+                App.ui.modalTransform.numericInput = (App.ui.modalTransform.numericInput || '').slice(0, -1);
+                if (!App.ui.modalTransform.numericInput) {
+                    App.ui.modalTransform.hasNumeric = false;
+                    updateModalTransformFromMouse(App.ui.lastCADMouse || App.ui.modalTransform.mouseStartCAD);
+                } else {
+                    applyNumericDistance(App.ui.modalTransform);
+                }
+                return;
+            }
+        } else if (App.ui.modalTransform.mode === 'rotate') {
+            if (/^[0-9.]$/.test(e.key) || (e.key === '-' && !App.ui.modalTransform.numericInput)) {
+                e.preventDefault();
+                e.stopPropagation();
+                App.ui.modalTransform.numericInput = (App.ui.modalTransform.numericInput || '') + e.key;
+                App.ui.modalTransform.hasNumeric = true;
+                applyNumericRotation(App.ui.modalTransform);
+                return;
+            }
+            if (e.key === 'Backspace') {
+                e.preventDefault();
+                e.stopPropagation();
+                App.ui.modalTransform.numericInput = (App.ui.modalTransform.numericInput || '').slice(0, -1);
+                if (!App.ui.modalTransform.numericInput) {
+                    App.ui.modalTransform.hasNumeric = false;
+                    updateModalTransformFromMouse(App.ui.lastCADMouse || App.ui.modalTransform.mouseStartCAD);
+                } else {
+                    applyNumericRotation(App.ui.modalTransform);
+                }
+                return;
+            }
+        }
+    }
+
+    if (App.state.drag && App.state.drag.dragging && App.state.drag.dragComponentId) {
+        if (/^[0-9.]$/.test(e.key) || (e.key === '-' && !App.state.drag.numericInput)) {
+            e.preventDefault();
+            e.stopPropagation();
+            App.state.drag.numericInput = (App.state.drag.numericInput || '') + e.key;
+            App.state.drag.hasNumeric = true;
+            applyDragNumericDistance();
+            return;
+        }
+        if (e.key === 'Backspace') {
+            e.preventDefault();
+            e.stopPropagation();
+            App.state.drag.numericInput = (App.state.drag.numericInput || '').slice(0, -1);
+            if (!App.state.drag.numericInput) {
+                App.state.drag.hasNumeric = false;
+                const badge = document.getElementById('cursor-transform-badge');
+                if (badge) badge.remove();
+            } else {
+                applyDragNumericDistance();
+            }
+            return;
+        }
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+            App.state.drag.dragging = false;
+            App.state.drag.dragComponentId = null;
+            App.state.drag.numericInput = '';
+            App.state.drag.hasNumeric = false;
+            const badge = document.getElementById('cursor-transform-badge');
+            if (badge) badge.remove();
+            if (typeof saveHistory === 'function') saveHistory();
+            refresh();
+            return;
+        }
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+            const active = App.state.components.find(c => c.id === App.state.drag.dragComponentId);
+            if (active) {
+                setProp(active, 'x', App.state.drag.componentStartX);
+                setProp(active, 'y', App.state.drag.componentStartY);
+                setProp(active, 'z', App.state.drag.componentStartZ);
+            }
+            App.state.drag.dragging = false;
+            App.state.drag.dragComponentId = null;
+            App.state.drag.numericInput = '';
+            App.state.drag.hasNumeric = false;
+            const badge = document.getElementById('cursor-transform-badge');
+            if (badge) badge.remove();
+            refresh();
+            return;
+        }
+    }
+
 	if (e.key === 'Escape') {
         const popover = document.getElementById('dim-edit-popover');
         if (popover && popover.style.display !== 'none') {
             closeDimensionModifyDialog();
-            return;
         }
         if (App.state.dimTool && App.state.dimTool.active) {
-            if (App.state.dimTool.step > 0) {
-                App.state.dimTool.step = 0;
-                App.state.dimTool.refA = null;
-                App.state.dimTool.refB = null;
-                App.state.dimTool.previewPos = null;
-                renderAircraft();
-            } else {
-                toggleDimensionTool(false);
-            }
+            toggleDimensionTool(false);
             return;
         }
         if (App.ui.eyedropperAxis) {
             App.ui.eyedropperAxis = null;
             document.body.classList.remove('eyedropper-mode');
+            return;
+        }
+    }
+
+    if (e.key === 'Enter') {
+        const popover = document.getElementById('dim-edit-popover');
+        if (popover && popover.style.display !== 'none') {
+            e.preventDefault();
+            confirmDimensionModify();
+            return;
+        }
+        if (App.state.dimTool && App.state.dimTool.active && App.state.dimTool.step === 2) {
+            e.preventDefault();
+            finalizeDimensionPlacement();
             return;
         }
     }
@@ -11048,19 +12261,85 @@ function handleGlobalKeyDown(e) {
     const key = e.key.toLowerCase();
     const ctrl = e.ctrlKey || e.metaKey;
 
+    // Modal transforms: G to grab (move), R to rotate
+    if (!ctrl && !e.altKey && !e.shiftKey && key === 'g') {
+        if (selectedComponentId && selectedComponentId !== 'main-wing') {
+            e.preventDefault();
+            startModalTransform('grab');
+            return;
+        }
+    }
+
+    if (!ctrl && !e.altKey && !e.shiftKey && key === 'r') {
+        if (selectedComponentId && selectedComponentId !== 'main-wing' && !viewParams.isIsolated) {
+            e.preventDefault();
+            startModalTransform('rotate');
+            return;
+        }
+    }
+
+    // Clipboard: Ctrl+C and Ctrl+V to duplicate component
+    if (ctrl && !e.shiftKey && key === 'c') {
+        if (!window.getSelection || !window.getSelection().toString()) {
+            if (selectedComponentId && selectedComponentId !== 'main-wing') {
+                App.clipboardComponentId = selectedComponentId;
+            }
+        }
+    }
+
+    if (ctrl && !e.shiftKey && key === 'v') {
+        if (App.clipboardComponentId) {
+            e.preventDefault();
+            handleCopyComponent(App.clipboardComponentId);
+            return;
+        }
+    }
+
+    // Shift+D to create instance
+    if (!ctrl && !e.altKey && e.shiftKey && key === 'd') {
+        if (selectedComponentId) {
+            e.preventDefault();
+            handleCreateInstance(selectedComponentId);
+            return;
+        }
+    }
+
+    // Shift+A to add new part
+    if (!ctrl && !e.altKey && e.shiftKey && (key === 'a' || e.code === 'KeyA')) {
+        e.preventDefault();
+        handleAddComponent();
+        return;
+    }
+
+    // D to activate dimension mode
+    if (!ctrl && !e.altKey && !e.shiftKey && key === 'd') {
+        e.preventDefault();
+        toggleDimensionTool(true);
+        return;
+    }
+
     if (!ctrl && key === 'w') {
         toggleWingWakeVisual();
         return;
     }
 
-    if (!ctrl && key === 'd') {
-        toggleDimensionTool();
-        return;
-    }
-
-    if ((e.key === 'Delete' || e.key === 'Backspace') && App.state.selectedDimensionId) {
-        deleteDimension(App.state.selectedDimensionId);
-        return;
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (App.state.selectedDimensionId) {
+            deleteDimension(App.state.selectedDimensionId);
+            return;
+        }
+        const { selectedComponentId } = App.state;
+        if (selectedComponentId && selectedComponentId !== 'main-wing') {
+            const comp = App.state.components.find(c => c.id === selectedComponentId);
+            if (comp) {
+                e.preventDefault();
+                const compName = comp.name || 'Component';
+                if (window.confirm(`Are you sure you want to delete '${compName}'?`)) {
+                    handleDeleteComponent(selectedComponentId);
+                }
+                return;
+            }
+        }
     }
 
     if (ctrl && key === 'h') {
@@ -11085,10 +12364,15 @@ function handleGlobalKeyDown(e) {
     }
 
     if (!ctrl && key === 'i' && selectedComponentId) {
+        if (App.ui.loopCutModal) cancelLoopCutModal();
         viewParams.isIsolated = !viewParams.isIsolated;
         if (viewParams.isIsolated) {
             viewParams.isolatedSet.clear();
             viewParams.isolatedSet.add(selectedComponentId);
+            if (selectedComponentId === 'main-wing' || (App.state.wingData && selectedComponentId === App.state.wingData.id)) {
+                viewParams.isolatedSet.add('main-wing');
+                if (App.state.wingData) viewParams.isolatedSet.add(App.state.wingData.id);
+            }
         }
         renderShortcutsLegend();
         refresh();
@@ -11097,9 +12381,7 @@ function handleGlobalKeyDown(e) {
 
     if (ctrl && key === 'r' && viewParams.isIsolated && selectedComponentId !== 'main-wing') {
         e.preventDefault();
-        performLoopCut(selectedComponentId);
-        refresh(); 
-        saveHistory();
+        startLoopCutModal(selectedComponentId);
         return;
     }
 	
@@ -11120,6 +12402,11 @@ function handleGlobalKeyDown(e) {
 }
 
 function handleGlobalKeyUp(e) {
+    if (App.ui.modalTransform && (e.key === 'Control' || e.key === 'Shift')) {
+        if (App.ui.lastCADMouse) {
+            updateModalTransformFromMouse(App.ui.lastCADMouse, e);
+        }
+    }
     if (e.key === 'Control') {
         App.ui.drag.isCtrlPressed = false;
         renderShortcutsLegend();
@@ -11823,8 +13110,12 @@ function toggleExtendedLock(type) {
 
 function handleSelectComponent(id, fromPanel = false) {
     if (App.ui.panelHistory?.isPeeking) stopPanelPeek();
+    if (App.ui.loopCutModal && App.ui.loopCutModal.componentId !== id) {
+        cancelLoopCutModal();
+    }
 
     App.state.selectedComponentId = id;
+    App.state.selectedDimensionId = null;
     App.ui.showSettings = false;
     App.ui.activeCalculator = null;
     if (typeof updateShortcutsLegend === 'function') updateShortcutsLegend();
@@ -11841,9 +13132,29 @@ function handleToggleVisibility(id, event) {
     if (event) event.stopPropagation();
     
     if (App.ui.viewParams.isIsolated) {
-        if (App.ui.viewParams.isolatedSet.has(id)) App.ui.viewParams.isolatedSet.delete(id);
-        else App.ui.viewParams.isolatedSet.add(id);
+        const isWing = (id === 'main-wing' || (App.state.wingData && id === App.state.wingData.id));
+        const wingId = App.state.wingData ? App.state.wingData.id : 'main-wing';
+        if (isWing) {
+            const hasWing = App.ui.viewParams.isolatedSet.has('main-wing') || App.ui.viewParams.isolatedSet.has(wingId);
+            if (hasWing) {
+                App.ui.viewParams.isolatedSet.delete('main-wing');
+                App.ui.viewParams.isolatedSet.delete(wingId);
+            } else {
+                App.ui.viewParams.isolatedSet.add('main-wing');
+                App.ui.viewParams.isolatedSet.add(wingId);
+                if (App.state.wingData) App.state.wingData.isHidden = false;
+            }
+        } else {
+            if (App.ui.viewParams.isolatedSet.has(id)) {
+                App.ui.viewParams.isolatedSet.delete(id);
+            } else {
+                App.ui.viewParams.isolatedSet.add(id);
+                const c = App.state.components.find(comp => comp.id === id);
+                if (c) setProp(c, 'isHidden', false);
+            }
+        }
         refresh();
+        if (typeof saveHistory === 'function') saveHistory();
         return;
     }
 
@@ -11896,14 +13207,28 @@ function handleAddComponent() {
 
 function startDrag(e, id) {
     if (e && e.button !== undefined && e.button !== 0) return;
-    e.stopPropagation(); 
+    if (e && e.stopPropagation) e.stopPropagation(); 
     if (App.state.dimTool && App.state.dimTool.active) {
         handleDimToolClick(e, id);
         return;
     }
-    if (App.state.drag.dragging || id === 'main-wing') return;
+    if (App.ui.modalTransform) {
+        confirmModalTransform();
+        return;
+    }
+    if (App.ui.loopCutModal) {
+        confirmLoopCutModal();
+        return;
+    }
+    if (id === 'main-wing') {
+        handleSelectComponent(id);
+        return;
+    }
     
     handleSelectComponent(id);
+    if (!App.ui.enableDragToMove) return; // Disabled by default! Use G to grab
+
+    if (App.state.drag.dragging) return;
     App.state.drag.dragging = true; 
     App.state.drag.dragComponentId = id;
     
@@ -12027,6 +13352,13 @@ function doDrag(e) {
         return;
     }
     const svg = document.getElementById('visualizer');
+    if (App.ui.modalTransform) {
+        if (svg) {
+            const p = getSVGPoint(svg, e.clientX, e.clientY);
+            updateModalTransformFromMouse({ u: p.x, v: p.y }, e);
+        }
+        return;
+    }
     const drag = App.state.drag;
     const SNAP_THRESHOLD = parseFloat(document.getElementById('snap-threshold')?.value) || 0.8;
 
@@ -12133,6 +13465,13 @@ function doDrag(e) {
     
     const p = getSVGPoint(svg, e.clientX, e.clientY);
     const dx = p.x - drag.dragStartX, dy = p.y - drag.dragStartY;
+    drag.lastRawDx = dx;
+    drag.lastRawDy = dy;
+
+    if (drag.hasNumeric && drag.numericInput) {
+        applyDragNumericDistance();
+        return;
+    }
     
     let targetX = drag.componentStartX + dx;
     let targetY = drag.componentStartY + dy;
@@ -12194,6 +13533,23 @@ function doDrag(e) {
         if (!active.lockedY) setProp(active, 'y', targetY); // <--- Route to Delta
         if (!active.lockedZ) setProp(active, 'z', targetZ); // <--- Route to Delta
     }
+
+    let badge = document.getElementById('cursor-transform-badge');
+    if (!badge) {
+        badge = document.createElement('div');
+        badge.id = 'cursor-transform-badge';
+        badge.style.cssText = "position:fixed; background:rgba(18,18,18,0.92); border:1px solid var(--border-grey); color:var(--text-main); padding:4px 8px; border-radius:4px; font-family:monospace; font-size:11px; z-index:9999; box-shadow:0 2px 8px rgba(0,0,0,0.5); pointer-events:none; white-space:nowrap; display:flex; gap:8px; align-items:center;";
+        document.body.appendChild(badge);
+    }
+    badge.style.left = (e.clientX + 16) + 'px';
+    badge.style.top = (e.clientY + 16) + 'px';
+    const unit = (App.state.unitScales && App.state.unitScales.dim) || 'cm';
+    const scalar = (typeof getDimScalar === 'function') ? getDimScalar() : 1;
+    const cdx = (safeParse(active.x) - drag.componentStartX) * scalar;
+    const cdy = (safeParse(active.y) - drag.componentStartY) * scalar;
+    const cdz = (safeParse(active.z) - drag.componentStartZ) * scalar;
+    badge.innerHTML = `dx:${cdx >= 0 ? '+' : ''}${cdx.toFixed(2)} dy:${cdy >= 0 ? '+' : ''}${cdy.toFixed(2)} dz:${cdz >= 0 ? '+' : ''}${cdz.toFixed(2)} ${unit}`;
+
     refresh();
 }
 
@@ -12417,7 +13773,7 @@ function updateComponentProperty(prop, value) {
     
     if (activePart) {
         // Auto-parse numbers for safety, except for known string fields
-        const stringProps = ['name', 'type', 'color', 'nacaRoot', 'nacaTip', 'tailConfig'];
+        const stringProps = ['name', 'type', 'color', 'nacaRoot', 'nacaTip', 'tailConfig', 'shape', 'cylinderAxis'];
         let parsed = stringProps.includes(prop) ? value : (parseFloat(value) || 0);
         const nonNegativeProps = [
             'sx', 'sy', 'sz', 'rho', 'wallT', 'budgetMass', 'measuredMass', 'predictedMass', 
@@ -12429,6 +13785,11 @@ function updateComponentProperty(prop, value) {
         }
         activePart[prop] = parsed;
 
+        if (prop === 'shape' || prop === 'cylinderAxis') {
+            const oldMass = getEffectiveMassGrams(activePart);
+            recalculateMassOrDensity(activePart, oldMass);
+        }
+
         if (prop === 'type' && value === 'custom' && activePart.eff === undefined) {
             activePart.eff = 0.6;
         }
@@ -12439,6 +13800,7 @@ function updateComponentProperty(prop, value) {
         
         if (typeof calculateAircraft === 'function') calculateAircraft();
         refresh();
+        if (typeof renderInspector === 'function') renderInspector();
         if (typeof saveHistory === 'function') saveHistory();
     }
 }
@@ -12454,8 +13816,8 @@ function handleCreateInstance(parentId, event) {
     const instanceId = createComponent(parentId);
     const instance = App.state.configurations[0].components.find(c => c.id === instanceId);
     
-    // NEW: Inherit physical dimensions, mass traits, and sections immediately
-    const inheritedProps = ['sx', 'sy', 'sz', 'rho', 'type', 'isHollow', 'wallT', 'budgetMass', 'measuredMass', 'predictedMass', 'thrustAuto', 'thrust', 'propDia', 'propPitch', 'motorKV', 'battCells'];
+    // NEW: Inherit physical dimensions, mass traits, sections, and shape immediately
+    const inheritedProps = ['sx', 'sy', 'sz', 'rho', 'type', 'isHollow', 'wallT', 'budgetMass', 'measuredMass', 'predictedMass', 'thrustAuto', 'thrust', 'propDia', 'propPitch', 'motorKV', 'battCells', 'shape', 'cylinderAxis'];
     inheritedProps.forEach(prop => {
         if (parent[prop] !== undefined) instance[prop] = parent[prop];
     });
@@ -13084,7 +14446,7 @@ function exportCurrentViewSVG() {
     if (previewGroup) previewGroup.remove();
 
     // Clean up temporary vertex drag handles and background/grid fills
-    clone.querySelectorAll('.vertex-handle, #cad-bg-fill, #bg-grid-fill, #bg-grid, #wake-layer').forEach(el => el.remove());
+    clone.querySelectorAll('.vertex-handle, #cad-bg-fill, #bg-grid-fill, #bg-grid, #wake-layer, #axes-layer').forEach(el => el.remove());
 
     // Remove internal 3D segment facet mesh fills (all polygons in component layer)
     clone.querySelectorAll('#components-layer polygon, #components-layer g[opacity]').forEach(el => el.remove());
@@ -13191,7 +14553,7 @@ function renderEverything() {
     renderAircraft();
 
     // Fast-path during active component or vertex drag: keep canvas rendering locked at fluid 60fps
-    const isDragging = App.state.drag.dragging || App.state.drag.draggingVertexIndex !== -1;
+    const isDragging = App.state.drag.dragging || App.state.drag.draggingVertexIndex !== -1 || !!App.ui.modalTransform;
     if (isDragging) {
         if (App.state.currentView === 'graph') {
             if (typeof renderYAxisBoxes === 'function') renderYAxisBoxes();
@@ -13240,7 +14602,49 @@ function bindEvents() {
     window.addEventListener('mousemove', (e) => {
         App.ui.mouseX = e.clientX;
         App.ui.mouseY = e.clientY;
+        const badge = document.getElementById('cursor-transform-badge');
+        if (badge) {
+            badge.style.left = (e.clientX + 16) + 'px';
+            badge.style.top = (e.clientY + 16) + 'px';
+        }
+        if (App.ui.loopCutModal) {
+            updateLoopCutModalFromMouse(e);
+        }
     });
+    window.addEventListener('mousedown', (e) => {
+        if (App.ui.loopCutModal) {
+            if (e.button === 0) { // Left click confirms loop cut
+                e.preventDefault();
+                e.stopPropagation();
+                confirmLoopCutModal();
+                return;
+            } else if (e.button === 2) { // Right click cancels loop cut
+                e.preventDefault();
+                e.stopPropagation();
+                cancelLoopCutModal();
+                return;
+            }
+        }
+        if (App.ui.modalTransform) {
+            if (e.button === 0) { // Left click confirms transform
+                e.preventDefault();
+                e.stopPropagation();
+                confirmModalTransform();
+                return;
+            } else if (e.button === 2) { // Right click cancels transform
+                e.preventDefault();
+                e.stopPropagation();
+                cancelModalTransform();
+                return;
+            }
+        }
+    }, { capture: true });
+    window.addEventListener('contextmenu', (e) => {
+        if (App.ui.modalTransform || App.ui.loopCutModal) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }, { capture: true });
     window.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('mousedown', handleMiddleMouseDown, { capture: true });
     window.addEventListener('mousemove', handleCameraPanMove, { capture: true });
@@ -13977,6 +15381,11 @@ function bindDragEvents() {
         
         if (drag.dragging) {
             drag.dragging = false;
+            drag.dragComponentId = null;
+            drag.numericInput = '';
+            drag.hasNumeric = false;
+            const badge = document.getElementById('cursor-transform-badge');
+            if (badge) badge.remove();
             drag.activeSnapLines = []; 
             needsRefresh = true;
             checkDeepStallAdvisory('drag');
@@ -14034,6 +15443,7 @@ function bindStaticUI() {
     document.getElementById('btn-toggle-table')?.addEventListener('click', toggleSpreadsheet);
     document.getElementById('btn-add-comp')?.addEventListener('click', handleAddComponent);
 	document.getElementById('btn-add-config')?.addEventListener('click', handleAddConfig);
+    
 	
     // Graph Sweep Overlay
     document.getElementById('pg-btn-x')?.addEventListener('click', () => { if(typeof startEyedropper === 'function') startEyedropper('x'); });
@@ -14073,10 +15483,20 @@ function bindStaticUI() {
     document.getElementById('dim-btn-delete')?.addEventListener('click', () => {
         if (App.state.selectedDimensionId) deleteDimension(App.state.selectedDimensionId);
     });
-    document.getElementById('dim-btn-cancel')?.addEventListener('click', closeDimensionModifyDialog);
+    document.getElementById('dim-btn-cancel')?.addEventListener('click', () => {
+        closeDimensionModifyDialog();
+        toggleDimensionTool(false);
+    });
     document.getElementById('dim-input-val')?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') confirmDimensionModify();
-        if (e.key === 'Escape') closeDimensionModifyDialog();
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            confirmDimensionModify();
+        }
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            closeDimensionModifyDialog();
+            toggleDimensionTool(false);
+        }
     });
 
     // Visualizer Dimension Placement Click & Mousemove
@@ -14105,6 +15525,9 @@ function initialize() {
     const isImperial = (App.state.unitScales.mass === 'oz' || App.state.unitScales.mass === 'lb');
     const wlUnit = document.getElementById('top-wl-unit');
     if (wlUnit) wlUnit.innerText = isImperial ? 'oz/ft²' : 'g/dm²';
+
+    const dragMoveEl = document.getElementById('settings-drag-move');
+    if (dragMoveEl) dragMoveEl.checked = !!App.ui.enableDragToMove;
 
     if (typeof bindEvents === 'function') bindEvents();
     if (typeof bindGraphEvents === 'function') bindGraphEvents();
